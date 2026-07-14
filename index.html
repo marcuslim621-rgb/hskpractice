@@ -121,7 +121,11 @@ html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
 
 /* ---------- quiz ---------- */
 .qbar{display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
-.qbar .hearts{color:var(--seal);font-size:13px;letter-spacing:2.5px;font-weight:600}
+.qbar .linkbtn{background:var(--card);border:1px solid var(--line);border-radius:9px;
+  padding:7px 13px;font-size:12px;font-weight:600;color:var(--ink)}
+.qbar .linkbtn:hover,.qbar .linkbtn:focus-visible{color:var(--seal);border-color:var(--seal)}
+.heartsrow{display:flex;justify-content:space-evenly;align-items:center;color:var(--seal);
+  font-size:38px;line-height:1;margin:6px 0 18px;min-height:42px}
 .qbar .score{margin-left:auto;font-variant-numeric:tabular-nums}
 .qbar .score .ok{color:var(--jade);font-weight:600} .qbar .score .bad{color:var(--seal);font-weight:600}
 .track{height:3px;background:var(--line);border-radius:99px;margin-bottom:16px;overflow:hidden}
@@ -183,7 +187,8 @@ function pinyinMatch(input,stored){
 }
 function startTypeQuiz(pool,label){
   againFn=()=>startTypeQuiz(pool,label);
-  TS={label,pool,lives:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,results:[]};
+  TS={label,pool,lives:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("tcard",0);
   show("typequiz");renderType();
 }
 function renderType(){
@@ -191,13 +196,15 @@ function renderType(){
   TS.answered=false;
   $("tchar").textContent=w[0];
   $("tseal").textContent=w[3]+"级";
-  $("thearts").textContent="♥".repeat(TS.lives)+"♡".repeat(5-TS.lives);
+  $("thearts").innerHTML=heartsHTML(TS.lives,false);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
   $("tprog").textContent=(TS.i+1)+" / "+TS.queue.length+" words";
   $("tfill").style.width=(TS.i/TS.queue.length*100)+"%";
   const inp=$("tinput");
-  inp.value="";inp.className="typeinput";inp.disabled=false;
-  $("tresult").innerHTML="Tones aren't needed — for ü you can type u or v";
+  inp.value="";inp.className="typeinput";inp.readOnly=false;inp.disabled=false;
+  const res=$("tresult");
+  res.className="typeresult";
+  res.innerHTML="Tones aren't needed — for ü you can type u or v";
   $("tbtn").textContent="Check";
   inp.focus();
 }
@@ -210,16 +217,21 @@ function typeCheck(){
   if(!inp.value.trim())return;
   TS.answered=true;
   const right=pinyinMatch(inp.value,w[1]);
-  inp.disabled=true;
+  inp.readOnly=true;
   inp.classList.add(right?"right":"wrong");
-  $("tresult").innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
+  const res=$("tresult");
+  res.className="typeresult "+(right?"right":"wrong");
+  res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
+  inp.focus();
   TS.results.push({c:w[0],ok:right});
-  if(right)TS.ok++;else{TS.bad++;TS.lives--}
+  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;TS.lives--}
+  setFire("tcard",TS.streak);
+  if(right&&TS.streak>=5)inp.classList.add("rainbow");
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  $("thearts").textContent="♥".repeat(Math.max(TS.lives,0))+"♡".repeat(5-Math.max(TS.lives,0));
+  $("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
   $("tbtn").textContent=(TS.lives<=0)?"Results →":(TS.i+1>=TS.queue.length?"Finish →":"Next →");
 }
 function typeSave(){
@@ -247,6 +259,12 @@ function typeNext(){
   }
   renderType();
 }
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&TS&&TS.answered&&$("scr-typequiz").classList.contains("active")
+     &&document.activeElement!==$("tinput")){
+    e.preventDefault();typeNext();
+  }
+});
 function typeEndEarly(){
   if(TS&&TS.results.length)typeSave();
   show("home");
@@ -256,14 +274,15 @@ function typeEndEarly(){
 let SS=null;
 function startSentQuiz(pool,label){
   againFn=()=>startSentQuiz(pool,label);
-  SS={label,queue:shuffle([...pool]),i:0,ok:0,bad:0,results:[]};
+  SS={label,queue:shuffle([...pool]),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("scard",0);
   show("sentquiz");renderSent();
 }
 function renderSent(){
   const q=SS.queue[SS.i];
   SS.answered=false;
   $("ssent").innerHTML=esc(q[1]).replace("___",'<span class="blank">＿＿＿</span>');
-  $("sreveal").classList.remove("show");
+  $("sreveal").className="reveal";
   $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
   $("sprog").textContent=(SS.i+1)+" / "+SS.queue.length;
   $("sfill").style.width=(SS.i/SS.queue.length*100)+"%";
@@ -277,12 +296,14 @@ function answerSent(btn,right){
   const q=SS.queue[SS.i];
   [...$("opts-sent").children].forEach(b=>{b.disabled=true;if(b.textContent===q[2])b.classList.add("right")});
   if(!right)btn.classList.add("wrong");
-  right?SS.ok++:SS.bad++;
+  if(right){SS.ok++;SS.streak++}else{SS.bad++;SS.streak=0}
+  setFire("scard",SS.streak);
+  if(right&&SS.streak>=5)btn.classList.add("rainbow");
   SS.results.push({c:q[2],ok:right});
-  $("ssent").innerHTML=esc(q[1]).replace("___",`<span class="filled">${q[2]}</span>`);
+  $("ssent").innerHTML=esc(q[1]).replace("___",`<span class="filled ${right?"ok":""}">${q[2]}</span>`);
   $("srevealpy").textContent=pin(q[4]);
   $("srevealen").textContent=q[5];
-  $("sreveal").classList.add("show");
+  $("sreveal").className="reveal show "+(right?"right":"wrong");
   $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
   $("snext").disabled=false;
   $("snext").textContent=SS.i+1>=SS.queue.length?"Finish →":"Next →";
@@ -328,16 +349,71 @@ function sentEndEarly(){
 .sent .zh{font-family:var(--hanzi);font-size:16.5px;font-weight:500;line-height:1.55}
 .sent .py{color:var(--seal);font-size:12px;margin-top:5px;font-weight:500}
 .sent .en{color:var(--muted);font-size:12.5px;margin-top:2px}
-.sentcard{background:var(--card);border:1px solid var(--line);border-radius:18px;
+.sentcard{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;
   padding:30px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(33,36,44,.05)}
 .sentcard .zh{font-family:var(--hanzi);font-size:23px;font-weight:600;line-height:1.75;text-align:center}
 .sentcard .blank{color:var(--muted);letter-spacing:.05em}
 .sentcard .filled{color:var(--seal);border-bottom:2px solid var(--seal)}
+.sentcard .filled.ok{color:var(--jade);border-bottom-color:var(--jade)}
 .reveal{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);text-align:center;display:none}
 .reveal.show{display:block}
 .reveal .py{color:var(--seal);font-size:13px;font-weight:500}
+.reveal.right .py{color:var(--jade)}
 .reveal .en{color:var(--muted);font-size:13px;margin-top:4px}
 .opts.hanziopts .opt{font-family:var(--hanzi);font-size:19px;font-weight:600;min-height:56px}
+/* streak (5+) rainbow ring */
+.onfire{border-color:transparent!important}
+.onfire::before{content:"";position:absolute;inset:-3px;z-index:-1;border-radius:21px;
+  background:linear-gradient(120deg,#ff5f6d,#ffc371,#ffe74f,#7ee34f,#4facfe,#b06ab3,#ff5f6d);
+  background-size:300% 300%;animation:rainbowmove 2.4s linear infinite}
+@keyframes rainbowmove{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.streakbadge{position:absolute;top:15px;left:15px;font-size:11px;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;opacity:0;pointer-events:none;
+  color:var(--seal);transition:opacity .2s}
+.streakbadge.show{opacity:1}
+.streakbadge.pop{animation:streakpop .45s ease}
+.streakbadge.rb{background:linear-gradient(90deg,#ff5f6d,#ffc371,#ffe74f,#7ee34f,#4facfe,#b06ab3,#ff5f6d);
+  background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:rainbowmove 2.4s linear infinite}
+.streakbadge.rb.pop{animation:rainbowmove 2.4s linear infinite,streakpop .45s ease}
+@keyframes streakpop{0%{transform:scale(1)}40%{transform:scale(1.45) rotate(-4deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
+/* 10+ streak: flickering fire glow beneath the rainbow ring */
+.blazing::after{content:"";position:absolute;inset:-26px -20px -22px;z-index:-2;border-radius:40px;
+  background:
+    radial-gradient(80% 90% at 50% 100%,rgba(255,120,20,.75),rgba(255,60,0,.35) 55%,transparent 78%),
+    radial-gradient(45% 60% at 28% 100%,rgba(255,190,60,.5),transparent 70%),
+    radial-gradient(45% 60% at 72% 100%,rgba(255,90,10,.5),transparent 70%);
+  filter:blur(14px);animation:flicker .38s ease-in-out infinite alternate;pointer-events:none}
+@keyframes flicker{
+  from{opacity:.6;transform:scaleY(.92) scaleX(.98)}
+  to{opacity:1;transform:scaleY(1.12) scaleX(1.03) translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.streakbadge,.streakbadge.pop,.streakbadge.rb,.blazing::after{animation:none}}
+/* correct selections go rainbow while streaking */
+.rainbow{border-color:transparent!important;box-shadow:none!important;
+  background-image:linear-gradient(var(--card),var(--card)),
+    linear-gradient(120deg,#ff5f6d,#ffc371,#ffe74f,#7ee34f,#4facfe,#b06ab3,#ff5f6d)!important;
+  background-origin:border-box!important;background-clip:padding-box,border-box!important;
+  background-size:auto,300% 300%!important;animation:rainbowborder 2.4s linear infinite;
+  color:var(--ink)!important}
+@keyframes rainbowborder{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
+@media (prefers-reduced-motion:reduce){.rainbow{animation:none}}
+/* breaking heart */
+.heartsrow .h{position:relative;display:inline-block}
+.h.breaking{animation:hollowIn 1.3s ease forwards}
+.h.breaking::before,.h.breaking::after{content:"♥";position:absolute;left:0;top:0;color:var(--seal)}
+.h.breaking::before{clip-path:polygon(0 0,58% 0,42% 38%,60% 66%,44% 100%,0 100%);
+  animation:breakL 1.3s ease forwards}
+.h.breaking::after{clip-path:polygon(58% 0,100% 0,100% 100%,44% 100%,60% 66%,42% 38%);
+  animation:breakR 1.3s ease forwards}
+@keyframes hollowIn{0%,60%{color:transparent}100%{color:var(--seal)}}
+@keyframes breakL{0%{transform:none;opacity:1}25%{transform:scale(1.3)}45%{transform:scale(1.15) rotate(-6deg)}
+  100%{transform:translate(-12px,18px) rotate(-35deg) scale(.65);opacity:0}}
+@keyframes breakR{0%{transform:none;opacity:1}25%{transform:scale(1.3)}45%{transform:scale(1.15) rotate(6deg)}
+  100%{transform:translate(12px,18px) rotate(35deg) scale(.65);opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .onfire::before,.h.breaking,.h.breaking::before,.h.breaking::after{animation:none}
+  .h.breaking::before,.h.breaking::after{display:none}
+}
 .typeinput{width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:12px;
   color:var(--ink);padding:15px;font-size:17px;text-align:center;font-family:var(--ui);
   letter-spacing:.04em;margin-bottom:10px}
@@ -346,6 +422,7 @@ function sentEndEarly(){
 .typeinput.wrong{border-color:var(--seal);background:var(--seal-tint);color:var(--seal)}
 .typeresult{text-align:center;font-size:13px;color:var(--muted);min-height:40px;margin-bottom:6px;line-height:1.5}
 .typeresult .py{color:var(--seal);font-size:16px;font-weight:600;font-family:var(--ui)}
+.typeresult.right .py{color:var(--jade)}
 .themetoggle{position:absolute;top:20px;right:18px;display:flex;align-items:center;gap:7px;
   background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 13px 7px 9px;
   font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;z-index:5}
@@ -455,11 +532,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
   <section class="screen" id="scr-quiz">
     <div class="qbar">
       <button class="linkbtn" onclick="endEarly()">End test</button>
-      <span class="hearts" id="qhearts"></span>
       <span class="score"><span class="ok" id="qok">✓ 0</span> &nbsp;<span class="bad" id="qbad">✗ 0</span> &nbsp;<span id="qprog"></span></span>
     </div>
     <div class="track"><div class="fill" id="qfill"></div></div>
-    <div class="charcard">
+    <div class="heartsrow" id="qhearts"></div>
+    <div class="charcard" id="qcard">
+      <div class="streakbadge" id="qcardstreak"></div>
       <div class="seal" id="qseal">1级</div>
       <div class="zh" id="qchar">–</div>
       <div class="prompt">What is this?</div>
@@ -479,11 +557,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
   <section class="screen" id="scr-typequiz">
     <div class="qbar">
       <button class="linkbtn" onclick="typeEndEarly()">End test</button>
-      <span class="hearts" id="thearts"></span>
       <span class="score"><span class="ok" id="tok">✓ 0</span> &nbsp;<span class="bad" id="tbad">✗ 0</span> &nbsp;<span id="tprog"></span></span>
     </div>
     <div class="track"><div class="fill" id="tfill"></div></div>
-    <div class="charcard">
+    <div class="heartsrow" id="thearts"></div>
+    <div class="charcard" id="tcard">
+      <div class="streakbadge" id="tcardstreak"></div>
       <div class="seal" id="tseal">1级</div>
       <div class="zh" id="tchar">–</div>
       <div class="prompt">Type the pinyin</div>
@@ -501,7 +580,8 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <span class="score"><span class="ok" id="sok">✓ 0</span> &nbsp;<span class="bad" id="sbad">✗ 0</span> &nbsp;<span id="sprog"></span></span>
     </div>
     <div class="track"><div class="fill" id="sfill"></div></div>
-    <div class="sentcard">
+    <div class="sentcard" id="scard">
+      <div class="streakbadge" id="scardstreak"></div>
       <div class="zh" id="ssent">–</div>
       <div class="reveal" id="sreveal">
         <div class="py" id="srevealpy"></div>
@@ -733,6 +813,68 @@ const WORDS=[
 ["粗心","cu1xin1","careless",4],["存","cun2","to save / deposit",4],["错误","cuo4wu4","mistake",4],
 ["答案","da2an4","answer",4],["打扮","da3ban4","to dress up",4],["打扰","da3rao3","to disturb",4],
 ["打印","da3yin4","to print",4]
+,
+/* ---- MASTER (level 5): rare characters, trap readings, literary chengyu ---- */
+["饕餮","tao1tie4","mythical gluttonous beast; glutton",5],
+["魑魅魍魉","chi1mei4wang3liang3","demons and monsters of every kind",5],
+["耄耋","mao4die2","advanced old age (one's 80s–90s)",5],
+["龃龉","ju3yu3","discord; friction",5],
+["踟蹰","chi2chu2","to hesitate; waver",5],
+["彳亍","chi4chu4","to stroll haltingly",5],
+["囹圄","ling2yu3","prison (literary)",5],
+["貔貅","pi2xiu1","mythical wealth-attracting beast",5],
+["觊觎","ji4yu2","to covet",5],
+["龌龊","wo4chuo4","filthy; sordid",5],
+["旮旯","ga1la2","nook; out-of-the-way corner",5],
+["邋遢","la1ta5","slovenly; unkempt",5],
+["熨帖","yu4tie1","fitting; just right",5],
+["拮据","jie2ju1","hard up; short of money",5],
+["桎梏","zhi4gu4","shackles; fetters",5],
+["缱绻","qian3quan3","tenderly attached (literary)",5],
+["旖旎","yi3ni3","charming; enchanting (scenery)",5],
+["蹉跎","cuo1tuo2","to idle away (time)",5],
+["婆娑","po2suo1","swaying; whirling",5],
+["逶迤","wei1yi2","winding; meandering",5],
+["璀璨","cui3can4","dazzling; resplendent",5],
+["圭臬","gui1nie4","criterion; standard (literary)",5],
+["造诣","zao4yi4","(scholarly) attainment",5],
+["商榷","shang1que4","open to deliberation",5],
+["掣肘","che4zhou3","to impede; hold back",5],
+["妊娠","ren4shen1","pregnancy; gestation",5],
+["症结","zheng1jie2","crux (of a problem)",5],
+["埋怨","man2yuan4","to blame; complain",5],
+["参差","cen1ci1","uneven; irregular",5],
+["龟裂","jun1lie4","to crack (of parched earth or skin)",5],
+["痼疾","gu4ji2","chronic ailment",5],
+["齉","nang4","to speak with a blocked nose",5],
+["爨","cuan4","to cook over a fire (archaic)",5],
+["龘","da2","the appearance of dragons in flight",5],
+["虚与委蛇","xu1yu3wei1yi2","to feign politeness",5],
+["暴虎冯河","bao4hu3ping2he2","reckless bravery",5],
+["沆瀣一气","hang4xie4yi2qi4","to collude; be in cahoots",5],
+["暴殄天物","bao4tian3tian1wu4","to squander heaven's gifts",5],
+["饮鸩止渴","yin3zhen4zhi3ke3","to drink poison to quench thirst",5],
+["鳞次栉比","lin2ci4zhi4bi3","packed row upon row (of buildings)",5],
+["佶屈聱牙","ji2qu1ao2ya2","convoluted and hard to read",5],
+["踽踽独行","ju3ju3du2xing2","to walk alone in solitude",5],
+["铩羽而归","sha1yu3er2gui1","to return defeated",5],
+["醍醐灌顶","ti2hu2guan4ding3","sudden enlightenment",5],
+["韬光养晦","tao1guang1yang3hui4","to hide one's talents and bide time",5],
+["罄竹难书","qing4zhu2nan2shu1","crimes too numerous to record",5],
+["良莠不齐","liang2you3bu4qi2","a mix of good and bad",5],
+["味同嚼蜡","wei4tong2jiao2la4","dry and dull as chewing wax",5],
+["高屋建瓴","gao1wu1jian4ling2","from a commanding strategic height",5],
+["焚膏继晷","fen2gao1ji4gui3","to study day and night",5],
+["管窥蠡测","guan3kui1li2ce4","a narrow, shallow view",5],
+["胼手胝足","pian2shou3zhi1zu2","work-calloused hands and feet",5],
+["筚路蓝缕","bi4lu4lan2lv3","to endure hardships pioneering",5],
+["宵衣旰食","xiao1yi1gan4shi2","diligent from before dawn until late",5],
+["睚眦必报","ya2zi4bi4bao4","to avenge the smallest slight",5],
+["怙恶不悛","hu4e4bu4quan1","unrepentantly evil",5],
+["一蹴而就","yi2cu4er2jiu4","to succeed in a single step",5],
+["鞭辟入里","bian1pi4ru4li3","penetrating; incisive",5],
+["荷枪实弹","he4qiang1shi2dan4","armed with loaded rifles",5],
+["拾级而上","she4ji2er2shang4","to ascend step by step",5]
 ];
 
 /* HSK-style fill-in-the-blank practice questions.
@@ -851,6 +993,7 @@ function show(name){
 }
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","HSK 1 + new words","二"],[3,"HSK 3","All beginner + intermediate","三"],[4,"HSK 4","Everything up to HSK 4","四"]];
+const TABS=[...LEVELS,[5,"Master"]];
 
 /* ---------- level select ---------- */
 let pendingMode="arcade";
@@ -863,6 +1006,13 @@ function goLevels(mode){
       <div class="sealic quiet">${em}</div><div><div class="tt">${name}</div>
       <div class="dd">${desc} · ${n} ${unit}</div></div><div class="chev">›</div></button>`;
   });
+  if(mode==="arcade"||mode==="typing"){
+    const mn=WORDS.filter(w=>w[3]===5).length;
+    rows.push(`<button class="card" onclick="startMaster()">
+      <div class="sealic">宗</div><div><div class="tt">Master 宗师</div>
+      <div class="dd">Rare characters, trap readings and literary chengyu — hard even for native speakers · ${mn} words</div></div>
+      <div class="chev">›</div></button>`);
+  }
   if(mode==="arcade"){
     rows.push(`<button class="card" onclick="openCustom()">
       <div class="sealic">选</div><div><div class="tt">Custom</div>
@@ -871,6 +1021,11 @@ function goLevels(mode){
   }
   $("levelrows").innerHTML=rows.join("");
   show("levels");
+}
+function startMaster(){
+  const pool=WORDS.filter(w=>w[3]===5);
+  if(pendingMode==="typing")startTypeQuiz(pool,"Master · typing");
+  else startQuiz("arcade",pool,"Master · arcade");
 }
 function startLevel(lv){
   if(pendingMode==="sentences"){
@@ -899,7 +1054,7 @@ function startRefresher(){
 let customTab=1;
 let customSel=new Set(store.get("hsk_custom_sel",[]));
 function openCustom(){
-  $("customtabs").innerHTML=LEVELS.map(([lv,name])=>
+  $("customtabs").innerHTML=TABS.map(([lv,name])=>
     `<button class="tab ${lv===customTab?"on":""}" onclick="customTab=${lv};openCustom()">${name}</button>`).join("");
   renderCustomList();
   show("custom");
@@ -938,6 +1093,31 @@ function startCustom(){
 }
 
 /* ---------- quiz engine ---------- */
+function heartsHTML(lives,broke){
+  let s="";
+  for(let i=0;i<5;i++){
+    if(i<lives)s+='<span class="h">♥</span>';
+    else if(i===lives&&broke)s+='<span class="h breaking">♡</span>';
+    else s+='<span class="h">♡</span>';
+  }
+  return s;
+}
+function setFire(id,streak){
+  // tiers: 2+ counter · 5+ rainbow · 10+ fire
+  const card=$(id),b=$(id+"streak");
+  card.classList.toggle("onfire",streak>=5);
+  card.classList.toggle("blazing",streak>=10);
+  if(streak>=2){
+    b.textContent="Streak ×"+streak+(streak>=10?" 🔥":"");
+    b.classList.toggle("rb",streak>=5);
+    b.classList.add("show");
+    b.classList.remove("pop");
+    void b.offsetWidth; // restart the pop animation on every increment
+    b.classList.add("pop");
+  }else{
+    b.classList.remove("show","pop","rb");
+  }
+}
 let S=null;
 function buildQueue(mode,pool){
   const q=shuffle([...pool]);
@@ -949,10 +1129,10 @@ function buildQueue(mode,pool){
 let againFn=null;
 function startQuiz(mode,pool,label){
   againFn=()=>startQuiz(mode,pool,label);
-  S={mode,label,pool,lives:mode==="arcade"?5:Infinity,queue:buildQueue(mode,pool),i:0,ok:0,bad:0,results:[]};
+  S={mode,label,pool,lives:mode==="arcade"?5:Infinity,queue:buildQueue(mode,pool),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("qcard",0);
   show("quiz");renderQ();
 }
-function heartsStr(){return S.mode==="arcade"?"♥".repeat(S.lives)+"♡".repeat(5-S.lives):"♥ ∞"}
 function toneVariants(p){
   const seen=new Set([p]),out=[];let g=0;
   while(out.length<3&&g++<300){
@@ -970,15 +1150,18 @@ function renderQ(){
   const w=S.queue[S.i];
   S.phase={enDone:false,pyDone:false,wrong:false};
   $("qchar").textContent=w[0];
-  $("qseal").textContent=w[3]+"级";
-  $("qhearts").textContent=heartsStr();
+  $("qseal").textContent=w[3]===5?"宗":w[3]+"级";
+  if(S.mode==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,false);
+  else $("qhearts").textContent="♥ ∞";
   $("qok").textContent="✓ "+S.ok;$("qbad").textContent="✗ "+S.bad;
   $("qprog").textContent=(S.i+1)+" / "+S.queue.length+" words";
   $("qfill").style.width=(S.i/S.queue.length*100)+"%";
   $("qnext").disabled=true;
   $("pyhint").textContent="answer above first";
   // english options
-  const others=shuffle(WORDS.filter(x=>x[2]!==w[2]).map(x=>x[2]));
+  let dpool=WORDS.filter(x=>x[3]===w[3]&&x[2]!==w[2]);
+  if(dpool.length<3)dpool=WORDS.filter(x=>x[2]!==w[2]);
+  const others=shuffle(dpool.map(x=>x[2]));
   const enOpts=shuffle([w[2],...[...new Set(others)].slice(0,3)]);
   $("opts-en").innerHTML=enOpts.map(o=>`<button class="opt" onclick="answerEn(this,${o===w[2]})">${esc(o)}</button>`).join("");
   $("opts-en").classList.remove("off");
@@ -1017,9 +1200,14 @@ function finishWord(){
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
-  if(S.phase.wrong){S.bad++;if(S.mode==="arcade")S.lives--}else S.ok++;
+  if(S.phase.wrong){S.bad++;S.streak=0;if(S.mode==="arcade")S.lives--}else{S.ok++;S.streak++}
+  setFire("qcard",S.streak);
+  if(!S.phase.wrong&&S.streak>=5)
+    document.querySelectorAll("#opts-en .opt.right,#opts-py .opt.right")
+      .forEach(b=>b.classList.add("rainbow"));
   $("qok").textContent="✓ "+S.ok;$("qbad").textContent="✗ "+S.bad;
-  $("qhearts").textContent=heartsStr();
+  if(S.mode==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,S.phase.wrong);
+  else $("qhearts").textContent="♥ ∞";
   $("qnext").disabled=false;
   $("qnext").textContent=(S.mode==="arcade"&&S.lives<=0)?"Results →":(S.i+1>=S.queue.length?"Finish →":"Next →");
 }
@@ -1069,7 +1257,8 @@ function pinyinMatch(input,stored){
 }
 function startTypeQuiz(pool,label){
   againFn=()=>startTypeQuiz(pool,label);
-  TS={label,pool,lives:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,results:[]};
+  TS={label,pool,lives:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("tcard",0);
   show("typequiz");renderType();
 }
 function renderType(){
@@ -1077,13 +1266,15 @@ function renderType(){
   TS.answered=false;
   $("tchar").textContent=w[0];
   $("tseal").textContent=w[3]+"级";
-  $("thearts").textContent="♥".repeat(TS.lives)+"♡".repeat(5-TS.lives);
+  $("thearts").innerHTML=heartsHTML(TS.lives,false);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
   $("tprog").textContent=(TS.i+1)+" / "+TS.queue.length+" words";
   $("tfill").style.width=(TS.i/TS.queue.length*100)+"%";
   const inp=$("tinput");
-  inp.value="";inp.className="typeinput";inp.disabled=false;
-  $("tresult").innerHTML="Tones aren't needed — for ü you can type u or v";
+  inp.value="";inp.className="typeinput";inp.readOnly=false;inp.disabled=false;
+  const res=$("tresult");
+  res.className="typeresult";
+  res.innerHTML="Tones aren't needed — for ü you can type u or v";
   $("tbtn").textContent="Check";
   inp.focus();
 }
@@ -1096,16 +1287,21 @@ function typeCheck(){
   if(!inp.value.trim())return;
   TS.answered=true;
   const right=pinyinMatch(inp.value,w[1]);
-  inp.disabled=true;
+  inp.readOnly=true;
   inp.classList.add(right?"right":"wrong");
-  $("tresult").innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
+  const res=$("tresult");
+  res.className="typeresult "+(right?"right":"wrong");
+  res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
+  inp.focus();
   TS.results.push({c:w[0],ok:right});
-  if(right)TS.ok++;else{TS.bad++;TS.lives--}
+  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;TS.lives--}
+  setFire("tcard",TS.streak);
+  if(right&&TS.streak>=5)inp.classList.add("rainbow");
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  $("thearts").textContent="♥".repeat(Math.max(TS.lives,0))+"♡".repeat(5-Math.max(TS.lives,0));
+  $("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
   $("tbtn").textContent=(TS.lives<=0)?"Results →":(TS.i+1>=TS.queue.length?"Finish →":"Next →");
 }
 function typeSave(){
@@ -1133,6 +1329,12 @@ function typeNext(){
   }
   renderType();
 }
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&TS&&TS.answered&&$("scr-typequiz").classList.contains("active")
+     &&document.activeElement!==$("tinput")){
+    e.preventDefault();typeNext();
+  }
+});
 function typeEndEarly(){
   if(TS&&TS.results.length)typeSave();
   show("home");
@@ -1142,14 +1344,15 @@ function typeEndEarly(){
 let SS=null;
 function startSentQuiz(pool,label){
   againFn=()=>startSentQuiz(pool,label);
-  SS={label,queue:shuffle([...pool]),i:0,ok:0,bad:0,results:[]};
+  SS={label,queue:shuffle([...pool]),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("scard",0);
   show("sentquiz");renderSent();
 }
 function renderSent(){
   const q=SS.queue[SS.i];
   SS.answered=false;
   $("ssent").innerHTML=esc(q[1]).replace("___",'<span class="blank">＿＿＿</span>');
-  $("sreveal").classList.remove("show");
+  $("sreveal").className="reveal";
   $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
   $("sprog").textContent=(SS.i+1)+" / "+SS.queue.length;
   $("sfill").style.width=(SS.i/SS.queue.length*100)+"%";
@@ -1163,12 +1366,14 @@ function answerSent(btn,right){
   const q=SS.queue[SS.i];
   [...$("opts-sent").children].forEach(b=>{b.disabled=true;if(b.textContent===q[2])b.classList.add("right")});
   if(!right)btn.classList.add("wrong");
-  right?SS.ok++:SS.bad++;
+  if(right){SS.ok++;SS.streak++}else{SS.bad++;SS.streak=0}
+  setFire("scard",SS.streak);
+  if(right&&SS.streak>=5)btn.classList.add("rainbow");
   SS.results.push({c:q[2],ok:right});
-  $("ssent").innerHTML=esc(q[1]).replace("___",`<span class="filled">${q[2]}</span>`);
+  $("ssent").innerHTML=esc(q[1]).replace("___",`<span class="filled ${right?"ok":""}">${q[2]}</span>`);
   $("srevealpy").textContent=pin(q[4]);
   $("srevealen").textContent=q[5];
-  $("sreveal").classList.add("show");
+  $("sreveal").className="reveal show "+(right?"right":"wrong");
   $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
   $("snext").disabled=false;
   $("snext").textContent=SS.i+1>=SS.queue.length?"Finish →":"Next →";
@@ -1212,7 +1417,7 @@ function clearHistory(){
 /* ---------- word list + detail ---------- */
 let wlTab=1;
 function openWordlist(){
-  $("wltabs").innerHTML=LEVELS.map(([lv,name])=>
+  $("wltabs").innerHTML=TABS.map(([lv,name])=>
     `<button class="tab ${lv===wlTab?"on":""}" onclick="wlTab=${lv};openWordlist()">${name}</button>`).join("");
   renderWordlist();show("wordlist");
 }
@@ -1228,7 +1433,7 @@ function renderWordlist(){
 function openDetail(c){
   const w=WORDS.find(x=>x[0]===c);if(!w)return;
   $("dchar").textContent=w[0];$("dpy").textContent=pin(w[1]);$("den").textContent=w[2];
-  $("dseal").textContent=w[3]+"级";
+  $("dseal").textContent=w[3]===5?"宗":w[3]+"级";
   const sents=SENTENCES[c];
   $("dsents").innerHTML=sents?sents.map(s=>
     `<div class="sent"><div class="zh">${s[0]}</div><div class="py">${pin(s[1])}</div><div class="en">${esc(s[2])}</div></div>`).join("")

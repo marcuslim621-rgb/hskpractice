@@ -307,6 +307,151 @@ function typeEndEarly(){
   show("home");
 }
 
+/* ---------- writing quiz engine (flashcard, self-graded) ---------- */
+let WQ=null;
+const WPAD={strokes:[],cur:null,size:0,cells:1};
+function startWriteQuiz(pool,label){
+  againFn=()=>startWriteQuiz(pool,label);
+  WQ={label,pool,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("wcard",0);
+  show("writequiz");
+  requestAnimationFrame(()=>renderWrite());
+}
+function renderWrite(){
+  const w=WQ.queue[WQ.i];
+  WQ.revealed=false;
+  $("wen").textContent=w[2];
+  $("wok").textContent="✓ "+WQ.ok;$("wbad").textContent="✗ "+WQ.bad;
+  $("wprog").textContent=(WQ.i+1)+" / "+WQ.queue.length+" words";
+  $("wfill").style.width=(WQ.i/WQ.queue.length*100)+"%";
+  $("wreveal").classList.remove("show");
+  $("wgrade").classList.remove("show");
+  $("wrevealbtn").style.display="block";
+  WPAD.strokes=[];WPAD.cur=null;
+  WPAD.cells=Math.min([...w[0]].length,4);
+  sizeWCanvas();redrawWPad();
+}
+function writeReveal(){
+  if(WQ.revealed)return;
+  WQ.revealed=true;
+  const w=WQ.queue[WQ.i];
+  $("wzh").textContent=w[0];
+  $("wpy").textContent=pin(w[1]);
+  $("wreveal").classList.add("show");
+  $("wrevealbtn").style.display="none";
+  $("wgrade").classList.add("show");
+}
+function writeGrade(right){
+  const w=WQ.queue[WQ.i];
+  WQ.results.push({c:w[0],ok:right});
+  if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0}
+  setFire("wcard",WQ.streak);
+  const seen=store.get("hsk_seen",{});
+  seen[w[0]]=(seen[w[0]]||0)+1;
+  store.set("hsk_seen",seen);
+  WQ.i++;
+  if(WQ.i>=WQ.queue.length){writeFinish();return}
+  renderWrite();
+}
+function writeSave(){
+  const hist=store.get("hsk_history",[]);
+  hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
+  store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
+}
+function writeFinish(){
+  writeSave();
+  $("sumbest").classList.toggle("show",lastWasBest);
+  $("sumlabel").textContent=WQ.label;
+  $("sumok").textContent=WQ.ok;$("sumbad").textContent=WQ.bad;
+  const t=WQ.ok+WQ.bad;
+  $("sumacc").textContent=(t?Math.round(WQ.ok/t*100):0)+"%";
+  $("sumwords").innerHTML=breakdownHTML(WQ.results);
+  show("summary");
+}
+function writeEndEarly(){
+  if(WQ&&WQ.results.length)writeSave();
+  show("home");
+}
+/* writing-mode drawing pad: one 米字格 cell per character */
+function sizeWCanvas(){
+  const c=$("wcanvas");
+  const avail=c.parentElement.clientWidth-20;
+  if(avail<=0)return;
+  const cell=Math.min(avail/WPAD.cells,300);
+  const w=cell*WPAD.cells,hgt=cell;
+  const dpr=window.devicePixelRatio||1;
+  WPAD.size=cell;
+  c.width=w*dpr;c.height=hgt*dpr;
+  c.style.width=w+"px";c.style.height=hgt+"px";
+  c.style.margin="0 auto";
+  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function redrawWPad(){
+  const c=$("wcanvas"),ctx=c.getContext("2d"),cell=WPAD.size,n=WPAD.cells;
+  if(!cell)return;
+  ctx.clearRect(0,0,cell*n,cell);
+  ctx.save();
+  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;
+  for(let k=0;k<n;k++){
+    const ox=k*cell;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath();
+    ctx.moveTo(ox+cell/2,0);ctx.lineTo(ox+cell/2,cell);
+    ctx.moveTo(ox,cell/2);ctx.lineTo(ox+cell,cell/2);
+    ctx.moveTo(ox,0);ctx.lineTo(ox+cell,cell);
+    ctx.moveTo(ox+cell,0);ctx.lineTo(ox,cell);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeRect(ox+.5,.5,cell-1,cell-1);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle=cssVar("--ink");
+  ctx.lineWidth=Math.max(5,cell/40);
+  ctx.lineCap="round";ctx.lineJoin="round";
+  const s=cell; // strokes normalised to cell height; x spans 0..n
+  for(const st of WPAD.strokes){
+    if(st.length<2)continue;
+    ctx.beginPath();
+    ctx.moveTo(st[0].x*s,st[0].y*s);
+    for(let i=1;i<st.length-1;i++){
+      const mx=(st[i].x+st[i+1].x)/2*s,my=(st[i].y+st[i+1].y)/2*s;
+      ctx.quadraticCurveTo(st[i].x*s,st[i].y*s,mx,my);
+    }
+    const l=st[st.length-1];
+    ctx.lineTo(l.x*s,l.y*s);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function wPadPoint(e){
+  const r=$("wcanvas").getBoundingClientRect();
+  return {x:(e.clientX-r.left)/WPAD.size,y:(e.clientY-r.top)/WPAD.size};
+}
+(function(){
+  const c=$("wcanvas");
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    c.setPointerCapture(e.pointerId);
+    WPAD.cur=[wPadPoint(e)];
+    WPAD.strokes.push(WPAD.cur);
+  });
+  c.addEventListener("pointermove",e=>{
+    if(!WPAD.cur)return;
+    e.preventDefault();
+    WPAD.cur.push(wPadPoint(e));
+    redrawWPad();
+  });
+  const end=()=>{WPAD.cur=null};
+  c.addEventListener("pointerup",end);
+  c.addEventListener("pointercancel",end);
+  window.addEventListener("resize",()=>{
+    if($("scr-writequiz").classList.contains("active")){sizeWCanvas();redrawWPad()}
+  });
+})();
+function writeClear(){WPAD.strokes=[];WPAD.cur=null;redrawWPad()}
+
 /* ---------- sentence quiz engine ---------- */
 let SS=null;
 function startSentQuiz(pool,label){
@@ -417,6 +562,30 @@ function clearBest(){
 .reveal.right .py{color:var(--jade)}
 .reveal .en{color:var(--muted);font-size:13px;margin-top:4px}
 .opts.hanziopts .opt{font-family:var(--hanzi);font-size:19px;font-weight:600;min-height:56px}
+.pin{margin-left:auto;font-size:17px;line-height:1;color:var(--line-strong);cursor:pointer;
+  padding:4px 2px;flex-shrink:0;transition:color .12s}
+.pin.on{color:#D9A62E}
+.pin:hover{color:#D9A62E}
+.wprompt{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:26px 20px;text-align:center;margin-bottom:14px;box-shadow:0 1px 3px rgba(33,36,44,.05)}
+.wprompt .en{font-size:21px;font-weight:700;letter-spacing:-.01em}
+.wprompt .hint2{color:var(--muted);font-size:11.5px;margin-top:8px;letter-spacing:.12em;text-transform:uppercase}
+.wreveal{display:none;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line)}
+.wreveal.show{display:block}
+.wreveal .zh{font-family:var(--hanzi);font-size:52px;font-weight:600;line-height:1.2}
+.wreveal .py{color:var(--seal);font-size:16px;font-weight:600;margin-top:6px}
+.gradebtns{display:none;gap:9px;margin-top:12px}
+.gradebtns.show{display:flex}
+.btn.good{background:var(--jade);border-color:var(--jade);color:#fff}
+.btn.badbtn{background:var(--seal);border-color:var(--seal);color:#fff}
+.drawwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;
+  box-shadow:0 1px 3px rgba(33,36,44,.05)}
+#dcanvas{display:block;width:100%;border-radius:10px;touch-action:none;cursor:crosshair}
+.drawtools{display:flex;gap:7px;margin-top:10px}
+.charchips{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.charchip{border:1px solid var(--line);background:var(--card);border-radius:10px;min-width:44px;height:44px;
+  font-family:var(--hanzi);font-size:21px;font-weight:600;color:var(--muted);cursor:pointer;padding:0 8px}
+.charchip.on{border-color:var(--seal);color:var(--seal);box-shadow:0 0 0 1px var(--seal)}
 .timerbig{font-variant-numeric:tabular-nums;font-size:36px;font-weight:700;color:var(--ink);letter-spacing:.02em}
 .timerbig.low{color:var(--seal);animation:timerpulse .5s ease-in-out infinite alternate}
 @keyframes timerpulse{from{opacity:1}to{opacity:.55}}
@@ -537,6 +706,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="dd">No lives, no limits — drill for as long as you like</div></div>
         <div class="chev">›</div>
       </button>
+      <button class="card" onclick="goLevels('writing')">
+        <div class="sealic quiet">书</div>
+        <div><div class="tt">Writing</div>
+        <div class="dd">See the English, draw the hanzi from memory, then grade yourself flashcard-style</div></div>
+        <div class="chev">›</div>
+      </button>
       <button class="card" onclick="goLevels('sentences')">
         <div class="sealic quiet">句</div>
         <div><div class="tt">Sentences</div>
@@ -649,6 +824,35 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     <button class="nextbtn" id="tbtn" onclick="typeAction()">Check</button>
   </section>
 
+  <!-- WRITING QUIZ -->
+  <section class="screen" id="scr-writequiz">
+    <div class="qbar">
+      <button class="linkbtn" onclick="writeEndEarly()">End test</button>
+      <span class="score"><span class="ok" id="wok">✓ 0</span> &nbsp;<span class="bad" id="wbad">✗ 0</span> &nbsp;<span id="wprog"></span></span>
+    </div>
+    <div class="track"><div class="fill" id="wfill"></div></div>
+    <div class="wprompt" id="wcard">
+      <div class="streakbadge" id="wcardstreak"></div>
+      <div class="en" id="wen">–</div>
+      <div class="hint2">Draw the character from memory</div>
+      <div class="wreveal" id="wreveal">
+        <div class="zh" id="wzh"></div>
+        <div class="py" id="wpy"></div>
+      </div>
+    </div>
+    <div class="drawwrap">
+      <canvas id="wcanvas"></canvas>
+      <div class="drawtools">
+        <button class="minibtn" onclick="writeClear()">Clear</button>
+      </div>
+    </div>
+    <button class="nextbtn" id="wrevealbtn" onclick="writeReveal()" style="margin-top:14px">Reveal →</button>
+    <div class="gradebtns" id="wgrade">
+      <button class="btn badbtn" onclick="writeGrade(false)">✗ Got it wrong</button>
+      <button class="btn good" onclick="writeGrade(true)">✓ Got it right</button>
+    </div>
+  </section>
+
   <!-- SENTENCE QUIZ -->
   <section class="screen" id="scr-sentquiz">
     <div class="qbar">
@@ -748,6 +952,15 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <div class="zh" id="dchar">–</div>
       <div class="py" id="dpy">–</div>
       <div class="en" id="den">–</div>
+    </div>
+    <div class="sechead">Writing practice</div>
+    <div class="charchips" id="dchips"></div>
+    <div class="drawwrap">
+      <canvas id="dcanvas"></canvas>
+      <div class="drawtools">
+        <button class="minibtn" onclick="drawClear()">Clear</button>
+        <button class="minibtn" id="dguidebtn" onclick="drawGuideToggle()">Guide: on</button>
+      </div>
     </div>
     <div class="sechead">Example sentences</div>
     <div class="sentlist" id="dsents"></div>
@@ -1099,7 +1312,7 @@ function goLevels(mode,keepTimed){
       <div class="sealic quiet">${em}</div><div><div class="tt">${name}</div>
       <div class="dd">${desc} · ${n} ${unit}</div></div><div class="chev">›</div></button>`;
   });
-  if(mode==="arcade"||mode==="typing"){
+  if(mode==="arcade"||mode==="typing"||mode==="writing"){
     const mn=WORDS.filter(w=>w[3]===5).length;
     rows.push(`<button class="card" onclick="startMaster()">
       <div class="sealic">宗</div><div><div class="tt">Master 宗师</div>
@@ -1125,6 +1338,7 @@ function goLevels(mode,keepTimed){
 function startMaster(){
   const pool=WORDS.filter(w=>w[3]===5);
   if(pendingMode==="typing")startTypeQuiz(pool,`Master · ${pendingTimed?"time attack":"typing"}`,pendingTimed);
+  else if(pendingMode==="writing")startWriteQuiz(pool,"Master · writing");
   else startQuiz("arcade",pool,"Master · arcade");
 }
 function startLevel(lv){
@@ -1134,6 +1348,10 @@ function startLevel(lv){
   }
   if(pendingMode==="typing"){
     startTypeQuiz(WORDS.filter(w=>w[3]<=lv),`HSK ${lv} · ${pendingTimed?"time attack":"typing"}`,pendingTimed);
+    return;
+  }
+  if(pendingMode==="writing"){
+    startWriteQuiz(WORDS.filter(w=>w[3]<=lv),`HSK ${lv} · writing`);
     return;
   }
   const pool=WORDS.filter(w=>w[3]<=lv);
@@ -1170,7 +1388,109 @@ function renderCustomList(){
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
       <span class="tick">✓</span></button>`;
   }).join("")||`<div class="empty">No words match your search</div>`;
-  updateCustomCount();
+  /* ---------- writing practice pad (word detail) ---------- */
+const DW={chars:[],idx:0,strokes:[],cur:null,guide:true,size:0};
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function setupPractice(word){
+  DW.chars=[...word];DW.idx=0;DW.strokes=[];DW.cur=null;
+  renderChips();
+  requestAnimationFrame(()=>{sizeCanvas();redrawPad()});
+}
+function renderChips(){
+  $("dchips").innerHTML=DW.chars.map((c,i)=>
+    `<button class="charchip ${i===DW.idx?"on":""}" onclick="pickChip(${i})">${c}</button>`).join("");
+  $("dchips").style.display=DW.chars.length>1?"flex":"none";
+}
+function pickChip(i){DW.idx=i;DW.strokes=[];renderChips();redrawPad()}
+function sizeCanvas(){
+  const c=$("dcanvas");
+  const w=c.parentElement.clientWidth-20;
+  if(w<=0)return;
+  const dpr=window.devicePixelRatio||1;
+  DW.size=w;
+  c.width=w*dpr;c.height=w*dpr;
+  c.style.height=w+"px";
+  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function redrawPad(){
+  const c=$("dcanvas"),ctx=c.getContext("2d"),s=DW.size;
+  if(!s)return;
+  ctx.clearRect(0,0,s,s);
+  // 米字格 practice-paper guides
+  ctx.save();
+  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);
+  ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);
+  ctx.moveTo(0,0);ctx.lineTo(s,s);
+  ctx.moveTo(s,0);ctx.lineTo(0,s);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeRect(.5,.5,s-1,s-1);
+  ctx.restore();
+  // faint template character to trace
+  if(DW.guide&&DW.chars[DW.idx]){
+    ctx.save();
+    ctx.globalAlpha=.14;
+    ctx.fillStyle=cssVar("--ink");
+    ctx.font=`600 ${s*.72}px "Noto Serif SC","Songti SC","SimSun",serif`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(DW.chars[DW.idx],s/2,s*.54);
+    ctx.restore();
+  }
+  // ink strokes (stored as 0..1 coordinates so resizing keeps them)
+  ctx.save();
+  ctx.strokeStyle=cssVar("--ink");
+  ctx.lineWidth=Math.max(5,s/40);
+  ctx.lineCap="round";ctx.lineJoin="round";
+  for(const st of DW.strokes)drawStroke(ctx,st,s);
+  ctx.restore();
+}
+function drawStroke(ctx,pts,s){
+  if(pts.length<2)return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x*s,pts[0].y*s);
+  for(let i=1;i<pts.length-1;i++){
+    const mx=(pts[i].x+pts[i+1].x)/2*s,my=(pts[i].y+pts[i+1].y)/2*s;
+    ctx.quadraticCurveTo(pts[i].x*s,pts[i].y*s,mx,my);
+  }
+  const l=pts[pts.length-1];
+  ctx.lineTo(l.x*s,l.y*s);
+  ctx.stroke();
+}
+function padPoint(e){
+  const r=$("dcanvas").getBoundingClientRect();
+  return {x:(e.clientX-r.left)/DW.size,y:(e.clientY-r.top)/DW.size};
+}
+(function(){
+  const c=$("dcanvas");
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    c.setPointerCapture(e.pointerId);
+    DW.cur=[padPoint(e)];
+    DW.strokes.push(DW.cur);
+  });
+  c.addEventListener("pointermove",e=>{
+    if(!DW.cur)return;
+    e.preventDefault();
+    DW.cur.push(padPoint(e));
+    redrawPad();
+  });
+  const end=e=>{DW.cur=null};
+  c.addEventListener("pointerup",end);
+  c.addEventListener("pointercancel",end);
+  window.addEventListener("resize",()=>{
+    if($("scr-worddetail").classList.contains("active")){sizeCanvas();redrawPad()}
+  });
+})();
+function drawClear(){DW.strokes=[];DW.cur=null;redrawPad()}
+function drawGuideToggle(){
+  DW.guide=!DW.guide;
+  $("dguidebtn").textContent="Guide: "+(DW.guide?"on":"off");
+  redrawPad();
+}
+
+updateCustomCount();
 }
 function toggleCustom(c){
   customSel.has(c)?customSel.delete(c):customSel.add(c);
@@ -1494,6 +1814,151 @@ function typeEndEarly(){
   show("home");
 }
 
+/* ---------- writing quiz engine (flashcard, self-graded) ---------- */
+let WQ=null;
+const WPAD={strokes:[],cur:null,size:0,cells:1};
+function startWriteQuiz(pool,label){
+  againFn=()=>startWriteQuiz(pool,label);
+  WQ={label,pool,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+  setFire("wcard",0);
+  show("writequiz");
+  requestAnimationFrame(()=>renderWrite());
+}
+function renderWrite(){
+  const w=WQ.queue[WQ.i];
+  WQ.revealed=false;
+  $("wen").textContent=w[2];
+  $("wok").textContent="✓ "+WQ.ok;$("wbad").textContent="✗ "+WQ.bad;
+  $("wprog").textContent=(WQ.i+1)+" / "+WQ.queue.length+" words";
+  $("wfill").style.width=(WQ.i/WQ.queue.length*100)+"%";
+  $("wreveal").classList.remove("show");
+  $("wgrade").classList.remove("show");
+  $("wrevealbtn").style.display="block";
+  WPAD.strokes=[];WPAD.cur=null;
+  WPAD.cells=Math.min([...w[0]].length,4);
+  sizeWCanvas();redrawWPad();
+}
+function writeReveal(){
+  if(WQ.revealed)return;
+  WQ.revealed=true;
+  const w=WQ.queue[WQ.i];
+  $("wzh").textContent=w[0];
+  $("wpy").textContent=pin(w[1]);
+  $("wreveal").classList.add("show");
+  $("wrevealbtn").style.display="none";
+  $("wgrade").classList.add("show");
+}
+function writeGrade(right){
+  const w=WQ.queue[WQ.i];
+  WQ.results.push({c:w[0],ok:right});
+  if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0}
+  setFire("wcard",WQ.streak);
+  const seen=store.get("hsk_seen",{});
+  seen[w[0]]=(seen[w[0]]||0)+1;
+  store.set("hsk_seen",seen);
+  WQ.i++;
+  if(WQ.i>=WQ.queue.length){writeFinish();return}
+  renderWrite();
+}
+function writeSave(){
+  const hist=store.get("hsk_history",[]);
+  hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
+  store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
+}
+function writeFinish(){
+  writeSave();
+  $("sumbest").classList.toggle("show",lastWasBest);
+  $("sumlabel").textContent=WQ.label;
+  $("sumok").textContent=WQ.ok;$("sumbad").textContent=WQ.bad;
+  const t=WQ.ok+WQ.bad;
+  $("sumacc").textContent=(t?Math.round(WQ.ok/t*100):0)+"%";
+  $("sumwords").innerHTML=breakdownHTML(WQ.results);
+  show("summary");
+}
+function writeEndEarly(){
+  if(WQ&&WQ.results.length)writeSave();
+  show("home");
+}
+/* writing-mode drawing pad: one 米字格 cell per character */
+function sizeWCanvas(){
+  const c=$("wcanvas");
+  const avail=c.parentElement.clientWidth-20;
+  if(avail<=0)return;
+  const cell=Math.min(avail/WPAD.cells,300);
+  const w=cell*WPAD.cells,hgt=cell;
+  const dpr=window.devicePixelRatio||1;
+  WPAD.size=cell;
+  c.width=w*dpr;c.height=hgt*dpr;
+  c.style.width=w+"px";c.style.height=hgt+"px";
+  c.style.margin="0 auto";
+  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function redrawWPad(){
+  const c=$("wcanvas"),ctx=c.getContext("2d"),cell=WPAD.size,n=WPAD.cells;
+  if(!cell)return;
+  ctx.clearRect(0,0,cell*n,cell);
+  ctx.save();
+  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;
+  for(let k=0;k<n;k++){
+    const ox=k*cell;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath();
+    ctx.moveTo(ox+cell/2,0);ctx.lineTo(ox+cell/2,cell);
+    ctx.moveTo(ox,cell/2);ctx.lineTo(ox+cell,cell/2);
+    ctx.moveTo(ox,0);ctx.lineTo(ox+cell,cell);
+    ctx.moveTo(ox+cell,0);ctx.lineTo(ox,cell);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeRect(ox+.5,.5,cell-1,cell-1);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle=cssVar("--ink");
+  ctx.lineWidth=Math.max(5,cell/40);
+  ctx.lineCap="round";ctx.lineJoin="round";
+  const s=cell; // strokes normalised to cell height; x spans 0..n
+  for(const st of WPAD.strokes){
+    if(st.length<2)continue;
+    ctx.beginPath();
+    ctx.moveTo(st[0].x*s,st[0].y*s);
+    for(let i=1;i<st.length-1;i++){
+      const mx=(st[i].x+st[i+1].x)/2*s,my=(st[i].y+st[i+1].y)/2*s;
+      ctx.quadraticCurveTo(st[i].x*s,st[i].y*s,mx,my);
+    }
+    const l=st[st.length-1];
+    ctx.lineTo(l.x*s,l.y*s);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function wPadPoint(e){
+  const r=$("wcanvas").getBoundingClientRect();
+  return {x:(e.clientX-r.left)/WPAD.size,y:(e.clientY-r.top)/WPAD.size};
+}
+(function(){
+  const c=$("wcanvas");
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    c.setPointerCapture(e.pointerId);
+    WPAD.cur=[wPadPoint(e)];
+    WPAD.strokes.push(WPAD.cur);
+  });
+  c.addEventListener("pointermove",e=>{
+    if(!WPAD.cur)return;
+    e.preventDefault();
+    WPAD.cur.push(wPadPoint(e));
+    redrawWPad();
+  });
+  const end=()=>{WPAD.cur=null};
+  c.addEventListener("pointerup",end);
+  c.addEventListener("pointercancel",end);
+  window.addEventListener("resize",()=>{
+    if($("scr-writequiz").classList.contains("active")){sizeWCanvas();redrawWPad()}
+  });
+})();
+function writeClear(){WPAD.strokes=[];WPAD.cur=null;redrawWPad()}
+
 /* ---------- sentence quiz engine ---------- */
 let SS=null;
 function startSentQuiz(pool,label){
@@ -1597,11 +2062,21 @@ function openWordlist(){
 function renderWordlist(){
   const q=$("wlsearch").value.trim().toLowerCase();
   const list=WORDS.filter(w=>w[3]===wlTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
+  const pinned=new Set(store.get("hsk_pins",[]));
+  list.sort((a,b)=>(pinned.has(b[0])?1:0)-(pinned.has(a[0])?1:0)); // stable: pinned float up, order kept
   $("wllist").innerHTML=list.map(w=>
     `<button class="wrow" onclick="openDetail('${w[0]}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
-      <span class="chev" style="margin-left:auto;color:var(--muted)">›</span></button>`).join("")
+      <span class="pin ${pinned.has(w[0])?"on":""}" title="Pin to top"
+        onclick="event.stopPropagation();togglePin('${w[0]}')">★</span></button>`).join("")
     ||`<div class="empty">No words match your search</div>`;
+}
+function togglePin(c){
+  const pins=store.get("hsk_pins",[]);
+  const i=pins.indexOf(c);
+  i>=0?pins.splice(i,1):pins.push(c);
+  store.set("hsk_pins",pins);
+  renderWordlist();
 }
 function openDetail(c){
   const w=WORDS.find(x=>x[0]===c);if(!w)return;
@@ -1612,6 +2087,7 @@ function openDetail(c){
     `<div class="sent"><div class="zh">${s[0]}</div><div class="py">${pin(s[1])}</div><div class="en">${esc(s[2])}</div></div>`).join("")
     :`<div class="empty">No example sentences loaded for this word yet.<br>Add them to the SENTENCES object in the source.</div>`;
   show("worddetail");
+  setupPractice(w[0]);
 }
 
 /* ---------- theme ---------- */
@@ -1629,6 +2105,108 @@ function toggleTheme(){
   applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
 }
 applyTheme(store.get("hsk_theme",window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+
+/* ---------- writing practice pad (word detail) ---------- */
+const DW={chars:[],idx:0,strokes:[],cur:null,guide:true,size:0};
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function setupPractice(word){
+  DW.chars=[...word];DW.idx=0;DW.strokes=[];DW.cur=null;
+  renderChips();
+  requestAnimationFrame(()=>{sizeCanvas();redrawPad()});
+}
+function renderChips(){
+  $("dchips").innerHTML=DW.chars.map((c,i)=>
+    `<button class="charchip ${i===DW.idx?"on":""}" onclick="pickChip(${i})">${c}</button>`).join("");
+  $("dchips").style.display=DW.chars.length>1?"flex":"none";
+}
+function pickChip(i){DW.idx=i;DW.strokes=[];renderChips();redrawPad()}
+function sizeCanvas(){
+  const c=$("dcanvas");
+  const w=c.parentElement.clientWidth-20;
+  if(w<=0)return;
+  const dpr=window.devicePixelRatio||1;
+  DW.size=w;
+  c.width=w*dpr;c.height=w*dpr;
+  c.style.height=w+"px";
+  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function redrawPad(){
+  const c=$("dcanvas"),ctx=c.getContext("2d"),s=DW.size;
+  if(!s)return;
+  ctx.clearRect(0,0,s,s);
+  // 米字格 practice-paper guides
+  ctx.save();
+  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);
+  ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);
+  ctx.moveTo(0,0);ctx.lineTo(s,s);
+  ctx.moveTo(s,0);ctx.lineTo(0,s);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeRect(.5,.5,s-1,s-1);
+  ctx.restore();
+  // faint template character to trace
+  if(DW.guide&&DW.chars[DW.idx]){
+    ctx.save();
+    ctx.globalAlpha=.14;
+    ctx.fillStyle=cssVar("--ink");
+    ctx.font=`600 ${s*.72}px "Noto Serif SC","Songti SC","SimSun",serif`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(DW.chars[DW.idx],s/2,s*.54);
+    ctx.restore();
+  }
+  // ink strokes (stored as 0..1 coordinates so resizing keeps them)
+  ctx.save();
+  ctx.strokeStyle=cssVar("--ink");
+  ctx.lineWidth=Math.max(5,s/40);
+  ctx.lineCap="round";ctx.lineJoin="round";
+  for(const st of DW.strokes)drawStroke(ctx,st,s);
+  ctx.restore();
+}
+function drawStroke(ctx,pts,s){
+  if(pts.length<2)return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x*s,pts[0].y*s);
+  for(let i=1;i<pts.length-1;i++){
+    const mx=(pts[i].x+pts[i+1].x)/2*s,my=(pts[i].y+pts[i+1].y)/2*s;
+    ctx.quadraticCurveTo(pts[i].x*s,pts[i].y*s,mx,my);
+  }
+  const l=pts[pts.length-1];
+  ctx.lineTo(l.x*s,l.y*s);
+  ctx.stroke();
+}
+function padPoint(e){
+  const r=$("dcanvas").getBoundingClientRect();
+  return {x:(e.clientX-r.left)/DW.size,y:(e.clientY-r.top)/DW.size};
+}
+(function(){
+  const c=$("dcanvas");
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    c.setPointerCapture(e.pointerId);
+    DW.cur=[padPoint(e)];
+    DW.strokes.push(DW.cur);
+  });
+  c.addEventListener("pointermove",e=>{
+    if(!DW.cur)return;
+    e.preventDefault();
+    DW.cur.push(padPoint(e));
+    redrawPad();
+  });
+  const end=e=>{DW.cur=null};
+  c.addEventListener("pointerup",end);
+  c.addEventListener("pointercancel",end);
+  window.addEventListener("resize",()=>{
+    if($("scr-worddetail").classList.contains("active")){sizeCanvas();redrawPad()}
+  });
+})();
+function drawClear(){DW.strokes=[];DW.cur=null;redrawPad()}
+function drawGuideToggle(){
+  DW.guide=!DW.guide;
+  $("dguidebtn").textContent="Guide: "+(DW.guide?"on":"off");
+  redrawPad();
+}
 
 updateCustomCount();
 </script></body>

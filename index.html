@@ -185,18 +185,45 @@ function pinyinMatch(input,stored){
   const inp=normPinyin(input);
   return inp===canon||inp===canon.replace(/v/g,"u");
 }
-function startTypeQuiz(pool,label){
-  againFn=()=>startTypeQuiz(pool,label);
-  TS={label,pool,lives:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+let typeTimer=null;
+function startTypeQuiz(pool,label,timed){
+  againFn=()=>startTypeQuiz(pool,label,timed);
+  clearInterval(typeTimer);
+  TS={label,pool,timed:!!timed,lives:timed?Infinity:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
+  if(timed){
+    TS.deadline=Date.now()+120000;
+    typeTimer=setInterval(typeTick,200);
+  }
   setFire("tcard",0);
   show("typequiz");renderType();
+}
+function typeTick(){
+  if(!TS||TS.done)return;
+  const left=Math.max(0,TS.deadline-Date.now());
+  const s=Math.ceil(left/1000);
+  const el=$("thearts");
+  el.innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
+  if(left<=0)typeTimeUp();
+}
+function typeTimeUp(){
+  TS.done=true;
+  clearInterval(typeTimer);
+  $("tinput").readOnly=true;
+  typeSave();
+  $("sumlabel").textContent=TS.label;
+  $("sumbest").classList.toggle("show",lastWasBest);
+  $("sumok").textContent=TS.ok;$("sumbad").textContent=TS.bad;
+  const t=TS.ok+TS.bad;
+  $("sumacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
+  $("sumwords").innerHTML=breakdownHTML(TS.results);
+  show("summary");
 }
 function renderType(){
   const w=TS.queue[TS.i];
   TS.answered=false;
   $("tchar").textContent=w[0];
   $("tseal").textContent=w[3]+"级";
-  $("thearts").innerHTML=heartsHTML(TS.lives,false);
+  if(!TS.timed)$("thearts").innerHTML=heartsHTML(TS.lives,false);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
   $("tprog").textContent=(TS.i+1)+" / "+TS.queue.length+" words";
   $("tfill").style.width=(TS.i/TS.queue.length*100)+"%";
@@ -211,7 +238,7 @@ function renderType(){
 function typeAction(){TS.answered?typeNext():typeCheck()}
 function typeKey(e){if(e.key==="Enter"){e.preventDefault();typeAction()}}
 function typeCheck(){
-  if(TS.answered)return;
+  if(TS.answered||TS.done)return;
   const w=TS.queue[TS.i];
   const inp=$("tinput");
   if(!inp.value.trim())return;
@@ -224,27 +251,35 @@ function typeCheck(){
   res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
   inp.focus();
   TS.results.push({c:w[0],ok:right});
-  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;TS.lives--}
+  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(!TS.timed)TS.lives--}
   setFire("tcard",TS.streak);
   if(right&&TS.streak>=5)inp.classList.add("rainbow");
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  $("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
-  $("tbtn").textContent=(TS.lives<=0)?"Results →":(TS.i+1>=TS.queue.length?"Finish →":"Next →");
+  if(!TS.timed)$("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
+  $("tbtn").textContent=(!TS.timed&&TS.lives<=0)?"Results →":((!TS.timed&&TS.i+1>=TS.queue.length)?"Finish →":"Next →");
 }
 function typeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
   store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
 }
 function typeNext(){
+  if(TS.done)return;
+  if(TS.timed){
+    TS.i++;
+    if(TS.i>=TS.queue.length){TS.queue=shuffle([...TS.pool]);TS.i=0} // loop the deck until time runs out
+    renderType();return;
+  }
   if(TS.lives<=0){
     typeSave();
     $("gook").textContent=TS.ok;$("gobad").textContent=TS.bad;
     const t=TS.ok+TS.bad;
     $("goacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
+    $("gowords").innerHTML=breakdownHTML(TS.results.filter(r=>!r.ok));
     show("gameover");return;
   }
   TS.i++;
@@ -266,6 +301,8 @@ document.addEventListener("keydown",e=>{
   }
 });
 function typeEndEarly(){
+  clearInterval(typeTimer);
+  if(TS)TS.done=true;
   if(TS&&TS.results.length)typeSave();
   show("home");
 }
@@ -317,6 +354,8 @@ function sentFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
+  $("sumbest").classList.toggle("show",lastWasBest);
   $("sumlabel").textContent=SS.label;
   $("sumok").textContent=SS.ok;$("sumbad").textContent=SS.bad;
   const t=SS.ok+SS.bad;
@@ -326,6 +365,23 @@ function sentFinish(){
 }
 function sentEndEarly(){
   if(SS&&SS.results.length)sentFinish();else show("home");
+}
+
+/* ---------- leaderboard ---------- */
+function renderLeaderboard(){
+  const best=store.get("hsk_best",{});
+  const entries=Object.entries(best).sort((a,b)=>b[1].ok-a[1].ok);
+  $("lblist").innerHTML=entries.length?entries.map(([label,v],i)=>{
+    const d=new Date(v.t);
+    const date=d.toLocaleDateString(undefined,{day:"numeric",month:"short"});
+    return `<div class="lbrow"><div class="rank">${i+1}</div>
+      <div><div class="lbl">${esc(label)}</div>
+      <div class="meta">${v.acc}% accuracy · ${date}</div></div>
+      <div class="best">✓ ${v.ok}</div></div>`;
+  }).join(""):`<div class="empty">No records yet — finish a session in any mode and your best score will appear here</div>`;
+}
+function clearBest(){
+  if(confirm("Clear all personal bests?")){store.del("hsk_best");renderLeaderboard()}
 }
 
 /* ---------- history ---------- */
@@ -361,6 +417,20 @@ function sentEndEarly(){
 .reveal.right .py{color:var(--jade)}
 .reveal .en{color:var(--muted);font-size:13px;margin-top:4px}
 .opts.hanziopts .opt{font-family:var(--hanzi);font-size:19px;font-weight:600;min-height:56px}
+.timerbig{font-variant-numeric:tabular-nums;font-size:36px;font-weight:700;color:var(--ink);letter-spacing:.02em}
+.timerbig.low{color:var(--seal);animation:timerpulse .5s ease-in-out infinite alternate}
+@keyframes timerpulse{from{opacity:1}to{opacity:.55}}
+.bestflag{color:#B8860B;font-size:12.5px;font-weight:700;margin-top:8px;letter-spacing:.04em;display:none}
+html[data-theme="dark"] .bestflag{color:var(--gold,#E8B64C);color:#E8B64C}
+.bestflag.show{display:block}
+.lbrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:12px 15px}
+.lbrow .rank{width:26px;height:26px;border-radius:8px;background:var(--seal2);color:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transform:rotate(-2deg)}
+html[data-theme="dark"] .lbrow .rank{color:var(--ink)}
+.lbrow .lbl{font-weight:600;font-size:13.5px}
+.lbrow .meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+.lbrow .best{margin-left:auto;font-size:17px;font-weight:800;color:var(--jade);font-variant-numeric:tabular-nums}
 /* streak (5+) rainbow ring */
 .onfire{border-color:transparent!important}
 .onfire::before{content:"";position:absolute;inset:-3px;z-index:-1;border-radius:21px;
@@ -488,6 +558,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="dd">Your last 10 sessions with a full word breakdown</div></div>
         <div class="chev">›</div>
       </button>
+      <button class="card" onclick="renderLeaderboard();show('leaderboard')">
+        <div class="sealic quiet">榜</div>
+        <div><div class="tt">Leaderboard</div>
+        <div class="dd">Your personal best score in every mode</div></div>
+        <div class="chev">›</div>
+      </button>
       <button class="card" onclick="openWordlist()">
         <div class="sealic quiet">词</div>
         <div><div class="tt">Word list</div>
@@ -597,7 +673,8 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 
   <!-- SUMMARY -->
   <section class="screen" id="scr-summary">
-    <div class="centerpiece"><div class="sealic lg">成</div><h2>Session summary</h2><p id="sumlabel"></p></div>
+    <div class="centerpiece"><div class="sealic lg">成</div><h2>Session summary</h2><p id="sumlabel"></p>
+      <p class="bestflag" id="sumbest">★ New personal best</p></div>
     <div class="bigstats">
       <div class="stat ok"><div class="v" id="sumok">0</div><div class="l">Correct</div></div>
       <div class="stat bad"><div class="v" id="sumbad">0</div><div class="l">Wrong</div></div>
@@ -613,7 +690,8 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 
   <!-- GAME OVER -->
   <section class="screen" id="scr-gameover">
-    <div class="centerpiece"><div class="sealic lg quiet">败</div><h2>Game over</h2><p>You used all 5 lives</p></div>
+    <div class="centerpiece"><div class="sealic lg quiet">败</div><h2>Game over</h2><p>You used all 5 lives</p>
+      <p class="bestflag" id="gobest">★ New personal best</p></div>
     <div class="bigstats">
       <div class="stat ok"><div class="v" id="gook">0</div><div class="l">Correct</div></div>
       <div class="stat bad"><div class="v" id="gobad">0</div><div class="l">Wrong</div></div>
@@ -623,6 +701,8 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <button class="btn primary" onclick="playAgain()">Try again</button>
       <button class="btn ghost" onclick="show('home')">Home</button>
     </div>
+    <div class="sechead">Words you got wrong</div>
+    <div class="breakdown" id="gowords"></div>
   </section>
 
   <!-- HISTORY -->
@@ -633,6 +713,17 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <button class="linkbtn" onclick="clearHistory()">Clear all</button>
     </div>
     <div class="rows" id="historylist"></div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section class="screen" id="scr-leaderboard">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('home')">← Home</button>
+      <h2>Leaderboard</h2>
+      <button class="linkbtn" onclick="clearBest()">Clear all</button>
+    </div>
+    <p class="hint">Your highest number of correct answers in a single session, per mode</p>
+    <div class="rows" id="lblist"></div>
   </section>
 
   <!-- WORD LIST -->
@@ -997,8 +1088,10 @@ const TABS=[...LEVELS,[5,"Master"]];
 
 /* ---------- level select ---------- */
 let pendingMode="arcade";
-function goLevels(mode){
+let pendingTimed=false;
+function goLevels(mode,keepTimed){
   pendingMode=mode;
+  if(!keepTimed)pendingTimed=false;
   const rows=LEVELS.map(([lv,name,desc,em])=>{
     const n=mode==="sentences"?SENTQ.filter(s=>s[0]<=lv).length:WORDS.filter(w=>w[3]<=lv).length;
     const unit=mode==="sentences"?"sentences":"words";
@@ -1019,12 +1112,19 @@ function goLevels(mode){
       <div class="dd">Hand-pick specific words from the word list and get tested only on those</div></div>
       <div class="chev">›</div></button>`);
   }
+  if(mode==="typing"){
+    rows.unshift(`<button class="card" onclick="pendingTimed=!pendingTimed;goLevels('typing',true)">
+      <div class="sealic ${pendingTimed?"":"quiet"}">时</div>
+      <div><div class="tt">Time attack — ${pendingTimed?"ON":"OFF"}</div>
+      <div class="dd">2:00 on the clock, no lives. Score as many words as you can, then pick a level below</div></div>
+      <div class="chev">${pendingTimed?"✓":"›"}</div></button>`);
+  }
   $("levelrows").innerHTML=rows.join("");
   show("levels");
 }
 function startMaster(){
   const pool=WORDS.filter(w=>w[3]===5);
-  if(pendingMode==="typing")startTypeQuiz(pool,"Master · typing");
+  if(pendingMode==="typing")startTypeQuiz(pool,`Master · ${pendingTimed?"time attack":"typing"}`,pendingTimed);
   else startQuiz("arcade",pool,"Master · arcade");
 }
 function startLevel(lv){
@@ -1033,7 +1133,7 @@ function startLevel(lv){
     return;
   }
   if(pendingMode==="typing"){
-    startTypeQuiz(WORDS.filter(w=>w[3]<=lv),`HSK ${lv} · typing`);
+    startTypeQuiz(WORDS.filter(w=>w[3]<=lv),`HSK ${lv} · ${pendingTimed?"time attack":"typing"}`,pendingTimed);
     return;
   }
   const pool=WORDS.filter(w=>w[3]<=lv);
@@ -1222,10 +1322,24 @@ function endEarly(){
   show("home");
 }
 function accuracy(){const t=S.ok+S.bad;return t?Math.round(S.ok/t*100):0}
+let lastWasBest=false;
+function recordBest(label,ok,bad){
+  const key=label.indexOf("Custom")===0?"Custom · arcade":label;
+  const best=store.get("hsk_best",{});
+  const acc=ok+bad?Math.round(ok/(ok+bad)*100):0;
+  const cur=best[key];
+  if(ok>0&&(!cur||ok>cur.ok||(ok===cur.ok&&acc>cur.acc))){
+    best[key]={ok,bad,acc,t:Date.now()};
+    store.set("hsk_best",best);
+    return true;
+  }
+  return false;
+}
 function saveSession(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:S.label,ok:S.ok,bad:S.bad,words:S.results});
   store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(S.label,S.ok,S.bad);
 }
 function breakdownHTML(results){
   return results.map(r=>{
@@ -1236,13 +1350,16 @@ function breakdownHTML(results){
   }).join("");
 }
 function showSummary(){
+  $("sumbest").classList.toggle("show",lastWasBest);
   $("sumlabel").textContent=S.label;
   $("sumok").textContent=S.ok;$("sumbad").textContent=S.bad;$("sumacc").textContent=accuracy()+"%";
   $("sumwords").innerHTML=breakdownHTML(S.results);
   show("summary");
 }
 function showGameOver(){
+  $("gobest").classList.toggle("show",lastWasBest);
   $("gook").textContent=S.ok;$("gobad").textContent=S.bad;$("goacc").textContent=accuracy()+"%";
+  $("gowords").innerHTML=breakdownHTML(S.results.filter(r=>!r.ok));
   show("gameover");
 }
 function playAgain(){if(againFn)againFn()}
@@ -1255,18 +1372,45 @@ function pinyinMatch(input,stored){
   const inp=normPinyin(input);
   return inp===canon||inp===canon.replace(/v/g,"u");
 }
-function startTypeQuiz(pool,label){
-  againFn=()=>startTypeQuiz(pool,label);
-  TS={label,pool,lives:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+let typeTimer=null;
+function startTypeQuiz(pool,label,timed){
+  againFn=()=>startTypeQuiz(pool,label,timed);
+  clearInterval(typeTimer);
+  TS={label,pool,timed:!!timed,lives:timed?Infinity:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
+  if(timed){
+    TS.deadline=Date.now()+120000;
+    typeTimer=setInterval(typeTick,200);
+  }
   setFire("tcard",0);
   show("typequiz");renderType();
+}
+function typeTick(){
+  if(!TS||TS.done)return;
+  const left=Math.max(0,TS.deadline-Date.now());
+  const s=Math.ceil(left/1000);
+  const el=$("thearts");
+  el.innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
+  if(left<=0)typeTimeUp();
+}
+function typeTimeUp(){
+  TS.done=true;
+  clearInterval(typeTimer);
+  $("tinput").readOnly=true;
+  typeSave();
+  $("sumlabel").textContent=TS.label;
+  $("sumbest").classList.toggle("show",lastWasBest);
+  $("sumok").textContent=TS.ok;$("sumbad").textContent=TS.bad;
+  const t=TS.ok+TS.bad;
+  $("sumacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
+  $("sumwords").innerHTML=breakdownHTML(TS.results);
+  show("summary");
 }
 function renderType(){
   const w=TS.queue[TS.i];
   TS.answered=false;
   $("tchar").textContent=w[0];
   $("tseal").textContent=w[3]+"级";
-  $("thearts").innerHTML=heartsHTML(TS.lives,false);
+  if(!TS.timed)$("thearts").innerHTML=heartsHTML(TS.lives,false);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
   $("tprog").textContent=(TS.i+1)+" / "+TS.queue.length+" words";
   $("tfill").style.width=(TS.i/TS.queue.length*100)+"%";
@@ -1281,7 +1425,7 @@ function renderType(){
 function typeAction(){TS.answered?typeNext():typeCheck()}
 function typeKey(e){if(e.key==="Enter"){e.preventDefault();typeAction()}}
 function typeCheck(){
-  if(TS.answered)return;
+  if(TS.answered||TS.done)return;
   const w=TS.queue[TS.i];
   const inp=$("tinput");
   if(!inp.value.trim())return;
@@ -1294,27 +1438,35 @@ function typeCheck(){
   res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
   inp.focus();
   TS.results.push({c:w[0],ok:right});
-  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;TS.lives--}
+  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(!TS.timed)TS.lives--}
   setFire("tcard",TS.streak);
   if(right&&TS.streak>=5)inp.classList.add("rainbow");
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  $("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
-  $("tbtn").textContent=(TS.lives<=0)?"Results →":(TS.i+1>=TS.queue.length?"Finish →":"Next →");
+  if(!TS.timed)$("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
+  $("tbtn").textContent=(!TS.timed&&TS.lives<=0)?"Results →":((!TS.timed&&TS.i+1>=TS.queue.length)?"Finish →":"Next →");
 }
 function typeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
   store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
 }
 function typeNext(){
+  if(TS.done)return;
+  if(TS.timed){
+    TS.i++;
+    if(TS.i>=TS.queue.length){TS.queue=shuffle([...TS.pool]);TS.i=0} // loop the deck until time runs out
+    renderType();return;
+  }
   if(TS.lives<=0){
     typeSave();
     $("gook").textContent=TS.ok;$("gobad").textContent=TS.bad;
     const t=TS.ok+TS.bad;
     $("goacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
+    $("gowords").innerHTML=breakdownHTML(TS.results.filter(r=>!r.ok));
     show("gameover");return;
   }
   TS.i++;
@@ -1336,6 +1488,8 @@ document.addEventListener("keydown",e=>{
   }
 });
 function typeEndEarly(){
+  clearInterval(typeTimer);
+  if(TS)TS.done=true;
   if(TS&&TS.results.length)typeSave();
   show("home");
 }
@@ -1387,6 +1541,8 @@ function sentFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
+  $("sumbest").classList.toggle("show",lastWasBest);
   $("sumlabel").textContent=SS.label;
   $("sumok").textContent=SS.ok;$("sumbad").textContent=SS.bad;
   const t=SS.ok+SS.bad;
@@ -1396,6 +1552,23 @@ function sentFinish(){
 }
 function sentEndEarly(){
   if(SS&&SS.results.length)sentFinish();else show("home");
+}
+
+/* ---------- leaderboard ---------- */
+function renderLeaderboard(){
+  const best=store.get("hsk_best",{});
+  const entries=Object.entries(best).sort((a,b)=>b[1].ok-a[1].ok);
+  $("lblist").innerHTML=entries.length?entries.map(([label,v],i)=>{
+    const d=new Date(v.t);
+    const date=d.toLocaleDateString(undefined,{day:"numeric",month:"short"});
+    return `<div class="lbrow"><div class="rank">${i+1}</div>
+      <div><div class="lbl">${esc(label)}</div>
+      <div class="meta">${v.acc}% accuracy · ${date}</div></div>
+      <div class="best">✓ ${v.ok}</div></div>`;
+  }).join(""):`<div class="empty">No records yet — finish a session in any mode and your best score will appear here</div>`;
+}
+function clearBest(){
+  if(confirm("Clear all personal bests?")){store.del("hsk_best");renderLeaderboard()}
 }
 
 /* ---------- history ---------- */

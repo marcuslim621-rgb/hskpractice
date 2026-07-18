@@ -57,7 +57,7 @@ html[data-theme="dark"]{
 }
 html[data-theme="dark"] body{-webkit-font-smoothing:auto}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none}
 body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.45;
   -webkit-font-smoothing:antialiased}
 .app{max-width:440px;margin:0 auto;min-height:100vh;padding:22px 18px 44px;position:relative}
@@ -291,8 +291,10 @@ html[data-theme="dark"] .poschip.idiom{background:rgba(255,255,255,.08);color:va
 .btn.good{background:var(--jade);border-color:var(--jade);color:#fff}
 .btn.badbtn{background:var(--seal);border-color:var(--seal);color:#fff}
 .drawwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;
+  overscroll-behavior:contain;touch-action:none;
   box-shadow:0 1px 3px rgba(33,36,44,.05)}
 #dcanvas{display:block;margin:0 auto;border-radius:10px;touch-action:none;cursor:crosshair}
+#wcanvas{display:block;margin:0 auto;border-radius:10px;touch-action:none;cursor:crosshair}
 .drawtools{display:flex;gap:7px;margin-top:10px}
 .charchips{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
 .charchip{border:1px solid var(--line);background:var(--card);border-radius:10px;min-width:44px;height:44px;
@@ -1783,16 +1785,17 @@ function wPadPoint(e){
     c.setPointerCapture(e.pointerId);
     WPAD.cur=[wPadPoint(e)];
     WPAD.strokes.push(WPAD.cur);
-  });
+  },{passive:false});
   c.addEventListener("pointermove",e=>{
     if(!WPAD.cur)return;
     e.preventDefault();
     WPAD.cur.push(wPadPoint(e));
     redrawWPad();
-  });
+  },{passive:false});
   const end=()=>{WPAD.cur=null};
   c.addEventListener("pointerup",end);
   c.addEventListener("pointercancel",end);
+  c.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
   window.addEventListener("resize",()=>{
     if($("scr-writequiz").classList.contains("active")){sizeWCanvas();redrawWPad()}
   });
@@ -2127,16 +2130,19 @@ function padPoint(e){
     c.setPointerCapture(e.pointerId);
     DW.cur=[padPoint(e)];
     DW.strokes.push(DW.cur);
-  });
+  },{passive:false});
   c.addEventListener("pointermove",e=>{
     if(!DW.cur)return;
     e.preventDefault();
     DW.cur.push(padPoint(e));
     redrawPad();
-  });
+  },{passive:false});
   const end=e=>{DW.cur=null};
   c.addEventListener("pointerup",end);
   c.addEventListener("pointercancel",end);
+  // belt-and-braces: some mobile browsers still scroll on touchmove unless
+  // this is blocked directly, even with touch-action:none + pointer preventDefault
+  c.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
   window.addEventListener("resize",()=>{
     if($("scr-worddetail").classList.contains("active")){sizeCanvas();redrawPad()}
   });

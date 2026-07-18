@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F4F4F1;        /* porcelain */
+  --bg:#EBEBE6;        /* page surface, sits behind cards */
   --card:#FFFFFF;
   --ink:#21242C;
   --muted:#70757F;
@@ -25,11 +25,17 @@
   --fill:#21242C;      /* filled controls */
   --on-fill:#FFFFFF;
   --seal2:#21242C;     /* quiet seal stamps */
+  --tile-ink-bg:rgba(33,36,44,.05);
+  --tile-ink-border:rgba(33,36,44,.15);
+  --tile-ink-border-hover:rgba(33,36,44,.25);
+  --tile-jade-bg:rgba(31,133,87,.05);
+  --tile-jade-border:rgba(31,133,87,.15);
+  --tile-jade-border-hover:rgba(31,133,87,.25);
   --hanzi:"Noto Serif SC","Songti SC","SimSun",serif;
   --ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 html[data-theme="dark"]{
-  --bg:#16171C;        /* lacquer */
+  --bg:#0F1013;        /* page surface, deeper than card in dark mode too */
   --card:#1E2028;
   --ink:#ECEBE6;
   --muted:#8B8F99;
@@ -42,6 +48,12 @@ html[data-theme="dark"]{
   --fill:#ECEBE6;
   --on-fill:#17181C;
   --seal2:#2B2E37;
+  --tile-ink-bg:rgba(236,235,230,.11);
+  --tile-ink-border:rgba(236,235,230,.23);
+  --tile-ink-border-hover:rgba(236,235,230,.33);
+  --tile-jade-bg:rgba(65,179,131,.11);
+  --tile-jade-border:rgba(65,179,131,.23);
+  --tile-jade-border-hover:rgba(65,179,131,.33);
 }
 html[data-theme="dark"] body{-webkit-font-smoothing:auto}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -62,10 +74,11 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radi
   transform:rotate(-2deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 0 0 3px var(--seal)}
 .sealic.quiet{background:var(--seal2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--seal2)}
 html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
+.sealic.jade{background:var(--jade);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--jade)}
 .sealic.lg{width:56px;height:56px;font-size:26px;border-radius:12px;margin:0 auto}
 
 /* ---------- header ---------- */
-.hero{text-align:center;padding:30px 0 26px}
+.hero{text-align:center;padding:30px 0 26px;position:relative;overflow:hidden}
 .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--seal);font-weight:600;margin-bottom:10px}
 .hero h1{font-family:var(--hanzi);font-weight:700;font-size:25px;letter-spacing:.01em}
 .hero .sub{color:var(--muted);font-size:13px;margin-top:7px}
@@ -87,6 +100,39 @@ html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
 .card .dd{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
 .card .chev{margin-left:auto;color:#C4C4BD;font-size:16px}
 
+/* ---------- hero card (Learn / Word list) ---------- */
+.card.hero{position:relative;overflow:hidden;align-items:flex-start;border-radius:20px;padding:26px 22px;
+  gap:16px;box-shadow:0 1px 2px rgba(33,36,44,.05)}
+.card.hero .sealic{width:56px;height:56px;font-size:25px;border-radius:13px}
+.card.hero .tt{font-size:17px}
+.card.hero .dd{font-size:13px;margin-top:5px;line-height:1.55}
+.card.hero .cta{margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;
+  font-weight:700;color:var(--seal)}
+
+/* ---------- ghost glyph watermark ---------- */
+.ghost{position:absolute;font-family:var(--hanzi);font-weight:600;line-height:1;pointer-events:none;
+  z-index:0;opacity:.07}
+@media (prefers-reduced-motion:no-preference){.ghost{opacity:.07}}
+.ghost.heroghost{top:-18px;left:50%;transform:translateX(-50%);font-size:150px;color:var(--ink);opacity:.05}
+.ghost.cardghost{right:-14px;bottom:-26px;font-size:150px;color:var(--seal)}
+.ghost.tileghost{right:-10px;bottom:-20px;font-size:96px;color:var(--ink);transform:rotate(-6deg)}
+.ghost.tileghost.jadeghost{color:var(--jade)}
+
+/* ---------- 2-column tinted tile grid (Practice / Review) ---------- */
+.tilegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{position:relative;overflow:hidden;text-align:left;border:none;cursor:pointer;
+  display:flex;flex-direction:column;gap:8px;border-radius:16px;padding:18px;
+  color:var(--ink);font-family:var(--ui);transition:border-color .12s}
+.tile.practice{min-height:158px}
+.tile.ink{background:var(--tile-ink-bg);border:1px solid var(--tile-ink-border)}
+.tile.ink:hover{border-color:var(--tile-ink-border-hover)}
+.tile.jade{background:var(--tile-jade-bg);border:1px solid var(--tile-jade-border)}
+.tile.jade:hover{border-color:var(--tile-jade-border-hover)}
+.tile:active{transform:scale(.99)}
+.tile .sealic{position:relative;width:42px;height:42px;font-size:19px;border-radius:11px}
+.tile .tt{position:relative;font-size:14.5px;font-weight:600;letter-spacing:-.005em}
+.tile .dd{position:relative;font-size:12px;color:var(--muted);line-height:1.5}
+
 /* ---------- tabs ---------- */
 .tabs{display:flex;gap:7px;margin-bottom:13px;overflow-x:auto;padding-bottom:2px}
 .tab{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:99px;
@@ -104,6 +150,10 @@ html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
 .wrow .tick{margin-left:auto;width:21px;height:21px;border-radius:6px;border:1.5px solid var(--line);
   display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;flex-shrink:0}
 .wrow.sel .tick{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.namebox{width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);
+  padding:13px 14px;font-size:17px;font-weight:700;margin-bottom:12px;font-family:var(--ui)}
+.namebox:focus{outline:none;border-color:var(--ink)}
+.namebox::placeholder{color:#A6A9B0;font-weight:500}
 .searchbox{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;color:var(--ink);
   padding:11px 14px;font-size:14px;margin-bottom:11px;font-family:var(--ui)}
 .searchbox::placeholder{color:#A6A9B0}
@@ -177,359 +227,6 @@ html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
 .btn.primary:disabled{opacity:.3;cursor:default}
 .btn.ghost{background:var(--card);color:var(--ink)}
 
-/* ---------- typing quiz engine ---------- */
-let TS=null;
-function normPinyin(p){return p.toLowerCase().replace(/u:/g,"v").replace(/[^a-z]/g,"")}
-function pinyinMatch(input,stored){
-  const canon=normPinyin(stored);           // stored uses v for ü, digits stripped
-  const inp=normPinyin(input);
-  return inp===canon||inp===canon.replace(/v/g,"u");
-}
-let typeTimer=null;
-function startTypeQuiz(pool,label,timed){
-  againFn=()=>startTypeQuiz(pool,label,timed);
-  clearInterval(typeTimer);
-  TS={label,pool,timed:!!timed,lives:timed?Infinity:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
-  if(timed){
-    TS.deadline=Date.now()+120000;
-    typeTimer=setInterval(typeTick,200);
-  }
-  setFire("tcard",0);
-  show("typequiz");renderType();
-}
-function typeTick(){
-  if(!TS||TS.done)return;
-  const left=Math.max(0,TS.deadline-Date.now());
-  const s=Math.ceil(left/1000);
-  const el=$("thearts");
-  el.innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
-  if(left<=0)typeTimeUp();
-}
-function typeTimeUp(){
-  TS.done=true;
-  clearInterval(typeTimer);
-  $("tinput").readOnly=true;
-  typeSave();
-  $("sumlabel").textContent=TS.label;
-  $("sumbest").classList.toggle("show",lastWasBest);
-  $("sumok").textContent=TS.ok;$("sumbad").textContent=TS.bad;
-  const t=TS.ok+TS.bad;
-  $("sumacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
-  $("sumwords").innerHTML=breakdownHTML(TS.results);
-  show("summary");
-}
-function renderType(){
-  const w=TS.queue[TS.i];
-  TS.answered=false;
-  $("tchar").textContent=w[0];
-  $("tseal").textContent=w[3]+"级";
-  if(!TS.timed)$("thearts").innerHTML=heartsHTML(TS.lives,false);
-  $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  $("tprog").textContent=(TS.i+1)+" / "+TS.queue.length+" words";
-  $("tfill").style.width=(TS.i/TS.queue.length*100)+"%";
-  const inp=$("tinput");
-  inp.value="";inp.className="typeinput";inp.readOnly=false;inp.disabled=false;
-  const res=$("tresult");
-  res.className="typeresult";
-  res.innerHTML="Tones aren't needed — for ü you can type u or v";
-  $("tbtn").textContent="Check";
-  inp.focus();
-}
-function typeAction(){TS.answered?typeNext():typeCheck()}
-function typeKey(e){if(e.key==="Enter"){e.preventDefault();typeAction()}}
-function typeCheck(){
-  if(TS.answered||TS.done)return;
-  const w=TS.queue[TS.i];
-  const inp=$("tinput");
-  if(!inp.value.trim())return;
-  TS.answered=true;
-  const right=pinyinMatch(inp.value,w[1]);
-  inp.readOnly=true;
-  inp.classList.add(right?"right":"wrong");
-  const res=$("tresult");
-  res.className="typeresult "+(right?"right":"wrong");
-  res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
-  inp.focus();
-  TS.results.push({c:w[0],ok:right});
-  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(!TS.timed)TS.lives--}
-  setFire("tcard",TS.streak);
-  if(right&&TS.streak>=5)inp.classList.add("rainbow");
-  const seen=store.get("hsk_seen",{});
-  seen[w[0]]=(seen[w[0]]||0)+1;
-  store.set("hsk_seen",seen);
-  $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  if(!TS.timed)$("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
-  $("tbtn").textContent=(!TS.timed&&TS.lives<=0)?"Results →":((!TS.timed&&TS.i+1>=TS.queue.length)?"Finish →":"Next →");
-}
-function typeSave(){
-  const hist=store.get("hsk_history",[]);
-  hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
-  store.set("hsk_history",hist.slice(0,10));
-  lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
-}
-function typeNext(){
-  if(TS.done)return;
-  if(TS.timed){
-    TS.i++;
-    if(TS.i>=TS.queue.length){TS.queue=shuffle([...TS.pool]);TS.i=0} // loop the deck until time runs out
-    renderType();return;
-  }
-  if(TS.lives<=0){
-    typeSave();
-    $("gook").textContent=TS.ok;$("gobad").textContent=TS.bad;
-    const t=TS.ok+TS.bad;
-    $("goacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
-    $("gowords").innerHTML=breakdownHTML(TS.results.filter(r=>!r.ok));
-    show("gameover");return;
-  }
-  TS.i++;
-  if(TS.i>=TS.queue.length){
-    typeSave();
-    $("sumlabel").textContent=TS.label;
-    $("sumok").textContent=TS.ok;$("sumbad").textContent=TS.bad;
-    const t=TS.ok+TS.bad;
-    $("sumacc").textContent=(t?Math.round(TS.ok/t*100):0)+"%";
-    $("sumwords").innerHTML=breakdownHTML(TS.results);
-    show("summary");return;
-  }
-  renderType();
-}
-document.addEventListener("keydown",e=>{
-  if(e.key==="Enter"&&TS&&TS.answered&&$("scr-typequiz").classList.contains("active")
-     &&document.activeElement!==$("tinput")){
-    e.preventDefault();typeNext();
-  }
-});
-function typeEndEarly(){
-  clearInterval(typeTimer);
-  if(TS)TS.done=true;
-  if(TS&&TS.results.length)typeSave();
-  show("home");
-}
-
-/* ---------- writing quiz engine (flashcard, self-graded) ---------- */
-let WQ=null;
-const WPAD={strokes:[],cur:null,size:0,cells:1};
-function startWriteQuiz(pool,label){
-  againFn=()=>startWriteQuiz(pool,label);
-  WQ={label,pool,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
-  setFire("wcard",0);
-  show("writequiz");
-  requestAnimationFrame(()=>renderWrite());
-}
-function renderWrite(){
-  const w=WQ.queue[WQ.i];
-  WQ.revealed=false;
-  $("wen").textContent=w[2];
-  $("wok").textContent="✓ "+WQ.ok;$("wbad").textContent="✗ "+WQ.bad;
-  $("wprog").textContent=(WQ.i+1)+" / "+WQ.queue.length+" words";
-  $("wfill").style.width=(WQ.i/WQ.queue.length*100)+"%";
-  $("wreveal").classList.remove("show");
-  $("wgrade").classList.remove("show");
-  $("wrevealbtn").style.display="block";
-  WPAD.strokes=[];WPAD.cur=null;
-  WPAD.cells=Math.min([...w[0]].length,4);
-  sizeWCanvas();redrawWPad();
-}
-function writeReveal(){
-  if(WQ.revealed)return;
-  WQ.revealed=true;
-  const w=WQ.queue[WQ.i];
-  $("wzh").textContent=w[0];
-  $("wpy").textContent=pin(w[1]);
-  $("wreveal").classList.add("show");
-  $("wrevealbtn").style.display="none";
-  $("wgrade").classList.add("show");
-}
-function writeGrade(right){
-  const w=WQ.queue[WQ.i];
-  WQ.results.push({c:w[0],ok:right});
-  if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0}
-  setFire("wcard",WQ.streak);
-  const seen=store.get("hsk_seen",{});
-  seen[w[0]]=(seen[w[0]]||0)+1;
-  store.set("hsk_seen",seen);
-  WQ.i++;
-  if(WQ.i>=WQ.queue.length){writeFinish();return}
-  renderWrite();
-}
-function writeSave(){
-  const hist=store.get("hsk_history",[]);
-  hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
-  store.set("hsk_history",hist.slice(0,10));
-  lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
-}
-function writeFinish(){
-  writeSave();
-  $("sumbest").classList.toggle("show",lastWasBest);
-  $("sumlabel").textContent=WQ.label;
-  $("sumok").textContent=WQ.ok;$("sumbad").textContent=WQ.bad;
-  const t=WQ.ok+WQ.bad;
-  $("sumacc").textContent=(t?Math.round(WQ.ok/t*100):0)+"%";
-  $("sumwords").innerHTML=breakdownHTML(WQ.results);
-  show("summary");
-}
-function writeEndEarly(){
-  if(WQ&&WQ.results.length)writeSave();
-  show("home");
-}
-/* writing-mode drawing pad: one 米字格 cell per character */
-function sizeWCanvas(){
-  const c=$("wcanvas");
-  const avail=c.parentElement.clientWidth-20;
-  if(avail<=0)return;
-  const cell=Math.min(avail/WPAD.cells,300);
-  const w=cell*WPAD.cells,hgt=cell;
-  const dpr=window.devicePixelRatio||1;
-  WPAD.size=cell;
-  c.width=w*dpr;c.height=hgt*dpr;
-  c.style.width=w+"px";c.style.height=hgt+"px";
-  c.style.margin="0 auto";
-  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
-}
-function redrawWPad(){
-  const c=$("wcanvas"),ctx=c.getContext("2d"),cell=WPAD.size,n=WPAD.cells;
-  if(!cell)return;
-  ctx.clearRect(0,0,cell*n,cell);
-  ctx.save();
-  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;
-  for(let k=0;k<n;k++){
-    const ox=k*cell;
-    ctx.setLineDash([5,5]);
-    ctx.beginPath();
-    ctx.moveTo(ox+cell/2,0);ctx.lineTo(ox+cell/2,cell);
-    ctx.moveTo(ox,cell/2);ctx.lineTo(ox+cell,cell/2);
-    ctx.moveTo(ox,0);ctx.lineTo(ox+cell,cell);
-    ctx.moveTo(ox+cell,0);ctx.lineTo(ox,cell);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.strokeRect(ox+.5,.5,cell-1,cell-1);
-  }
-  ctx.restore();
-  ctx.save();
-  ctx.strokeStyle=cssVar("--ink");
-  ctx.lineWidth=Math.max(5,cell/40);
-  ctx.lineCap="round";ctx.lineJoin="round";
-  const s=cell; // strokes normalised to cell height; x spans 0..n
-  for(const st of WPAD.strokes){
-    if(st.length<2)continue;
-    ctx.beginPath();
-    ctx.moveTo(st[0].x*s,st[0].y*s);
-    for(let i=1;i<st.length-1;i++){
-      const mx=(st[i].x+st[i+1].x)/2*s,my=(st[i].y+st[i+1].y)/2*s;
-      ctx.quadraticCurveTo(st[i].x*s,st[i].y*s,mx,my);
-    }
-    const l=st[st.length-1];
-    ctx.lineTo(l.x*s,l.y*s);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-function wPadPoint(e){
-  const r=$("wcanvas").getBoundingClientRect();
-  return {x:(e.clientX-r.left)/WPAD.size,y:(e.clientY-r.top)/WPAD.size};
-}
-(function(){
-  const c=$("wcanvas");
-  c.addEventListener("pointerdown",e=>{
-    e.preventDefault();
-    c.setPointerCapture(e.pointerId);
-    WPAD.cur=[wPadPoint(e)];
-    WPAD.strokes.push(WPAD.cur);
-  });
-  c.addEventListener("pointermove",e=>{
-    if(!WPAD.cur)return;
-    e.preventDefault();
-    WPAD.cur.push(wPadPoint(e));
-    redrawWPad();
-  });
-  const end=()=>{WPAD.cur=null};
-  c.addEventListener("pointerup",end);
-  c.addEventListener("pointercancel",end);
-  window.addEventListener("resize",()=>{
-    if($("scr-writequiz").classList.contains("active")){sizeWCanvas();redrawWPad()}
-  });
-})();
-function writeClear(){WPAD.strokes=[];WPAD.cur=null;redrawWPad()}
-
-/* ---------- sentence quiz engine ---------- */
-let SS=null;
-function startSentQuiz(pool,label){
-  againFn=()=>startSentQuiz(pool,label);
-  SS={label,queue:shuffle([...pool]),i:0,ok:0,bad:0,streak:0,results:[]};
-  setFire("scard",0);
-  show("sentquiz");renderSent();
-}
-function renderSent(){
-  const q=SS.queue[SS.i];
-  SS.answered=false;
-  $("ssent").innerHTML=esc(q[1]).replace("___",'<span class="blank">＿＿＿</span>');
-  $("sreveal").className="reveal";
-  $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
-  $("sprog").textContent=(SS.i+1)+" / "+SS.queue.length;
-  $("sfill").style.width=(SS.i/SS.queue.length*100)+"%";
-  $("snext").disabled=true;
-  const opts=shuffle([q[2],...q[3]]);
-  $("opts-sent").innerHTML=opts.map(o=>
-    `<button class="opt" onclick="answerSent(this,${o===q[2]})">${o}</button>`).join("");
-}
-function answerSent(btn,right){
-  if(SS.answered)return;SS.answered=true;
-  const q=SS.queue[SS.i];
-  [...$("opts-sent").children].forEach(b=>{b.disabled=true;if(b.textContent===q[2])b.classList.add("right")});
-  if(!right)btn.classList.add("wrong");
-  if(right){SS.ok++;SS.streak++}else{SS.bad++;SS.streak=0}
-  setFire("scard",SS.streak);
-  if(right&&SS.streak>=5)btn.classList.add("rainbow");
-  SS.results.push({c:q[2],ok:right});
-  $("ssent").innerHTML=esc(q[1]).replace("___",`<span class="filled ${right?"ok":""}">${q[2]}</span>`);
-  $("srevealpy").textContent=pin(q[4]);
-  $("srevealen").textContent=q[5];
-  $("sreveal").className="reveal show "+(right?"right":"wrong");
-  $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
-  $("snext").disabled=false;
-  $("snext").textContent=SS.i+1>=SS.queue.length?"Finish →":"Next →";
-}
-function sentNext(){
-  SS.i++;
-  if(SS.i>=SS.queue.length){sentFinish();return}
-  renderSent();
-}
-function sentFinish(){
-  const hist=store.get("hsk_history",[]);
-  hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
-  store.set("hsk_history",hist.slice(0,10));
-  lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
-  $("sumbest").classList.toggle("show",lastWasBest);
-  $("sumlabel").textContent=SS.label;
-  $("sumok").textContent=SS.ok;$("sumbad").textContent=SS.bad;
-  const t=SS.ok+SS.bad;
-  $("sumacc").textContent=(t?Math.round(SS.ok/t*100):0)+"%";
-  $("sumwords").innerHTML=breakdownHTML(SS.results);
-  show("summary");
-}
-function sentEndEarly(){
-  if(SS&&SS.results.length)sentFinish();else show("home");
-}
-
-/* ---------- leaderboard ---------- */
-function renderLeaderboard(){
-  const best=store.get("hsk_best",{});
-  const entries=Object.entries(best).sort((a,b)=>b[1].ok-a[1].ok);
-  $("lblist").innerHTML=entries.length?entries.map(([label,v],i)=>{
-    const d=new Date(v.t);
-    const date=d.toLocaleDateString(undefined,{day:"numeric",month:"short"});
-    return `<div class="lbrow"><div class="rank">${i+1}</div>
-      <div><div class="lbl">${esc(label)}</div>
-      <div class="meta">${v.acc}% accuracy · ${date}</div></div>
-      <div class="best">✓ ${v.ok}</div></div>`;
-  }).join(""):`<div class="empty">No records yet — finish a session in any mode and your best score will appear here</div>`;
-}
-function clearBest(){
-  if(confirm("Clear all personal bests?")){store.del("hsk_best");renderLeaderboard()}
-}
-
-/* ---------- history ---------- */
 .hitem{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px;cursor:pointer}
 .hitem .top{display:flex;align-items:center;gap:8px;font-size:13.5px}
 .hitem .mode{font-weight:600}
@@ -562,7 +259,22 @@ function clearBest(){
 .reveal.right .py{color:var(--jade)}
 .reveal .en{color:var(--muted);font-size:13px;margin-top:4px}
 .opts.hanziopts .opt{font-family:var(--hanzi);font-size:19px;font-weight:600;min-height:56px}
-.pin{margin-left:auto;font-size:17px;line-height:1;color:var(--line-strong);cursor:pointer;
+/* part-of-speech badges */
+.poschip{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.02em;
+  flex-shrink:0;white-space:nowrap;margin-left:auto}
+.poschip.noun{background:rgba(67,120,209,.13);color:#3E6FC4}
+.poschip.verb{background:var(--jade-tint);color:var(--jade)}
+.poschip.adj{background:rgba(190,52,37,.1);color:var(--seal)}
+.poschip.adv{background:rgba(190,140,20,.13);color:#B8860B}
+.poschip.pronoun{background:rgba(140,90,200,.13);color:#8B5CC7}
+.poschip.function{background:var(--line);color:var(--muted)}
+.poschip.idiom{background:rgba(33,36,44,.08);color:var(--ink)}
+html[data-theme="dark"] .poschip.noun{background:rgba(90,150,255,.16);color:#7FB0FF}
+html[data-theme="dark"] .poschip.adv{background:rgba(232,182,76,.16);color:#E8B64C}
+html[data-theme="dark"] .poschip.pronoun{background:rgba(170,130,230,.18);color:#C4A6F0}
+html[data-theme="dark"] .poschip.idiom{background:rgba(255,255,255,.08);color:var(--ink)}
+.posfilters{display:flex;gap:7px;margin-bottom:11px;overflow-x:auto;padding-bottom:2px}
+.pin{margin-left:8px;font-size:17px;line-height:1;color:var(--line-strong);cursor:pointer;
   padding:4px 2px;flex-shrink:0;transition:color .12s}
 .pin.on{color:#D9A62E}
 .pin:hover{color:#D9A62E}
@@ -682,67 +394,99 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <span class="dot" id="themedot">暗</span><span id="themelabel">Dark</span>
     </button>
     <div class="hero">
-      <div class="eyebrow">汉语水平考试</div>
-      <h1>HSK Preparation Quiz</h1>
-      <div class="sub">Vocabulary drills · translation &amp; tone · HSK 1–4</div>
+      <div class="ghost heroghost">考</div>
+      <div style="position:relative">
+        <div class="eyebrow">汉语水平考试</div>
+        <h1>HSK Preparation Quiz</h1>
+        <div class="sub">Vocabulary drills · translation &amp; tone · HSK 1–4</div>
+      </div>
+    </div>
+    <div class="sechead">Learn</div>
+    <div class="cards">
+      <button class="card hero" onclick="openWordlist()">
+        <div class="ghost cardghost">词</div>
+        <div class="sealic">词</div>
+        <div style="position:relative">
+          <div class="tt">Word list</div>
+          <div class="dd">Browse every word by level, filter by part of speech, and pin the ones to focus on</div>
+          <div class="cta">Browse words <span>→</span></div>
+        </div>
+      </button>
     </div>
     <div class="sechead">Practice</div>
+    <div class="tilegrid">
+      <button class="tile practice ink" onclick="goCategory('guessing')">
+        <div class="ghost tileghost">认</div>
+        <div class="sealic quiet" style="transform:rotate(-3deg)">认</div>
+        <div class="tt">Recognition</div>
+        <div class="dd">See the character, pick the translation and pinyin</div>
+      </button>
+      <button class="tile practice ink" onclick="goCategory('typing')">
+        <div class="ghost tileghost">拼</div>
+        <div class="sealic quiet" style="transform:rotate(2deg)">拼</div>
+        <div class="tt">Pinyin Typing</div>
+        <div class="dd">Type the pinyin yourself — no tone marks needed</div>
+      </button>
+      <button class="tile practice ink" onclick="goCategory('writing')">
+        <div class="ghost tileghost">写</div>
+        <div class="sealic quiet" style="transform:rotate(-2deg)">写</div>
+        <div class="tt">Character Writing</div>
+        <div class="dd">See the English, draw the hanzi, grade yourself</div>
+      </button>
+      <button class="tile practice ink" onclick="goCategory('sentences')">
+        <div class="ghost tileghost">填</div>
+        <div class="sealic quiet" style="transform:rotate(3deg)">填</div>
+        <div class="tt">Fill-in-the-Blank</div>
+        <div class="dd">HSK-style fill-in-the-blank practice</div>
+      </button>
+    </div>
+    <button class="card" style="margin-top:10px" onclick="startRefresher()">
+      <div class="sealic quiet">温</div>
+      <div><div class="tt">Refresher</div>
+      <div class="dd">Drill only the words you got wrong in your last 3 sessions</div></div>
+      <div class="chev">›</div>
+    </button>
+    <div class="sechead">Review</div>
+    <div class="tilegrid">
+      <button class="tile jade" onclick="renderHistory();show('history')">
+        <div class="ghost tileghost jadeghost" style="font-size:104px">录</div>
+        <div class="sealic jade" style="transform:rotate(-2deg)">录</div>
+        <div class="tt">Past scores</div>
+        <div class="dd">Your last 10 sessions, full breakdown</div>
+      </button>
+      <button class="tile jade" onclick="renderLeaderboard();show('leaderboard')">
+        <div class="ghost tileghost jadeghost" style="font-size:104px">榜</div>
+        <div class="sealic jade" style="transform:rotate(2deg)">榜</div>
+        <div class="tt">Leaderboard</div>
+        <div class="dd">Your personal best in every mode</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- MODE SELECT -->
+  <section class="screen" id="scr-modeselect">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('home')">← Home</button>
+      <h2 id="mstitle">Choose mode</h2>
+    </div>
+    <p class="hint">Pick how you want to be tested, then choose a level</p>
     <div class="cards">
-      <button class="card" onclick="goLevels('arcade')">
+      <button class="card" onclick="pickVariant('arcade')">
         <div class="sealic">闯</div>
         <div><div class="tt">Arcade</div>
-        <div class="dd">5 lives — one wrong word costs one heart. Words you haven't done yet always come first</div></div>
+        <div class="dd">5 lives — one wrong answer costs a heart. Lose them all and it's game over</div></div>
         <div class="chev">›</div>
       </button>
-      <button class="card" onclick="goLevels('typing')">
-        <div class="sealic quiet">写</div>
-        <div><div class="tt">Typing</div>
-        <div class="dd">Arcade rules, but you type the pinyin yourself — plain letters, no tone marks needed</div></div>
-        <div class="chev">›</div>
-      </button>
-      <button class="card" onclick="goLevels('unlimited')">
+      <button class="card" onclick="pickVariant('unlimited')">
         <div class="sealic quiet">练</div>
         <div><div class="tt">Unlimited</div>
         <div class="dd">No lives, no limits — drill for as long as you like</div></div>
         <div class="chev">›</div>
       </button>
-      <button class="card" onclick="goLevels('writing')">
-        <div class="sealic quiet">书</div>
-        <div><div class="tt">Writing</div>
-        <div class="dd">See the English, draw the hanzi from memory, then grade yourself flashcard-style</div></div>
-        <div class="chev">›</div>
-      </button>
-      <button class="card" onclick="goLevels('sentences')">
-        <div class="sealic quiet">句</div>
-        <div><div class="tt">Sentences</div>
-        <div class="dd">HSK-style fill-in-the-blank — complete real sentences with the right word</div></div>
-        <div class="chev">›</div>
-      </button>
-      <button class="card" onclick="startRefresher()">
-        <div class="sealic quiet">温</div>
-        <div><div class="tt">Refresher</div>
-        <div class="dd">Drill only the words you got wrong in your last 3 sessions</div></div>
-        <div class="chev">›</div>
-      </button>
-    </div>
-    <div class="sechead">Review</div>
-    <div class="cards">
-      <button class="card" onclick="renderHistory();show('history')">
-        <div class="sealic quiet">录</div>
-        <div><div class="tt">Past scores</div>
-        <div class="dd">Your last 10 sessions with a full word breakdown</div></div>
-        <div class="chev">›</div>
-      </button>
-      <button class="card" onclick="renderLeaderboard();show('leaderboard')">
-        <div class="sealic quiet">榜</div>
-        <div><div class="tt">Leaderboard</div>
-        <div class="dd">Your personal best score in every mode</div></div>
-        <div class="chev">›</div>
-      </button>
-      <button class="card" onclick="openWordlist()">
-        <div class="sealic quiet">词</div>
-        <div><div class="tt">Word list</div>
-        <div class="dd">Browse every word by level, with pinyin and example sentences</div></div>
+      <button class="card" onclick="pickVariant('timer')">
+        <div class="sealic quiet">时</div>
+        <div><div class="tt">Timer</div>
+        <div class="dd">2:00 on the clock — score as many as you can before time runs out</div></div>
         <div class="chev">›</div>
       </button>
     </div>
@@ -751,7 +495,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
   <!-- LEVEL SELECT -->
   <section class="screen" id="scr-levels">
     <div class="topbar">
-      <button class="linkbtn" onclick="show('home')">← Home</button>
+      <button class="linkbtn" onclick="show('modeselect')">← Back</button>
       <h2>Choose level</h2>
     </div>
     <p class="hint">Each level includes all words from the levels before it</p>
@@ -759,24 +503,55 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
   </section>
 
   <!-- CUSTOM PICKER -->
-  <section class="screen" id="scr-custom">
+  <section class="screen" id="scr-wordlisteditor">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('mywordlists')">← Back</button>
+      <h2>Edit wordlist</h2>
+      <button class="linkbtn" onclick="deleteCurrentWordlist()">Delete</button>
+    </div>
+    <input class="namebox" id="editorname" type="text" placeholder="Name this wordlist…" oninput="renameCurrentWordlist(this.value)">
+    <p class="hint">Pick the words that belong in this list. Changes save automatically.</p>
+    <div class="tabs" id="editortabs"></div>
+    <input class="searchbox" id="editorsearch" type="text" placeholder="Search characters, pinyin or English" oninput="renderEditorList()">
+    <div class="minirow">
+      <button class="minibtn" onclick="editorBulk(true)">Select all shown</button>
+      <button class="minibtn" onclick="editorBulk(false)">Clear shown</button>
+      <button class="minibtn" onclick="editorClearAll()">Clear all</button>
+    </div>
+    <div class="rows" id="editorlist"></div>
+    <div class="stickybar">
+      <div class="cnt"><b id="editorcount">0</b> words in this list</div>
+      <button class="btn primary" style="flex:1" onclick="show('mywordlists');renderMyWordlists()">Done</button>
+    </div>
+  </section>
+
+  <!-- MY WORDLISTS (management) -->
+  <section class="screen" id="scr-mywordlists">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('wordlist')">← Back</button>
+      <h2>My wordlists</h2>
+    </div>
+    <p class="hint">Build your own named wordlists, then test them from any practice category</p>
+    <div class="cards">
+      <button class="card" onclick="createNewWordlist()">
+        <div class="sealic">＋</div>
+        <div><div class="tt">New wordlist</div>
+        <div class="dd">Start a fresh named list and pick words for it</div></div>
+        <div class="chev">›</div>
+      </button>
+    </div>
+    <div class="sechead">Your lists</div>
+    <div class="rows" id="mywordlistrows"></div>
+  </section>
+
+  <!-- WORDLIST PICKER (for practice flow) -->
+  <section class="screen" id="scr-wordlistpick">
     <div class="topbar">
       <button class="linkbtn" onclick="show('levels')">← Back</button>
-      <h2>Custom test</h2>
+      <h2>Choose a wordlist</h2>
     </div>
-    <p class="hint">Pick the exact words you want to be tested on. Your selection is saved for next time.</p>
-    <div class="tabs" id="customtabs"></div>
-    <input class="searchbox" id="customsearch" type="text" placeholder="Search characters, pinyin or English" oninput="renderCustomList()">
-    <div class="minirow">
-      <button class="minibtn" onclick="customBulk(true)">Select all shown</button>
-      <button class="minibtn" onclick="customBulk(false)">Clear shown</button>
-      <button class="minibtn" onclick="customClearAll()">Clear all</button>
-    </div>
-    <div class="rows" id="customlist"></div>
-    <div class="stickybar">
-      <div class="cnt"><b id="customcount">0</b> words selected</div>
-      <button class="btn primary" style="flex:1" id="customstart" onclick="startCustom()">Start arcade →</button>
-    </div>
+    <p class="hint">Pick one of your saved wordlists to test in this mode</p>
+    <div class="rows" id="wordlistpickrows"></div>
   </section>
 
   <!-- QUIZ -->
@@ -831,6 +606,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <span class="score"><span class="ok" id="wok">✓ 0</span> &nbsp;<span class="bad" id="wbad">✗ 0</span> &nbsp;<span id="wprog"></span></span>
     </div>
     <div class="track"><div class="fill" id="wfill"></div></div>
+    <div class="heartsrow" id="whearts"></div>
     <div class="wprompt" id="wcard">
       <div class="streakbadge" id="wcardstreak"></div>
       <div class="en" id="wen">–</div>
@@ -860,6 +636,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <span class="score"><span class="ok" id="sok">✓ 0</span> &nbsp;<span class="bad" id="sbad">✗ 0</span> &nbsp;<span id="sprog"></span></span>
     </div>
     <div class="track"><div class="fill" id="sfill"></div></div>
+    <div class="heartsrow" id="shearts"></div>
     <div class="sentcard" id="scard">
       <div class="streakbadge" id="scardstreak"></div>
       <div class="zh" id="ssent">–</div>
@@ -935,8 +712,10 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     <div class="topbar">
       <button class="linkbtn" onclick="show('home')">← Home</button>
       <h2>Word list</h2>
+      <button class="linkbtn" onclick="renderMyWordlists();show('mywordlists')">My wordlists</button>
     </div>
     <div class="tabs" id="wltabs"></div>
+    <div class="posfilters" id="wlposfilters"></div>
     <input class="searchbox" id="wlsearch" type="text" placeholder="Search characters, pinyin or English" oninput="renderWordlist()">
     <div class="rows" id="wllist"></div>
   </section>
@@ -952,8 +731,13 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <div class="zh" id="dchar">–</div>
       <div class="py" id="dpy">–</div>
       <div class="en" id="den">–</div>
+      <div style="margin-top:8px"><span class="poschip" id="dpos">–</span></div>
     </div>
-    <div class="sechead">Writing practice</div>
+    <div class="tabs" id="dtabs">
+      <button class="tab on" onclick="detailTab('write')">Writing practice</button>
+      <button class="tab" onclick="detailTab('sentences')">My sentences</button>
+    </div>
+    <div id="panel-write">
     <div class="charchips" id="dchips"></div>
     <div class="drawwrap">
       <canvas id="dcanvas"></canvas>
@@ -961,6 +745,15 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <button class="minibtn" onclick="drawClear()">Clear</button>
         <button class="minibtn" id="dguidebtn" onclick="drawGuideToggle()">Guide: on</button>
       </div>
+    </div>
+    </div>
+    <div id="panel-sentences" style="display:none">
+      <div class="rows" id="mysentlist"></div>
+      <div class="sechead">Add a sentence</div>
+      <input class="searchbox" id="msinput" type="text" placeholder="Type a Chinese sentence using this word…">
+      <input class="searchbox" id="mspyinput" type="text" placeholder="Pinyin (optional)">
+      <input class="searchbox" id="msenginput" type="text" placeholder="English translation (optional)">
+      <button class="btn primary" style="width:100%" onclick="addMySentence()">Add sentence</button>
     </div>
   </section>
 
@@ -973,210 +766,210 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
    ============================================================ */
 const WORDS=[
 /* ---- HSK 1 ---- */
-["爱","ai4","to love",1],["八","ba1","eight",1],["爸爸","ba4ba5","dad",1],["杯子","bei1zi5","cup",1],
-["北京","Bei3jing1","Beijing",1],["本","ben3","(measure: books)",1],["不","bu4","no / not",1],
-["不客气","bu2ke4qi5","you're welcome",1],["菜","cai4","dish / vegetable",1],["茶","cha2","tea",1],
-["吃","chi1","to eat",1],["出租车","chu1zu1che1","taxi",1],["打电话","da3dian4hua4","make a phone call",1],
-["大","da4","big",1],["的","de5","(possessive particle)",1],["点","dian3","o'clock / dot",1],
-["电脑","dian4nao3","computer",1],["电视","dian4shi4","television",1],["电影","dian4ying3","movie",1],
-["东西","dong1xi5","thing",1],["都","dou1","all / both",1],["读","du2","to read",1],
-["对不起","dui4bu5qi3","sorry",1],["多","duo1","many / much",1],["多少","duo1shao3","how many / much",1],
-["儿子","er2zi5","son",1],["二","er4","two",1],["饭店","fan4dian4","restaurant / hotel",1],
-["飞机","fei1ji1","airplane",1],["分钟","fen1zhong1","minute",1],["高兴","gao1xing4","happy / glad",1],
-["个","ge4","(general measure word)",1],["工作","gong1zuo4","work / job",1],["狗","gou3","dog",1],
-["汉语","Han4yu3","Chinese language",1],["好","hao3","good",1],["号","hao4","date / number",1],
-["喝","he1","to drink",1],["和","he2","and",1],["很","hen3","very",1],["后面","hou4mian4","behind",1],
-["回","hui2","to return",1],["会","hui4","can / will",1],["几","ji3","how many / several",1],
-["家","jia1","home / family",1],["叫","jiao4","to be called",1],["今天","jin1tian1","today",1],
-["九","jiu3","nine",1],["开","kai1","to open / drive",1],["看","kan4","to look / watch",1],
-["看见","kan4jian4","to see",1],["块","kuai4","yuan (money)",1],["来","lai2","to come",1],
-["老师","lao3shi1","teacher",1],["了","le5","(completed action particle)",1],["冷","leng3","cold",1],
-["里","li3","inside",1],["六","liu4","six",1],["妈妈","ma1ma5","mum",1],["吗","ma5","(question particle)",1],
-["买","mai3","to buy",1],["猫","mao1","cat",1],["没关系","mei2guan1xi5","it's okay",1],
-["没有","mei2you3","to not have",1],["米饭","mi3fan4","cooked rice",1],["名字","ming2zi5","name",1],
-["明天","ming2tian1","tomorrow",1],["哪","na3","which",1],["那","na4","that",1],
-["呢","ne5","(question particle)",1],["能","neng2","can / be able to",1],["你","ni3","you",1],
-["年","nian2","year",1],["女儿","nv3er2","daughter",1],["朋友","peng2you5","friend",1],
-["漂亮","piao4liang5","pretty",1],["苹果","ping2guo3","apple",1],["七","qi1","seven",1],
-["前面","qian2mian4","in front",1],["钱","qian2","money",1],["请","qing3","please",1],
-["去","qu4","to go",1],["热","re4","hot",1],["人","ren2","person",1],["认识","ren4shi5","to know (someone)",1],
-["三","san1","three",1],["商店","shang1dian4","shop",1],["上","shang4","up / on",1],
-["上午","shang4wu3","morning",1],["少","shao3","few / little",1],["谁","shei2","who",1],
-["什么","shen2me5","what",1],["十","shi2","ten",1],["时候","shi2hou5","time / moment",1],
-["是","shi4","to be",1],["书","shu1","book",1],["水","shui3","water",1],["水果","shui3guo3","fruit",1],
-["睡觉","shui4jiao4","to sleep",1],["说","shuo1","to speak",1],["四","si4","four",1],
-["岁","sui4","years old",1],["他","ta1","he / him",1],["她","ta1","she / her",1],
-["太","tai4","too (excessively)",1],["天气","tian1qi4","weather",1],["听","ting1","to listen",1],
-["同学","tong2xue2","classmate",1],["喂","wei2","hello (on phone)",1],["我","wo3","I / me",1],
-["我们","wo3men5","we / us",1],["五","wu3","five",1],["喜欢","xi3huan5","to like",1],
-["下","xia4","down / under",1],["下午","xia4wu3","afternoon",1],["下雨","xia4yu3","to rain",1],
-["先生","xian1sheng5","Mr / sir",1],["现在","xian4zai4","now",1],["想","xiang3","to want / think",1],
-["小","xiao3","small",1],["小姐","xiao3jie3","Miss",1],["些","xie1","some",1],["写","xie3","to write",1],
-["谢谢","xie4xie5","thanks",1],["星期","xing1qi1","week",1],["学生","xue2sheng5","student",1],
-["学习","xue2xi2","to study",1],["学校","xue2xiao4","school",1],["一","yi1","one",1],
-["衣服","yi1fu5","clothes",1],["医生","yi1sheng1","doctor",1],["医院","yi1yuan4","hospital",1],
-["椅子","yi3zi5","chair",1],["有","you3","to have",1],["月","yue4","month / moon",1],
-["再见","zai4jian4","goodbye",1],["在","zai4","at / in",1],["怎么","zen3me5","how",1],
-["怎么样","zen3me5yang4","how about",1],["这","zhe4","this",1],["中国","Zhong1guo2","China",1],
-["中午","zhong1wu3","noon",1],["住","zhu4","to live / reside",1],["桌子","zhuo1zi5","table",1],
-["字","zi4","character / word",1],["昨天","zuo2tian1","yesterday",1],["坐","zuo4","to sit",1],
-["做","zuo4","to do / make",1],
+["爱","ai4","to love",1,"verb"],["八","ba1","eight",1,"function"],["爸爸","ba4ba5","dad",1,"noun"],["杯子","bei1zi5","cup",1,"noun"],
+["北京","Bei3jing1","Beijing",1,"noun"],["本","ben3","(measure: books)",1,"function"],["不","bu4","no / not",1,"noun"],
+["不客气","bu2ke4qi5","you're welcome",1,"noun"],["菜","cai4","dish / vegetable",1,"noun"],["茶","cha2","tea",1,"noun"],
+["吃","chi1","to eat",1,"verb"],["出租车","chu1zu1che1","taxi",1,"noun"],["打电话","da3dian4hua4","make a phone call",1,"noun"],
+["大","da4","big",1,"adj"],["的","de5","(possessive particle)",1,"function"],["点","dian3","o'clock / dot",1,"noun"],
+["电脑","dian4nao3","computer",1,"noun"],["电视","dian4shi4","television",1,"noun"],["电影","dian4ying3","movie",1,"noun"],
+["东西","dong1xi5","thing",1,"noun"],["都","dou1","all / both",1,"noun"],["读","du2","to read",1,"verb"],
+["对不起","dui4bu5qi3","sorry",1,"noun"],["多","duo1","many / much",1,"adj"],["多少","duo1shao3","how many / much",1,"pronoun"],
+["儿子","er2zi5","son",1,"noun"],["二","er4","two",1,"function"],["饭店","fan4dian4","restaurant / hotel",1,"noun"],
+["飞机","fei1ji1","airplane",1,"noun"],["分钟","fen1zhong1","minute",1,"noun"],["高兴","gao1xing4","happy / glad",1,"adj"],
+["个","ge4","(general measure word)",1,"function"],["工作","gong1zuo4","work / job",1,"noun"],["狗","gou3","dog",1,"noun"],
+["汉语","Han4yu3","Chinese language",1,"noun"],["好","hao3","good",1,"noun"],["号","hao4","date / number",1,"noun"],
+["喝","he1","to drink",1,"verb"],["和","he2","and",1,"function"],["很","hen3","very",1,"adv"],["后面","hou4mian4","behind",1,"noun"],
+["回","hui2","to return",1,"verb"],["会","hui4","can / will",1,"verb"],["几","ji3","how many / several",1,"pronoun"],
+["家","jia1","home / family",1,"noun"],["叫","jiao4","to be called",1,"verb"],["今天","jin1tian1","today",1,"noun"],
+["九","jiu3","nine",1,"function"],["开","kai1","to open / drive",1,"verb"],["看","kan4","to look / watch",1,"verb"],
+["看见","kan4jian4","to see",1,"verb"],["块","kuai4","yuan (money)",1,"noun"],["来","lai2","to come",1,"verb"],
+["老师","lao3shi1","teacher",1,"noun"],["了","le5","(completed action particle)",1,"function"],["冷","leng3","cold",1,"adj"],
+["里","li3","inside",1,"noun"],["六","liu4","six",1,"function"],["妈妈","ma1ma5","mum",1,"noun"],["吗","ma5","(question particle)",1,"function"],
+["买","mai3","to buy",1,"verb"],["猫","mao1","cat",1,"noun"],["没关系","mei2guan1xi5","it's okay",1,"noun"],
+["没有","mei2you3","to not have",1,"verb"],["米饭","mi3fan4","cooked rice",1,"noun"],["名字","ming2zi5","name",1,"noun"],
+["明天","ming2tian1","tomorrow",1,"noun"],["哪","na3","which",1,"pronoun"],["那","na4","that",1,"pronoun"],
+["呢","ne5","(question particle)",1,"function"],["能","neng2","can / be able to",1,"verb"],["你","ni3","you",1,"pronoun"],
+["年","nian2","year",1,"noun"],["女儿","nv3er2","daughter",1,"noun"],["朋友","peng2you5","friend",1,"noun"],
+["漂亮","piao4liang5","pretty",1,"adj"],["苹果","ping2guo3","apple",1,"noun"],["七","qi1","seven",1,"function"],
+["前面","qian2mian4","in front",1,"noun"],["钱","qian2","money",1,"noun"],["请","qing3","please",1,"noun"],
+["去","qu4","to go",1,"verb"],["热","re4","hot",1,"adj"],["人","ren2","person",1,"noun"],["认识","ren4shi5","to know (someone)",1,"verb"],
+["三","san1","three",1,"function"],["商店","shang1dian4","shop",1,"noun"],["上","shang4","up / on",1,"noun"],
+["上午","shang4wu3","morning",1,"noun"],["少","shao3","few / little",1,"adj"],["谁","shei2","who",1,"pronoun"],
+["什么","shen2me5","what",1,"pronoun"],["十","shi2","ten",1,"function"],["时候","shi2hou5","time / moment",1,"noun"],
+["是","shi4","to be",1,"verb"],["书","shu1","book",1,"noun"],["水","shui3","water",1,"noun"],["水果","shui3guo3","fruit",1,"noun"],
+["睡觉","shui4jiao4","to sleep",1,"verb"],["说","shuo1","to speak",1,"verb"],["四","si4","four",1,"function"],
+["岁","sui4","years old",1,"adj"],["他","ta1","he / him",1,"pronoun"],["她","ta1","she / her",1,"pronoun"],
+["太","tai4","too (excessively)",1,"adv"],["天气","tian1qi4","weather",1,"noun"],["听","ting1","to listen",1,"verb"],
+["同学","tong2xue2","classmate",1,"noun"],["喂","wei2","hello (on phone)",1,"noun"],["我","wo3","I / me",1,"pronoun"],
+["我们","wo3men5","we / us",1,"pronoun"],["五","wu3","five",1,"function"],["喜欢","xi3huan5","to like",1,"verb"],
+["下","xia4","down / under",1,"noun"],["下午","xia4wu3","afternoon",1,"noun"],["下雨","xia4yu3","to rain",1,"verb"],
+["先生","xian1sheng5","Mr / sir",1,"noun"],["现在","xian4zai4","now",1,"noun"],["想","xiang3","to want / think",1,"verb"],
+["小","xiao3","small",1,"adj"],["小姐","xiao3jie3","Miss",1,"noun"],["些","xie1","some",1,"noun"],["写","xie3","to write",1,"verb"],
+["谢谢","xie4xie5","thanks",1,"noun"],["星期","xing1qi1","week",1,"noun"],["学生","xue2sheng5","student",1,"noun"],
+["学习","xue2xi2","to study",1,"verb"],["学校","xue2xiao4","school",1,"noun"],["一","yi1","one",1,"function"],
+["衣服","yi1fu5","clothes",1,"noun"],["医生","yi1sheng1","doctor",1,"noun"],["医院","yi1yuan4","hospital",1,"noun"],
+["椅子","yi3zi5","chair",1,"noun"],["有","you3","to have",1,"verb"],["月","yue4","month / moon",1,"noun"],
+["再见","zai4jian4","goodbye",1,"noun"],["在","zai4","at / in",1,"function"],["怎么","zen3me5","how",1,"pronoun"],
+["怎么样","zen3me5yang4","how about",1,"pronoun"],["这","zhe4","this",1,"pronoun"],["中国","Zhong1guo2","China",1,"noun"],
+["中午","zhong1wu3","noon",1,"noun"],["住","zhu4","to live / reside",1,"verb"],["桌子","zhuo1zi5","table",1,"noun"],
+["字","zi4","character / word",1,"noun"],["昨天","zuo2tian1","yesterday",1,"noun"],["坐","zuo4","to sit",1,"verb"],
+["做","zuo4","to do / make",1,"verb"],
 /* ---- HSK 2 ---- */
-["吧","ba5","(suggestion particle)",2],["白","bai2","white",2],["百","bai3","hundred",2],
-["帮助","bang1zhu4","to help",2],["报纸","bao4zhi3","newspaper",2],["比","bi3","to compare / than",2],
-["别","bie2","don't",2],["宾馆","bin1guan3","hotel",2],["长","chang2","long",2],
-["唱歌","chang4ge1","to sing",2],["出","chu1","to go out",2],["穿","chuan1","to wear",2],
-["次","ci4","time (occurrence)",2],["从","cong2","from",2],["错","cuo4","wrong",2],
-["打篮球","da3lan2qiu2","play basketball",2],["大家","da4jia1","everyone",2],["到","dao4","to arrive",2],
-["得","de5","(structural particle)",2],["等","deng3","to wait",2],["弟弟","di4di5","younger brother",2],
-["第一","di4yi1","first",2],["懂","dong3","to understand",2],["对","dui4","correct / toward",2],
-["房间","fang2jian1","room",2],["非常","fei1chang2","very / extremely",2],["服务员","fu2wu4yuan2","waiter",2],
-["高","gao1","tall / high",2],["告诉","gao4su5","to tell",2],["哥哥","ge1ge5","older brother",2],
-["给","gei3","to give",2],["公共汽车","gong1gong4qi4che1","bus",2],["公司","gong1si1","company",2],
-["贵","gui4","expensive",2],["过","guo4","(experience particle)",2],["还","hai2","still / also",2],
-["孩子","hai2zi5","child",2],["好吃","hao3chi1","delicious",2],["黑","hei1","black",2],
-["红","hong2","red",2],["火车站","huo3che1zhan4","train station",2],["机场","ji1chang3","airport",2],
-["鸡蛋","ji1dan4","egg",2],["件","jian4","(measure: clothes/items)",2],["教室","jiao4shi4","classroom",2],
-["姐姐","jie3jie5","older sister",2],["介绍","jie4shao4","to introduce",2],["进","jin4","to enter",2],
-["近","jin4","near",2],["就","jiu4","then / right away",2],["觉得","jue2de5","to feel / think",2],
-["咖啡","ka1fei1","coffee",2],["开始","kai1shi3","to begin",2],["考试","kao3shi4","exam",2],
-["可能","ke3neng2","maybe",2],["可以","ke3yi3","can / may",2],["课","ke4","class / lesson",2],
-["快","kuai4","fast",2],["快乐","kuai4le4","happy",2],["累","lei4","tired",2],
-["离","li2","away from",2],["两","liang3","two (+ measure word)",2],["零","ling2","zero",2],
-["路","lu4","road",2],["旅游","lv3you2","to travel",2],["卖","mai4","to sell",2],
-["慢","man4","slow",2],["忙","mang2","busy",2],["每","mei3","every",2],
-["妹妹","mei4mei5","younger sister",2],["门","men2","door",2],["面条","mian4tiao2","noodles",2],
-["男","nan2","male",2],["您","nin2","you (polite)",2],["牛奶","niu2nai3","milk",2],
-["女","nv3","female",2],["旁边","pang2bian1","beside",2],["跑步","pao3bu4","to run / jog",2],
-["便宜","pian2yi5","cheap",2],["票","piao4","ticket",2],["妻子","qi1zi5","wife",2],
-["起床","qi3chuang2","to get up",2],["千","qian1","thousand",2],["铅笔","qian1bi3","pencil",2],
-["晴","qing2","sunny",2],["去年","qu4nian2","last year",2],["让","rang4","to let / allow",2],
-["日","ri4","day / sun",2],["上班","shang4ban1","to go to work",2],["身体","shen1ti3","body / health",2],
-["生病","sheng1bing4","to get sick",2],["生日","sheng1ri4","birthday",2],["时间","shi2jian1","time",2],
-["事情","shi4qing5","matter / affair",2],["手表","shou3biao3","wristwatch",2],["手机","shou3ji1","mobile phone",2],
-["说话","shuo1hua4","to talk",2],["送","song4","to give / deliver",2],["虽然","sui1ran2","although",2],
-["它","ta1","it",2],["踢足球","ti1zu2qiu2","play football",2],["题","ti2","question / problem",2],
-["跳舞","tiao4wu3","to dance",2],["外","wai4","outside",2],["完","wan2","to finish",2],
-["玩","wan2","to play",2],["晚上","wan3shang5","evening",2],["往","wang3","toward",2],
-["为什么","wei4shen2me5","why",2],["问","wen4","to ask",2],["问题","wen4ti2","question / issue",2],
-["西瓜","xi1gua1","watermelon",2],["希望","xi1wang4","to hope",2],["洗","xi3","to wash",2],
-["小时","xiao3shi2","hour",2],["笑","xiao4","to laugh / smile",2],["新","xin1","new",2],
-["姓","xing4","surname",2],["休息","xiu1xi5","to rest",2],["雪","xue3","snow",2],
-["颜色","yan2se4","colour",2],["眼睛","yan3jing5","eyes",2],["羊肉","yang2rou4","mutton",2],
-["药","yao4","medicine",2],["要","yao4","to want / will",2],["也","ye3","also",2],
-["一起","yi4qi3","together",2],["一下","yi2xia4","a bit / briefly",2],["已经","yi3jing1","already",2],
-["意思","yi4si5","meaning",2],["阴","yin1","cloudy",2],["因为","yin1wei4","because",2],
-["游泳","you2yong3","to swim",2],["右边","you4bian5","right side",2],["鱼","yu2","fish",2],
-["远","yuan3","far",2],["运动","yun4dong4","sport / exercise",2],["再","zai4","again",2],
-["早上","zao3shang5","morning",2],["丈夫","zhang4fu5","husband",2],["找","zhao3","to look for",2],
-["着","zhe5","(continuous particle)",2],["真","zhen1","really",2],["正在","zheng4zai4","in the middle of",2],
-["知道","zhi1dao4","to know",2],["准备","zhun3bei4","to prepare",2],["走","zou3","to walk / leave",2],
-["最","zui4","most",2],["左边","zuo3bian5","left side",2],
+["吧","ba5","(suggestion particle)",2,"function"],["白","bai2","white",2,"adj"],["百","bai3","hundred",2,"function"],
+["帮助","bang1zhu4","to help",2,"verb"],["报纸","bao4zhi3","newspaper",2,"noun"],["比","bi3","to compare / than",2,"function"],
+["别","bie2","don't",2,"noun"],["宾馆","bin1guan3","hotel",2,"noun"],["长","chang2","long",2,"adj"],
+["唱歌","chang4ge1","to sing",2,"verb"],["出","chu1","to go out",2,"verb"],["穿","chuan1","to wear",2,"verb"],
+["次","ci4","time (occurrence)",2,"noun"],["从","cong2","from",2,"function"],["错","cuo4","wrong",2,"adj"],
+["打篮球","da3lan2qiu2","play basketball",2,"noun"],["大家","da4jia1","everyone",2,"pronoun"],["到","dao4","to arrive",2,"verb"],
+["得","de5","(structural particle)",2,"function"],["等","deng3","to wait",2,"verb"],["弟弟","di4di5","younger brother",2,"noun"],
+["第一","di4yi1","first",2,"function"],["懂","dong3","to understand",2,"verb"],["对","dui4","correct / toward",2,"function"],
+["房间","fang2jian1","room",2,"noun"],["非常","fei1chang2","very / extremely",2,"adv"],["服务员","fu2wu4yuan2","waiter",2,"noun"],
+["高","gao1","tall / high",2,"adj"],["告诉","gao4su5","to tell",2,"verb"],["哥哥","ge1ge5","older brother",2,"noun"],
+["给","gei3","to give",2,"verb"],["公共汽车","gong1gong4qi4che1","bus",2,"noun"],["公司","gong1si1","company",2,"noun"],
+["贵","gui4","expensive",2,"adj"],["过","guo4","(experience particle)",2,"function"],["还","hai2","still / also",2,"adv"],
+["孩子","hai2zi5","child",2,"noun"],["好吃","hao3chi1","delicious",2,"adj"],["黑","hei1","black",2,"adj"],
+["红","hong2","red",2,"adj"],["火车站","huo3che1zhan4","train station",2,"noun"],["机场","ji1chang3","airport",2,"noun"],
+["鸡蛋","ji1dan4","egg",2,"noun"],["件","jian4","(measure: clothes/items)",2,"function"],["教室","jiao4shi4","classroom",2,"noun"],
+["姐姐","jie3jie5","older sister",2,"noun"],["介绍","jie4shao4","to introduce",2,"verb"],["进","jin4","to enter",2,"verb"],
+["近","jin4","near",2,"adj"],["就","jiu4","then / right away",2,"noun"],["觉得","jue2de5","to feel / think",2,"verb"],
+["咖啡","ka1fei1","coffee",2,"noun"],["开始","kai1shi3","to begin",2,"verb"],["考试","kao3shi4","exam",2,"noun"],
+["可能","ke3neng2","maybe",2,"adv"],["可以","ke3yi3","can / may",2,"verb"],["课","ke4","class / lesson",2,"noun"],
+["快","kuai4","fast",2,"adj"],["快乐","kuai4le4","happy",2,"adj"],["累","lei4","tired",2,"adj"],
+["离","li2","away from",2,"function"],["两","liang3","two (+ measure word)",2,"function"],["零","ling2","zero",2,"function"],
+["路","lu4","road",2,"noun"],["旅游","lv3you2","to travel",2,"verb"],["卖","mai4","to sell",2,"verb"],
+["慢","man4","slow",2,"adj"],["忙","mang2","busy",2,"adj"],["每","mei3","every",2,"noun"],
+["妹妹","mei4mei5","younger sister",2,"noun"],["门","men2","door",2,"noun"],["面条","mian4tiao2","noodles",2,"noun"],
+["男","nan2","male",2,"adj"],["您","nin2","you (polite)",2,"pronoun"],["牛奶","niu2nai3","milk",2,"noun"],
+["女","nv3","female",2,"adj"],["旁边","pang2bian1","beside",2,"noun"],["跑步","pao3bu4","to run / jog",2,"verb"],
+["便宜","pian2yi5","cheap",2,"adj"],["票","piao4","ticket",2,"noun"],["妻子","qi1zi5","wife",2,"noun"],
+["起床","qi3chuang2","to get up",2,"verb"],["千","qian1","thousand",2,"function"],["铅笔","qian1bi3","pencil",2,"noun"],
+["晴","qing2","sunny",2,"adj"],["去年","qu4nian2","last year",2,"noun"],["让","rang4","to let / allow",2,"verb"],
+["日","ri4","day / sun",2,"noun"],["上班","shang4ban1","to go to work",2,"verb"],["身体","shen1ti3","body / health",2,"noun"],
+["生病","sheng1bing4","to get sick",2,"verb"],["生日","sheng1ri4","birthday",2,"noun"],["时间","shi2jian1","time",2,"noun"],
+["事情","shi4qing5","matter / affair",2,"noun"],["手表","shou3biao3","wristwatch",2,"noun"],["手机","shou3ji1","mobile phone",2,"noun"],
+["说话","shuo1hua4","to talk",2,"verb"],["送","song4","to give / deliver",2,"verb"],["虽然","sui1ran2","although",2,"function"],
+["它","ta1","it",2,"pronoun"],["踢足球","ti1zu2qiu2","play football",2,"noun"],["题","ti2","question / problem",2,"noun"],
+["跳舞","tiao4wu3","to dance",2,"verb"],["外","wai4","outside",2,"noun"],["完","wan2","to finish",2,"verb"],
+["玩","wan2","to play",2,"verb"],["晚上","wan3shang5","evening",2,"noun"],["往","wang3","toward",2,"function"],
+["为什么","wei4shen2me5","why",2,"pronoun"],["问","wen4","to ask",2,"verb"],["问题","wen4ti2","question / issue",2,"noun"],
+["西瓜","xi1gua1","watermelon",2,"noun"],["希望","xi1wang4","to hope",2,"verb"],["洗","xi3","to wash",2,"verb"],
+["小时","xiao3shi2","hour",2,"noun"],["笑","xiao4","to laugh / smile",2,"verb"],["新","xin1","new",2,"adj"],
+["姓","xing4","surname",2,"noun"],["休息","xiu1xi5","to rest",2,"verb"],["雪","xue3","snow",2,"noun"],
+["颜色","yan2se4","colour",2,"noun"],["眼睛","yan3jing5","eyes",2,"noun"],["羊肉","yang2rou4","mutton",2,"noun"],
+["药","yao4","medicine",2,"noun"],["要","yao4","to want / will",2,"verb"],["也","ye3","also",2,"adv"],
+["一起","yi4qi3","together",2,"adv"],["一下","yi2xia4","a bit / briefly",2,"noun"],["已经","yi3jing1","already",2,"adv"],
+["意思","yi4si5","meaning",2,"noun"],["阴","yin1","cloudy",2,"adj"],["因为","yin1wei4","because",2,"function"],
+["游泳","you2yong3","to swim",2,"verb"],["右边","you4bian5","right side",2,"noun"],["鱼","yu2","fish",2,"noun"],
+["远","yuan3","far",2,"adj"],["运动","yun4dong4","sport / exercise",2,"noun"],["再","zai4","again",2,"adv"],
+["早上","zao3shang5","morning",2,"noun"],["丈夫","zhang4fu5","husband",2,"noun"],["找","zhao3","to look for",2,"verb"],
+["着","zhe5","(continuous particle)",2,"function"],["真","zhen1","really",2,"noun"],["正在","zheng4zai4","in the middle of",2,"adv"],
+["知道","zhi1dao4","to know",2,"verb"],["准备","zhun3bei4","to prepare",2,"verb"],["走","zou3","to walk / leave",2,"verb"],
+["最","zui4","most",2,"noun"],["左边","zuo3bian5","left side",2,"noun"],
 /* ---- HSK 3 (PARTIAL — replace with your full list) ---- */
-["阿姨","a1yi2","aunt",3],["矮","ai3","short (height)",3],["爱好","ai4hao4","hobby",3],
-["安静","an1jing4","quiet",3],["把","ba3","(object marker)",3],["班","ban1","class / team",3],
-["搬","ban1","to move (house)",3],["办法","ban4fa3","method / way",3],["办公室","ban4gong1shi4","office",3],
-["半","ban4","half",3],["帮忙","bang1mang2","to help out",3],["包","bao1","bag",3],
-["饱","bao3","full (eaten)",3],["北方","bei3fang1","the north",3],["被","bei4","(passive marker)",3],
-["鼻子","bi2zi5","nose",3],["比较","bi3jiao4","relatively / compare",3],["比赛","bi3sai4","competition",3],
-["笔记本","bi3ji4ben3","notebook",3],["必须","bi4xu1","must",3],["变化","bian4hua4","change",3],
-["别人","bie2ren2","other people",3],["冰箱","bing1xiang1","fridge",3],["不但","bu2dan4","not only",3],
-["菜单","cai4dan1","menu",3],["参加","can1jia1","to participate",3],["草","cao3","grass",3],
-["层","ceng2","floor / layer",3],["差","cha4","lacking / poor",3],["超市","chao1shi4","supermarket",3],
-["衬衫","chen4shan1","shirt",3],["成绩","cheng2ji4","grades / result",3],["城市","cheng2shi4","city",3],
-["迟到","chi2dao4","to be late",3],["出现","chu1xian4","to appear",3],["厨房","chu2fang2","kitchen",3],
-["除了","chu2le5","except / besides",3],["船","chuan2","boat",3],["春","chun1","spring",3],
-["词典","ci2dian3","dictionary",3],["聪明","cong1ming5","clever",3],["打扫","da3sao3","to clean",3],
-["打算","da3suan4","to plan",3],["带","dai4","to bring",3],["担心","dan1xin1","to worry",3],
-["蛋糕","dan4gao1","cake",3],["当然","dang1ran2","of course",3],["地","de5","(adverbial particle)",3],
-["灯","deng1","lamp / light",3],["地方","di4fang5","place",3],["地铁","di4tie3","subway",3],
-["地图","di4tu2","map",3],["电梯","dian4ti1","lift / elevator",3],["电子邮件","dian4zi3you2jian4","email",3],
-["东","dong1","east",3],["冬","dong1","winter",3],["动物","dong4wu4","animal",3],
-["短","duan3","short (length)",3],["段","duan4","section / paragraph",3],["锻炼","duan4lian4","to work out",3],
+["阿姨","a1yi2","aunt",3,"noun"],["矮","ai3","short (height)",3,"adj"],["爱好","ai4hao4","hobby",3,"noun"],
+["安静","an1jing4","quiet",3,"adj"],["把","ba3","(object marker)",3,"function"],["班","ban1","class / team",3,"noun"],
+["搬","ban1","to move (house)",3,"verb"],["办法","ban4fa3","method / way",3,"noun"],["办公室","ban4gong1shi4","office",3,"noun"],
+["半","ban4","half",3,"noun"],["帮忙","bang1mang2","to help out",3,"verb"],["包","bao1","bag",3,"noun"],
+["饱","bao3","full (eaten)",3,"adj"],["北方","bei3fang1","the north",3,"noun"],["被","bei4","(passive marker)",3,"function"],
+["鼻子","bi2zi5","nose",3,"noun"],["比较","bi3jiao4","relatively / compare",3,"noun"],["比赛","bi3sai4","competition",3,"noun"],
+["笔记本","bi3ji4ben3","notebook",3,"noun"],["必须","bi4xu1","must",3,"noun"],["变化","bian4hua4","change",3,"noun"],
+["别人","bie2ren2","other people",3,"noun"],["冰箱","bing1xiang1","fridge",3,"noun"],["不但","bu2dan4","not only",3,"function"],
+["菜单","cai4dan1","menu",3,"noun"],["参加","can1jia1","to participate",3,"verb"],["草","cao3","grass",3,"noun"],
+["层","ceng2","floor / layer",3,"noun"],["差","cha4","lacking / poor",3,"adj"],["超市","chao1shi4","supermarket",3,"noun"],
+["衬衫","chen4shan1","shirt",3,"noun"],["成绩","cheng2ji4","grades / result",3,"noun"],["城市","cheng2shi4","city",3,"noun"],
+["迟到","chi2dao4","to be late",3,"verb"],["出现","chu1xian4","to appear",3,"verb"],["厨房","chu2fang2","kitchen",3,"noun"],
+["除了","chu2le5","except / besides",3,"function"],["船","chuan2","boat",3,"noun"],["春","chun1","spring",3,"noun"],
+["词典","ci2dian3","dictionary",3,"noun"],["聪明","cong1ming5","clever",3,"adj"],["打扫","da3sao3","to clean",3,"verb"],
+["打算","da3suan4","to plan",3,"verb"],["带","dai4","to bring",3,"verb"],["担心","dan1xin1","to worry",3,"verb"],
+["蛋糕","dan4gao1","cake",3,"noun"],["当然","dang1ran2","of course",3,"adv"],["地","de5","(adverbial particle)",3,"function"],
+["灯","deng1","lamp / light",3,"noun"],["地方","di4fang5","place",3,"noun"],["地铁","di4tie3","subway",3,"noun"],
+["地图","di4tu2","map",3,"noun"],["电梯","dian4ti1","lift / elevator",3,"noun"],["电子邮件","dian4zi3you2jian4","email",3,"noun"],
+["东","dong1","east",3,"noun"],["冬","dong1","winter",3,"noun"],["动物","dong4wu4","animal",3,"noun"],
+["短","duan3","short (length)",3,"adj"],["段","duan4","section / paragraph",3,"noun"],["锻炼","duan4lian4","to work out",3,"verb"],
 /* ---- HSK 4 (PARTIAL — replace with your full list) ---- */
-["爱情","ai4qing2","(romantic) love",4],["安排","an1pai2","to arrange",4],["安全","an1quan2","safe / safety",4],
-["按时","an4shi2","on time",4],["按照","an4zhao4","according to",4],["百分之","bai3fen1zhi1","percent",4],
-["棒","bang4","great / awesome",4],["包子","bao1zi5","steamed bun",4],["保护","bao3hu4","to protect",4],
-["保证","bao3zheng4","to guarantee",4],["抱","bao4","to hug",4],["抱歉","bao4qian4","sorry / apologetic",4],
-["倍","bei4","times (multiple)",4],["本来","ben3lai2","originally",4],["笨","ben4","stupid",4],
-["比如","bi3ru2","for example",4],["毕业","bi4ye4","to graduate",4],["遍","bian4","(measure: times through)",4],
-["标准","biao1zhun3","standard",4],["表格","biao3ge2","form / table",4],["表示","biao3shi4","to express",4],
-["表演","biao3yan3","to perform",4],["表扬","biao3yang2","to praise",4],["饼干","bing3gan1","biscuit",4],
-["并且","bing4qie3","moreover",4],["博士","bo2shi4","PhD / doctor",4],["不得不","bu4de2bu4","to have to",4],
-["不管","bu4guan3","no matter",4],["不过","bu2guo4","however",4],["不仅","bu4jin3","not only",4],
-["部分","bu4fen5","part / section",4],["擦","ca1","to wipe",4],["猜","cai1","to guess",4],
-["材料","cai2liao4","material",4],["参观","can1guan1","to visit (place)",4],["餐厅","can1ting1","restaurant",4],
-["厕所","ce4suo3","toilet",4],["差不多","cha4bu5duo1","almost / about",4],["长城","Chang2cheng2","the Great Wall",4],
-["场","chang3","(measure: events)",4],["超过","chao1guo4","to exceed",4],["成功","cheng2gong1","to succeed",4],
-["成为","cheng2wei2","to become",4],["诚实","cheng2shi2","honest",4],["乘坐","cheng2zuo4","to ride / take",4],
-["吃惊","chi1jing1","to be shocked",4],["重新","chong2xin1","again / anew",4],["抽烟","chou1yan1","to smoke",4],
-["出差","chu1chai1","business trip",4],["出发","chu1fa1","to set off",4],["出生","chu1sheng1","to be born",4],
-["窗户","chuang1hu5","window",4],["词语","ci2yu3","words / terms",4],["从来","cong2lai2","always / (never)",4],
-["粗心","cu1xin1","careless",4],["存","cun2","to save / deposit",4],["错误","cuo4wu4","mistake",4],
-["答案","da2an4","answer",4],["打扮","da3ban4","to dress up",4],["打扰","da3rao3","to disturb",4],
-["打印","da3yin4","to print",4]
+["爱情","ai4qing2","(romantic) love",4,"function"],["安排","an1pai2","to arrange",4,"verb"],["安全","an1quan2","safe / safety",4,"adj"],
+["按时","an4shi2","on time",4,"adv"],["按照","an4zhao4","according to",4,"function"],["百分之","bai3fen1zhi1","percent",4,"noun"],
+["棒","bang4","great / awesome",4,"noun"],["包子","bao1zi5","steamed bun",4,"noun"],["保护","bao3hu4","to protect",4,"verb"],
+["保证","bao3zheng4","to guarantee",4,"verb"],["抱","bao4","to hug",4,"verb"],["抱歉","bao4qian4","sorry / apologetic",4,"noun"],
+["倍","bei4","times (multiple)",4,"noun"],["本来","ben3lai2","originally",4,"adv"],["笨","ben4","stupid",4,"noun"],
+["比如","bi3ru2","for example",4,"noun"],["毕业","bi4ye4","to graduate",4,"verb"],["遍","bian4","(measure: times through)",4,"function"],
+["标准","biao1zhun3","standard",4,"noun"],["表格","biao3ge2","form / table",4,"noun"],["表示","biao3shi4","to express",4,"verb"],
+["表演","biao3yan3","to perform",4,"verb"],["表扬","biao3yang2","to praise",4,"verb"],["饼干","bing3gan1","biscuit",4,"noun"],
+["并且","bing4qie3","moreover",4,"function"],["博士","bo2shi4","PhD / doctor",4,"noun"],["不得不","bu4de2bu4","to have to",4,"verb"],
+["不管","bu4guan3","no matter",4,"adv"],["不过","bu2guo4","however",4,"function"],["不仅","bu4jin3","not only",4,"function"],
+["部分","bu4fen5","part / section",4,"noun"],["擦","ca1","to wipe",4,"verb"],["猜","cai1","to guess",4,"verb"],
+["材料","cai2liao4","material",4,"noun"],["参观","can1guan1","to visit (place)",4,"verb"],["餐厅","can1ting1","restaurant",4,"noun"],
+["厕所","ce4suo3","toilet",4,"noun"],["差不多","cha4bu5duo1","almost / about",4,"adv"],["长城","Chang2cheng2","the Great Wall",4,"noun"],
+["场","chang3","(measure: events)",4,"function"],["超过","chao1guo4","to exceed",4,"verb"],["成功","cheng2gong1","to succeed",4,"verb"],
+["成为","cheng2wei2","to become",4,"verb"],["诚实","cheng2shi2","honest",4,"adj"],["乘坐","cheng2zuo4","to ride / take",4,"verb"],
+["吃惊","chi1jing1","to be shocked",4,"verb"],["重新","chong2xin1","again / anew",4,"adv"],["抽烟","chou1yan1","to smoke",4,"verb"],
+["出差","chu1chai1","business trip",4,"noun"],["出发","chu1fa1","to set off",4,"verb"],["出生","chu1sheng1","to be born",4,"verb"],
+["窗户","chuang1hu5","window",4,"noun"],["词语","ci2yu3","words / terms",4,"noun"],["从来","cong2lai2","always / (never)",4,"adv"],
+["粗心","cu1xin1","careless",4,"adj"],["存","cun2","to save / deposit",4,"verb"],["错误","cuo4wu4","mistake",4,"noun"],
+["答案","da2an4","answer",4,"noun"],["打扮","da3ban4","to dress up",4,"verb"],["打扰","da3rao3","to disturb",4,"verb"],
+["打印","da3yin4","to print",4,"verb"]
 ,
 /* ---- MASTER (level 5): rare characters, trap readings, literary chengyu ---- */
-["饕餮","tao1tie4","mythical gluttonous beast; glutton",5],
-["魑魅魍魉","chi1mei4wang3liang3","demons and monsters of every kind",5],
-["耄耋","mao4die2","advanced old age (one's 80s–90s)",5],
-["龃龉","ju3yu3","discord; friction",5],
-["踟蹰","chi2chu2","to hesitate; waver",5],
-["彳亍","chi4chu4","to stroll haltingly",5],
-["囹圄","ling2yu3","prison (literary)",5],
-["貔貅","pi2xiu1","mythical wealth-attracting beast",5],
-["觊觎","ji4yu2","to covet",5],
-["龌龊","wo4chuo4","filthy; sordid",5],
-["旮旯","ga1la2","nook; out-of-the-way corner",5],
-["邋遢","la1ta5","slovenly; unkempt",5],
-["熨帖","yu4tie1","fitting; just right",5],
-["拮据","jie2ju1","hard up; short of money",5],
-["桎梏","zhi4gu4","shackles; fetters",5],
-["缱绻","qian3quan3","tenderly attached (literary)",5],
-["旖旎","yi3ni3","charming; enchanting (scenery)",5],
-["蹉跎","cuo1tuo2","to idle away (time)",5],
-["婆娑","po2suo1","swaying; whirling",5],
-["逶迤","wei1yi2","winding; meandering",5],
-["璀璨","cui3can4","dazzling; resplendent",5],
-["圭臬","gui1nie4","criterion; standard (literary)",5],
-["造诣","zao4yi4","(scholarly) attainment",5],
-["商榷","shang1que4","open to deliberation",5],
-["掣肘","che4zhou3","to impede; hold back",5],
-["妊娠","ren4shen1","pregnancy; gestation",5],
-["症结","zheng1jie2","crux (of a problem)",5],
-["埋怨","man2yuan4","to blame; complain",5],
-["参差","cen1ci1","uneven; irregular",5],
-["龟裂","jun1lie4","to crack (of parched earth or skin)",5],
-["痼疾","gu4ji2","chronic ailment",5],
-["齉","nang4","to speak with a blocked nose",5],
-["爨","cuan4","to cook over a fire (archaic)",5],
-["龘","da2","the appearance of dragons in flight",5],
-["虚与委蛇","xu1yu3wei1yi2","to feign politeness",5],
-["暴虎冯河","bao4hu3ping2he2","reckless bravery",5],
-["沆瀣一气","hang4xie4yi2qi4","to collude; be in cahoots",5],
-["暴殄天物","bao4tian3tian1wu4","to squander heaven's gifts",5],
-["饮鸩止渴","yin3zhen4zhi3ke3","to drink poison to quench thirst",5],
-["鳞次栉比","lin2ci4zhi4bi3","packed row upon row (of buildings)",5],
-["佶屈聱牙","ji2qu1ao2ya2","convoluted and hard to read",5],
-["踽踽独行","ju3ju3du2xing2","to walk alone in solitude",5],
-["铩羽而归","sha1yu3er2gui1","to return defeated",5],
-["醍醐灌顶","ti2hu2guan4ding3","sudden enlightenment",5],
-["韬光养晦","tao1guang1yang3hui4","to hide one's talents and bide time",5],
-["罄竹难书","qing4zhu2nan2shu1","crimes too numerous to record",5],
-["良莠不齐","liang2you3bu4qi2","a mix of good and bad",5],
-["味同嚼蜡","wei4tong2jiao2la4","dry and dull as chewing wax",5],
-["高屋建瓴","gao1wu1jian4ling2","from a commanding strategic height",5],
-["焚膏继晷","fen2gao1ji4gui3","to study day and night",5],
-["管窥蠡测","guan3kui1li2ce4","a narrow, shallow view",5],
-["胼手胝足","pian2shou3zhi1zu2","work-calloused hands and feet",5],
-["筚路蓝缕","bi4lu4lan2lv3","to endure hardships pioneering",5],
-["宵衣旰食","xiao1yi1gan4shi2","diligent from before dawn until late",5],
-["睚眦必报","ya2zi4bi4bao4","to avenge the smallest slight",5],
-["怙恶不悛","hu4e4bu4quan1","unrepentantly evil",5],
-["一蹴而就","yi2cu4er2jiu4","to succeed in a single step",5],
-["鞭辟入里","bian1pi4ru4li3","penetrating; incisive",5],
-["荷枪实弹","he4qiang1shi2dan4","armed with loaded rifles",5],
-["拾级而上","she4ji2er2shang4","to ascend step by step",5]
+["饕餮","tao1tie4","mythical gluttonous beast; glutton",5,"noun"],
+["魑魅魍魉","chi1mei4wang3liang3","demons and monsters of every kind",5,"noun"],
+["耄耋","mao4die2","advanced old age (one's 80s–90s)",5,"noun"],
+["龃龉","ju3yu3","discord; friction",5,"noun"],
+["踟蹰","chi2chu2","to hesitate; waver",5,"verb"],
+["彳亍","chi4chu4","to stroll haltingly",5,"verb"],
+["囹圄","ling2yu3","prison (literary)",5,"noun"],
+["貔貅","pi2xiu1","mythical wealth-attracting beast",5,"noun"],
+["觊觎","ji4yu2","to covet",5,"verb"],
+["龌龊","wo4chuo4","filthy; sordid",5,"adj"],
+["旮旯","ga1la2","nook; out-of-the-way corner",5,"noun"],
+["邋遢","la1ta5","slovenly; unkempt",5,"adj"],
+["熨帖","yu4tie1","fitting; just right",5,"adj"],
+["拮据","jie2ju1","hard up; short of money",5,"adj"],
+["桎梏","zhi4gu4","shackles; fetters",5,"noun"],
+["缱绻","qian3quan3","tenderly attached (literary)",5,"adj"],
+["旖旎","yi3ni3","charming; enchanting (scenery)",5,"adj"],
+["蹉跎","cuo1tuo2","to idle away (time)",5,"verb"],
+["婆娑","po2suo1","swaying; whirling",5,"adj"],
+["逶迤","wei1yi2","winding; meandering",5,"adj"],
+["璀璨","cui3can4","dazzling; resplendent",5,"adj"],
+["圭臬","gui1nie4","criterion; standard (literary)",5,"noun"],
+["造诣","zao4yi4","(scholarly) attainment",5,"noun"],
+["商榷","shang1que4","open to deliberation",5,"verb"],
+["掣肘","che4zhou3","to impede; hold back",5,"verb"],
+["妊娠","ren4shen1","pregnancy; gestation",5,"noun"],
+["症结","zheng1jie2","crux (of a problem)",5,"noun"],
+["埋怨","man2yuan4","to blame; complain",5,"verb"],
+["参差","cen1ci1","uneven; irregular",5,"adj"],
+["龟裂","jun1lie4","to crack (of parched earth or skin)",5,"verb"],
+["痼疾","gu4ji2","chronic ailment",5,"noun"],
+["齉","nang4","to speak with a blocked nose",5,"verb"],
+["爨","cuan4","to cook over a fire (archaic)",5,"verb"],
+["龘","da2","the appearance of dragons in flight",5,"noun"],
+["虚与委蛇","xu1yu3wei1yi2","to feign politeness",5,"idiom"],
+["暴虎冯河","bao4hu3ping2he2","reckless bravery",5,"idiom"],
+["沆瀣一气","hang4xie4yi2qi4","to collude; be in cahoots",5,"idiom"],
+["暴殄天物","bao4tian3tian1wu4","to squander heaven's gifts",5,"idiom"],
+["饮鸩止渴","yin3zhen4zhi3ke3","to drink poison to quench thirst",5,"idiom"],
+["鳞次栉比","lin2ci4zhi4bi3","packed row upon row (of buildings)",5,"idiom"],
+["佶屈聱牙","ji2qu1ao2ya2","convoluted and hard to read",5,"idiom"],
+["踽踽独行","ju3ju3du2xing2","to walk alone in solitude",5,"idiom"],
+["铩羽而归","sha1yu3er2gui1","to return defeated",5,"idiom"],
+["醍醐灌顶","ti2hu2guan4ding3","sudden enlightenment",5,"idiom"],
+["韬光养晦","tao1guang1yang3hui4","to hide one's talents and bide time",5,"idiom"],
+["罄竹难书","qing4zhu2nan2shu1","crimes too numerous to record",5,"idiom"],
+["良莠不齐","liang2you3bu4qi2","a mix of good and bad",5,"idiom"],
+["味同嚼蜡","wei4tong2jiao2la4","dry and dull as chewing wax",5,"idiom"],
+["高屋建瓴","gao1wu1jian4ling2","from a commanding strategic height",5,"idiom"],
+["焚膏继晷","fen2gao1ji4gui3","to study day and night",5,"idiom"],
+["管窥蠡测","guan3kui1li2ce4","a narrow, shallow view",5,"idiom"],
+["胼手胝足","pian2shou3zhi1zu2","work-calloused hands and feet",5,"idiom"],
+["筚路蓝缕","bi4lu4lan2lv3","to endure hardships pioneering",5,"idiom"],
+["宵衣旰食","xiao1yi1gan4shi2","diligent from before dawn until late",5,"idiom"],
+["睚眦必报","ya2zi4bi4bao4","to avenge the smallest slight",5,"idiom"],
+["怙恶不悛","hu4e4bu4quan1","unrepentantly evil",5,"idiom"],
+["一蹴而就","yi2cu4er2jiu4","to succeed in a single step",5,"idiom"],
+["鞭辟入里","bian1pi4ru4li3","penetrating; incisive",5,"idiom"],
+["荷枪实弹","he4qiang1shi2dan4","armed with loaded rifles",5,"idiom"],
+["拾级而上","she4ji2er2shang4","to ascend step by step",5,"idiom"]
 ];
 
 /* HSK-style fill-in-the-blank practice questions.
@@ -1284,62 +1077,61 @@ const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","HSK 1 + new w
 const TABS=[...LEVELS,[5,"Master"]];
 
 /* ---------- level select ---------- */
-let pendingMode="arcade";
-let pendingTimed=false;
-function goLevels(mode,keepTimed){
-  pendingMode=mode;
-  if(!keepTimed)pendingTimed=false;
+const CATEGORY_TITLE={guessing:"Recognition",typing:"Typing",writing:"Writing",sentences:"Fill-in-the-Blank"};
+const VARIANT_LABEL={arcade:"Arcade",unlimited:"Unlimited",timer:"Timer"};
+let pendingCategory="guessing";
+let pendingVariant="arcade";
+function goCategory(cat){
+  pendingCategory=cat;
+  $("mstitle").textContent=CATEGORY_TITLE[cat];
+  show("modeselect");
+}
+function pickVariant(v){
+  pendingVariant=v;
+  goLevels(pendingCategory);
+}
+function goLevels(category){
+  pendingCategory=category;
   const rows=LEVELS.map(([lv,name,desc,em])=>{
-    const n=mode==="sentences"?SENTQ.filter(s=>s[0]<=lv).length:WORDS.filter(w=>w[3]<=lv).length;
-    const unit=mode==="sentences"?"sentences":"words";
+    const n=category==="sentences"?SENTQ.filter(s=>s[0]<=lv).length:WORDS.filter(w=>w[3]<=lv).length;
+    const unit=category==="sentences"?"sentences":"words";
     return `<button class="card" onclick="startLevel(${lv})">
       <div class="sealic quiet">${em}</div><div><div class="tt">${name}</div>
       <div class="dd">${desc} · ${n} ${unit}</div></div><div class="chev">›</div></button>`;
   });
-  if(mode==="arcade"||mode==="typing"||mode==="writing"){
+  if(category==="guessing"||category==="typing"||category==="writing"){
     const mn=WORDS.filter(w=>w[3]===5).length;
     rows.push(`<button class="card" onclick="startMaster()">
       <div class="sealic">宗</div><div><div class="tt">Master 宗师</div>
       <div class="dd">Rare characters, trap readings and literary chengyu — hard even for native speakers · ${mn} words</div></div>
       <div class="chev">›</div></button>`);
   }
-  if(mode==="arcade"){
-    rows.push(`<button class="card" onclick="openCustom()">
-      <div class="sealic">选</div><div><div class="tt">Custom</div>
-      <div class="dd">Hand-pick specific words from the word list and get tested only on those</div></div>
-      <div class="chev">›</div></button>`);
-  }
-  if(mode==="typing"){
-    rows.unshift(`<button class="card" onclick="pendingTimed=!pendingTimed;goLevels('typing',true)">
-      <div class="sealic ${pendingTimed?"":"quiet"}">时</div>
-      <div><div class="tt">Time attack — ${pendingTimed?"ON":"OFF"}</div>
-      <div class="dd">2:00 on the clock, no lives. Score as many words as you can, then pick a level below</div></div>
-      <div class="chev">${pendingTimed?"✓":"›"}</div></button>`);
-  }
+  rows.push(`<button class="card" onclick="openWordlistPick()">
+    <div class="sealic">词</div><div><div class="tt">My wordlists</div>
+    <div class="dd">Test one of your own named wordlists in this mode</div></div>
+    <div class="chev">›</div></button>`);
   $("levelrows").innerHTML=rows.join("");
   show("levels");
 }
 function startMaster(){
+  const cat=pendingCategory,variant=pendingVariant;
   const pool=WORDS.filter(w=>w[3]===5);
-  if(pendingMode==="typing")startTypeQuiz(pool,`Master · ${pendingTimed?"time attack":"typing"}`,pendingTimed);
-  else if(pendingMode==="writing")startWriteQuiz(pool,"Master · writing");
-  else startQuiz("arcade",pool,"Master · arcade");
+  const label=`Master · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
+  if(cat==="typing")startTypeQuiz(pool,label,variant);
+  else if(cat==="writing")startWriteQuiz(pool,label,variant);
+  else startQuiz(pool,label,variant);
 }
 function startLevel(lv){
-  if(pendingMode==="sentences"){
-    startSentQuiz(SENTQ.filter(s=>s[0]<=lv),`HSK ${lv} · sentences`);
-    return;
-  }
-  if(pendingMode==="typing"){
-    startTypeQuiz(WORDS.filter(w=>w[3]<=lv),`HSK ${lv} · ${pendingTimed?"time attack":"typing"}`,pendingTimed);
-    return;
-  }
-  if(pendingMode==="writing"){
-    startWriteQuiz(WORDS.filter(w=>w[3]<=lv),`HSK ${lv} · writing`);
+  const cat=pendingCategory,variant=pendingVariant;
+  const label=`HSK ${lv} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
+  if(cat==="sentences"){
+    startSentQuiz(SENTQ.filter(s=>s[0]<=lv),label,variant);
     return;
   }
   const pool=WORDS.filter(w=>w[3]<=lv);
-  startQuiz(pendingMode,pool,`HSK ${lv} · ${pendingMode}`);
+  if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
+  if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
+  startQuiz(pool,label,variant);
 }
 
 /* ---------- refresher ---------- */
@@ -1349,151 +1141,135 @@ function startRefresher(){
   hist.slice(0,3).forEach(s=>s.words.forEach(w=>{if(!w.ok)chars.add(w.c)}));
   const pool=WORDS.filter(w=>chars.has(w[0]));
   if(!pool.length){alert("No wrong words in your last 3 sessions — nothing to refresh! 🎉");return}
-  startQuiz("unlimited",pool,"Refresher");
+  startQuiz(pool,"Refresher","unlimited");
 }
 
-/* ---------- custom mode ---------- */
-let customTab=1;
-let customSel=new Set(store.get("hsk_custom_sel",[]));
-function openCustom(){
-  $("customtabs").innerHTML=TABS.map(([lv,name])=>
-    `<button class="tab ${lv===customTab?"on":""}" onclick="customTab=${lv};openCustom()">${name}</button>`).join("");
-  renderCustomList();
-  show("custom");
+/* ---------- custom wordlists (create, edit, pick for testing) ---------- */
+function getWordlists(){return store.get("hsk_wordlists",{})}
+function saveWordlists(obj){store.set("hsk_wordlists",obj)}
+// one-time migration from the old single anonymous selection, if present
+(function migrateOldCustomSel(){
+  if(store.get("hsk_wordlists",null)!==null)return;
+  const oldSel=store.get("hsk_custom_sel",[]);
+  const fresh={};
+  if(oldSel.length){
+    const id="wl_"+Date.now();
+    fresh[id]={name:"My Custom Words",words:[...oldSel],created:Date.now()};
+  }
+  saveWordlists(fresh);
+})();
+
+let editingListId=null;
+let editorTab=1;
+let editorSel=new Set();
+
+function createNewWordlist(){
+  const lists=getWordlists();
+  const id="wl_"+Date.now();
+  lists[id]={name:"",words:[],created:Date.now()};
+  saveWordlists(lists);
+  openWordlistEditor(id);
 }
-function customVisible(){
-  const q=$("customsearch").value.trim().toLowerCase();
-  return WORDS.filter(w=>w[3]===customTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
+function openWordlistEditor(id){
+  const lists=getWordlists();
+  if(!lists[id])return;
+  editingListId=id;
+  editorSel=new Set(lists[id].words);
+  editorTab=1;
+  $("editorname").value=lists[id].name;
+  renderEditorTabs();
+  renderEditorList();
+  show("wordlisteditor");
 }
-function renderCustomList(){
-  $("customlist").innerHTML=customVisible().map(w=>{
-    const on=customSel.has(w[0]);
-    return `<button class="wrow ${on?"sel":""}" onclick="toggleCustom('${w[0]}')">
+function renderEditorTabs(){
+  $("editortabs").innerHTML=TABS.map(([lv,name])=>
+    `<button class="tab ${lv===editorTab?"on":""}" onclick="editorTab=${lv};renderEditorTabs();renderEditorList()">${name}</button>`).join("");
+}
+function editorVisible(){
+  const q=$("editorsearch").value.trim().toLowerCase();
+  return WORDS.filter(w=>w[3]===editorTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
+}
+function renderEditorList(){
+  $("editorlist").innerHTML=editorVisible().map(w=>{
+    const on=editorSel.has(w[0]);
+    return `<button class="wrow ${on?"sel":""}" onclick="toggleEditorWord('${w[0]}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
       <span class="tick">✓</span></button>`;
   }).join("")||`<div class="empty">No words match your search</div>`;
-  /* ---------- writing practice pad (word detail) ---------- */
-const DW={chars:[],idx:0,strokes:[],cur:null,guide:true,size:0};
-function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
-function setupPractice(word){
-  DW.chars=[...word];DW.idx=0;DW.strokes=[];DW.cur=null;
-  renderChips();
-  requestAnimationFrame(()=>{sizeCanvas();redrawPad()});
+  updateEditorCount();
 }
-function renderChips(){
-  $("dchips").innerHTML=DW.chars.map((c,i)=>
-    `<button class="charchip ${i===DW.idx?"on":""}" onclick="pickChip(${i})">${c}</button>`).join("");
-  $("dchips").style.display=DW.chars.length>1?"flex":"none";
+function persistEditorSel(){
+  const lists=getWordlists();
+  if(!lists[editingListId])return;
+  lists[editingListId].words=[...editorSel];
+  saveWordlists(lists);
 }
-function pickChip(i){DW.idx=i;DW.strokes=[];renderChips();redrawPad()}
-function sizeCanvas(){
-  const c=$("dcanvas");
-  const w=Math.min(c.parentElement.clientWidth-20,240);
-  if(w<=0)return;
-  const dpr=window.devicePixelRatio||1;
-  DW.size=w;
-  c.width=w*dpr;c.height=w*dpr;
-  c.style.width=w+"px";c.style.height=w+"px";
-  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+function toggleEditorWord(c){
+  editorSel.has(c)?editorSel.delete(c):editorSel.add(c);
+  persistEditorSel();
+  renderEditorList();
 }
-function redrawPad(){
-  const c=$("dcanvas"),ctx=c.getContext("2d"),s=DW.size;
-  if(!s)return;
-  ctx.clearRect(0,0,s,s);
-  // 米字格 practice-paper guides
-  ctx.save();
-  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;ctx.setLineDash([5,5]);
-  ctx.beginPath();
-  ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);
-  ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);
-  ctx.moveTo(0,0);ctx.lineTo(s,s);
-  ctx.moveTo(s,0);ctx.lineTo(0,s);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.strokeRect(.5,.5,s-1,s-1);
-  ctx.restore();
-  // faint template character to trace
-  if(DW.guide&&DW.chars[DW.idx]){
-    ctx.save();
-    ctx.globalAlpha=.14;
-    ctx.fillStyle=cssVar("--ink");
-    ctx.font=`600 ${s*.72}px "Noto Serif SC","Songti SC","SimSun",serif`;
-    ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(DW.chars[DW.idx],s/2,s*.54);
-    ctx.restore();
+function editorBulk(on){
+  editorVisible().forEach(w=>on?editorSel.add(w[0]):editorSel.delete(w[0]));
+  persistEditorSel();renderEditorList();
+}
+function editorClearAll(){editorSel.clear();persistEditorSel();renderEditorList()}
+function updateEditorCount(){$("editorcount").textContent=editorSel.size}
+function renameCurrentWordlist(name){
+  const lists=getWordlists();
+  if(!lists[editingListId])return;
+  lists[editingListId].name=name;
+  saveWordlists(lists);
+}
+function deleteCurrentWordlist(){
+  if(!confirm("Delete this wordlist? This can't be undone."))return;
+  const lists=getWordlists();
+  delete lists[editingListId];
+  saveWordlists(lists);
+  show("mywordlists");
+  renderMyWordlists();
+}
+function renderMyWordlists(){
+  const lists=getWordlists();
+  const entries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
+  $("mywordlistrows").innerHTML=entries.length?entries.map(([id,l])=>
+    `<button class="card" onclick="openWordlistEditor('${id}')">
+      <div class="sealic quiet">词</div>
+      <div><div class="tt">${esc(l.name||"Untitled list")}</div>
+      <div class="dd">${l.words.length} word${l.words.length===1?"":"s"}</div></div>
+      <div class="chev">›</div></button>`).join("")
+    :`<div class="empty">No wordlists yet — tap "New wordlist" above to create your first one</div>`;
+}
+function openWordlistPick(){
+  const lists=getWordlists();
+  const entries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
+  $("wordlistpickrows").innerHTML=entries.length?entries.map(([id,l])=>
+    `<button class="card" onclick="startWithWordlist('${id}')">
+      <div class="sealic quiet">词</div>
+      <div><div class="tt">${esc(l.name||"Untitled list")}</div>
+      <div class="dd">${l.words.length} word${l.words.length===1?"":"s"}</div></div>
+      <div class="chev">›</div></button>`).join("")
+    :`<div class="empty">No wordlists yet. Go to Word list → My wordlists to build one, then come back here to test it.</div>`;
+  show("wordlistpick");
+}
+function startWithWordlist(id){
+  const list=getWordlists()[id];
+  if(!list)return;
+  const cat=pendingCategory,variant=pendingVariant;
+  const label=`${list.name||"Untitled list"} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
+  if(cat==="sentences"){
+    const wset=new Set(list.words);
+    const pool=SENTQ.filter(s=>wset.has(s[2]));
+    if(!pool.length){alert("None of the sentence questions in this app target words from this list yet — try a different practice category.");return}
+    startSentQuiz(pool,label,variant);
+    return;
   }
-  // ink strokes (stored as 0..1 coordinates so resizing keeps them)
-  ctx.save();
-  ctx.strokeStyle=cssVar("--ink");
-  ctx.lineWidth=Math.max(5,s/40);
-  ctx.lineCap="round";ctx.lineJoin="round";
-  for(const st of DW.strokes)drawStroke(ctx,st,s);
-  ctx.restore();
-}
-function drawStroke(ctx,pts,s){
-  if(pts.length<2)return;
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x*s,pts[0].y*s);
-  for(let i=1;i<pts.length-1;i++){
-    const mx=(pts[i].x+pts[i+1].x)/2*s,my=(pts[i].y+pts[i+1].y)/2*s;
-    ctx.quadraticCurveTo(pts[i].x*s,pts[i].y*s,mx,my);
-  }
-  const l=pts[pts.length-1];
-  ctx.lineTo(l.x*s,l.y*s);
-  ctx.stroke();
-}
-function padPoint(e){
-  const r=$("dcanvas").getBoundingClientRect();
-  return {x:(e.clientX-r.left)/DW.size,y:(e.clientY-r.top)/DW.size};
-}
-(function(){
-  const c=$("dcanvas");
-  c.addEventListener("pointerdown",e=>{
-    e.preventDefault();
-    c.setPointerCapture(e.pointerId);
-    DW.cur=[padPoint(e)];
-    DW.strokes.push(DW.cur);
-  });
-  c.addEventListener("pointermove",e=>{
-    if(!DW.cur)return;
-    e.preventDefault();
-    DW.cur.push(padPoint(e));
-    redrawPad();
-  });
-  const end=e=>{DW.cur=null};
-  c.addEventListener("pointerup",end);
-  c.addEventListener("pointercancel",end);
-  window.addEventListener("resize",()=>{
-    if($("scr-worddetail").classList.contains("active")){sizeCanvas();redrawPad()}
-  });
-})();
-function drawClear(){DW.strokes=[];DW.cur=null;redrawPad()}
-function drawGuideToggle(){
-  DW.guide=!DW.guide;
-  $("dguidebtn").textContent="Guide: "+(DW.guide?"on":"off");
-  redrawPad();
-}
-
-updateCustomCount();
-}
-function toggleCustom(c){
-  customSel.has(c)?customSel.delete(c):customSel.add(c);
-  store.set("hsk_custom_sel",[...customSel]);
-  renderCustomList();
-}
-function customBulk(on){
-  customVisible().forEach(w=>on?customSel.add(w[0]):customSel.delete(w[0]));
-  store.set("hsk_custom_sel",[...customSel]);renderCustomList();
-}
-function customClearAll(){customSel.clear();store.set("hsk_custom_sel",[]);renderCustomList()}
-function updateCustomCount(){
-  $("customcount").textContent=customSel.size;
-  $("customstart").disabled=customSel.size===0;
-}
-function startCustom(){
-  const pool=WORDS.filter(w=>customSel.has(w[0]));
+  const wset=new Set(list.words);
+  const pool=WORDS.filter(w=>wset.has(w[0]));
   if(!pool.length)return;
-  startQuiz("arcade",pool,`Custom · ${pool.length} words`);
+  if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
+  if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
+  startQuiz(pool,label,variant);
 }
 
 /* ---------- quiz engine ---------- */
@@ -1523,19 +1299,36 @@ function setFire(id,streak){
   }
 }
 let S=null;
-function buildQueue(mode,pool){
+function buildQueue(pool){
   const q=shuffle([...pool]);
-  if(mode!=="arcade")return q;
-  // arcade prioritises words you haven't completed yet, then least-drilled
   const seen=store.get("hsk_seen",{});
   return q.sort((a,b)=>(seen[a[0]]||0)-(seen[b[0]]||0)); // stable sort keeps ties shuffled
 }
 let againFn=null;
-function startQuiz(mode,pool,label){
-  againFn=()=>startQuiz(mode,pool,label);
-  S={mode,label,pool,lives:mode==="arcade"?5:Infinity,queue:buildQueue(mode,pool),i:0,ok:0,bad:0,streak:0,results:[]};
+let quizTimer=null;
+function startQuiz(pool,label,variant){
+  againFn=()=>startQuiz(pool,label,variant);
+  clearInterval(quizTimer);
+  const lives=variant==="arcade"?5:Infinity;
+  const timed=variant==="timer";
+  S={variant,timed,label,pool,lives,queue:buildQueue(pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
+  if(timed){S.deadline=Date.now()+120000;quizTimer=setInterval(quizTick,200)}
   setFire("qcard",0);
   show("quiz");renderQ();
+}
+function quizTick(){
+  if(!S||S.done)return;
+  const left=Math.max(0,S.deadline-Date.now());
+  const s=Math.ceil(left/1000);
+  $("qhearts").innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
+  if(left<=0)quizTimeUp();
+}
+function quizTimeUp(){
+  S.done=true;
+  clearInterval(quizTimer);
+  document.querySelectorAll("#opts-en .opt,#opts-py .opt").forEach(b=>b.disabled=true);
+  saveSession();
+  showSummary();
 }
 function toneVariants(p){
   const seen=new Set([p]),out=[];let g=0;
@@ -1555,7 +1348,10 @@ function renderQ(){
   S.phase={enDone:false,pyDone:false,wrong:false};
   $("qchar").textContent=w[0];
   $("qseal").textContent=w[3]===5?"宗":w[3]+"级";
-  if(S.mode==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,false);
+  if(S.timed){
+    const left=Math.max(0,S.deadline-Date.now());const s=Math.ceil(left/1000);
+    $("qhearts").innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
+  }else if(S.variant==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,false);
   else $("qhearts").textContent="♥ ∞";
   $("qok").textContent="✓ "+S.ok;$("qbad").textContent="✗ "+S.bad;
   $("qprog").textContent=(S.i+1)+" / "+S.queue.length+" words";
@@ -1604,36 +1400,45 @@ function finishWord(){
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
-  if(S.phase.wrong){S.bad++;S.streak=0;if(S.mode==="arcade")S.lives--}else{S.ok++;S.streak++}
+  if(S.phase.wrong){S.bad++;S.streak=0;if(S.variant==="arcade")S.lives--}else{S.ok++;S.streak++}
   setFire("qcard",S.streak);
   if(!S.phase.wrong&&S.streak>=5)
     document.querySelectorAll("#opts-en .opt.right,#opts-py .opt.right")
       .forEach(b=>b.classList.add("rainbow"));
   $("qok").textContent="✓ "+S.ok;$("qbad").textContent="✗ "+S.bad;
-  if(S.mode==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,S.phase.wrong);
-  else $("qhearts").textContent="♥ ∞";
+  if(!S.timed){
+    if(S.variant==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,S.phase.wrong);
+    else $("qhearts").textContent="♥ ∞";
+  }
   $("qnext").disabled=false;
-  $("qnext").textContent=(S.mode==="arcade"&&S.lives<=0)?"Results →":(S.i+1>=S.queue.length?"Finish →":"Next →");
+  $("qnext").textContent=(!S.timed&&S.variant==="arcade"&&S.lives<=0)?"Results →":((!S.timed&&S.i+1>=S.queue.length)?"Finish →":"Next →");
 }
 function nextWord(){
-  if(S.mode==="arcade"&&S.lives<=0){saveSession();showGameOver();return}
+  if(S.done)return;
+  if(S.timed){
+    S.i++;
+    if(S.i>=S.queue.length){S.queue=shuffle([...S.pool]);S.i=0}
+    renderQ();return;
+  }
+  if(S.variant==="arcade"&&S.lives<=0){saveSession();showGameOver();return}
   S.i++;
   if(S.i>=S.queue.length){saveSession();showSummary();return}
   renderQ();
 }
 function endEarly(){
-  if(S.results.length)saveSession();
+  clearInterval(quizTimer);
+  if(S)S.done=true;
+  if(S&&S.results.length)saveSession();
   show("home");
 }
 function accuracy(){const t=S.ok+S.bad;return t?Math.round(S.ok/t*100):0}
 let lastWasBest=false;
 function recordBest(label,ok,bad){
-  const key=label.indexOf("Custom")===0?"Custom · arcade":label;
   const best=store.get("hsk_best",{});
   const acc=ok+bad?Math.round(ok/(ok+bad)*100):0;
-  const cur=best[key];
+  const cur=best[label];
   if(ok>0&&(!cur||ok>cur.ok||(ok===cur.ok&&acc>cur.acc))){
-    best[key]={ok,bad,acc,t:Date.now()};
+    best[label]={ok,bad,acc,t:Date.now()};
     store.set("hsk_best",best);
     return true;
   }
@@ -1677,10 +1482,12 @@ function pinyinMatch(input,stored){
   return inp===canon||inp===canon.replace(/v/g,"u");
 }
 let typeTimer=null;
-function startTypeQuiz(pool,label,timed){
-  againFn=()=>startTypeQuiz(pool,label,timed);
+function startTypeQuiz(pool,label,variant){
+  againFn=()=>startTypeQuiz(pool,label,variant);
   clearInterval(typeTimer);
-  TS={label,pool,timed:!!timed,lives:timed?Infinity:5,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
+  const lives=variant==="arcade"?5:Infinity;
+  const timed=variant==="timer";
+  TS={variant,label,pool,timed,lives,queue:buildQueue(pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
   if(timed){
     TS.deadline=Date.now()+120000;
     typeTimer=setInterval(typeTick,200);
@@ -1714,7 +1521,10 @@ function renderType(){
   TS.answered=false;
   $("tchar").textContent=w[0];
   $("tseal").textContent=w[3]+"级";
-  if(!TS.timed)$("thearts").innerHTML=heartsHTML(TS.lives,false);
+  if(!TS.timed){
+    if(TS.variant==="arcade")$("thearts").innerHTML=heartsHTML(TS.lives,false);
+    else $("thearts").textContent="♥ ∞";
+  }
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
   $("tprog").textContent=(TS.i+1)+" / "+TS.queue.length+" words";
   $("tfill").style.width=(TS.i/TS.queue.length*100)+"%";
@@ -1742,15 +1552,18 @@ function typeCheck(){
   res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
   inp.focus();
   TS.results.push({c:w[0],ok:right});
-  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(!TS.timed)TS.lives--}
+  if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(TS.variant==="arcade")TS.lives--}
   setFire("tcard",TS.streak);
   if(right&&TS.streak>=5)inp.classList.add("rainbow");
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
-  if(!TS.timed)$("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
-  $("tbtn").textContent=(!TS.timed&&TS.lives<=0)?"Results →":((!TS.timed&&TS.i+1>=TS.queue.length)?"Finish →":"Next →");
+  if(!TS.timed){
+    if(TS.variant==="arcade")$("thearts").innerHTML=heartsHTML(Math.max(TS.lives,0),!right);
+    else $("thearts").textContent="♥ ∞";
+  }
+  $("tbtn").textContent=(!TS.timed&&TS.variant==="arcade"&&TS.lives<=0)?"Results →":((!TS.timed&&TS.i+1>=TS.queue.length)?"Finish →":"Next →");
 }
 function typeSave(){
   const hist=store.get("hsk_history",[]);
@@ -1765,7 +1578,7 @@ function typeNext(){
     if(TS.i>=TS.queue.length){TS.queue=shuffle([...TS.pool]);TS.i=0} // loop the deck until time runs out
     renderType();return;
   }
-  if(TS.lives<=0){
+  if(TS.variant==="arcade"&&TS.lives<=0){
     typeSave();
     $("gook").textContent=TS.ok;$("gobad").textContent=TS.bad;
     const t=TS.ok+TS.bad;
@@ -1800,13 +1613,30 @@ function typeEndEarly(){
 
 /* ---------- writing quiz engine (flashcard, self-graded) ---------- */
 let WQ=null;
+let writeTimer=null;
 const WPAD={strokes:[],cur:null,size:0,cells:1};
-function startWriteQuiz(pool,label){
-  againFn=()=>startWriteQuiz(pool,label);
-  WQ={label,pool,queue:buildQueue("arcade",pool),i:0,ok:0,bad:0,streak:0,results:[]};
+function startWriteQuiz(pool,label,variant){
+  againFn=()=>startWriteQuiz(pool,label,variant);
+  clearInterval(writeTimer);
+  const lives=variant==="arcade"?5:Infinity;
+  const timed=variant==="timer";
+  WQ={variant,timed,lives,label,pool,queue:buildQueue(pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
+  if(timed){WQ.deadline=Date.now()+120000;writeTimer=setInterval(writeTick,200)}
   setFire("wcard",0);
   show("writequiz");
   requestAnimationFrame(()=>renderWrite());
+}
+function writeTick(){
+  if(!WQ||WQ.done)return;
+  const left=Math.max(0,WQ.deadline-Date.now());
+  const s=Math.ceil(left/1000);
+  $("whearts").innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
+  if(left<=0)writeTimeUp();
+}
+function writeTimeUp(){
+  WQ.done=true;
+  clearInterval(writeTimer);
+  writeFinish();
 }
 function renderWrite(){
   const w=WQ.queue[WQ.i];
@@ -1815,6 +1645,10 @@ function renderWrite(){
   $("wok").textContent="✓ "+WQ.ok;$("wbad").textContent="✗ "+WQ.bad;
   $("wprog").textContent=(WQ.i+1)+" / "+WQ.queue.length+" words";
   $("wfill").style.width=(WQ.i/WQ.queue.length*100)+"%";
+  if(!WQ.timed){
+    if(WQ.variant==="arcade")$("whearts").innerHTML=heartsHTML(WQ.lives,false);
+    else $("whearts").textContent="♥ ∞";
+  }
   $("wreveal").classList.remove("show");
   $("wgrade").classList.remove("show");
   $("wrevealbtn").style.display="block";
@@ -1833,13 +1667,33 @@ function writeReveal(){
   $("wgrade").classList.add("show");
 }
 function writeGrade(right){
+  if(WQ.done)return;
   const w=WQ.queue[WQ.i];
   WQ.results.push({c:w[0],ok:right});
-  if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0}
+  if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0;if(WQ.variant==="arcade")WQ.lives--}
   setFire("wcard",WQ.streak);
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
+  $("wok").textContent="✓ "+WQ.ok;$("wbad").textContent="✗ "+WQ.bad;
+  if(!WQ.timed){
+    if(WQ.variant==="arcade")$("whearts").innerHTML=heartsHTML(Math.max(WQ.lives,0),!right);
+    else $("whearts").textContent="♥ ∞";
+  }
+  if(WQ.timed){
+    WQ.i++;
+    if(WQ.i>=WQ.queue.length){WQ.queue=shuffle([...WQ.pool]);WQ.i=0}
+    renderWrite();return;
+  }
+  if(WQ.variant==="arcade"&&WQ.lives<=0){
+    writeSave();
+    $("gobest").classList.toggle("show",lastWasBest);
+    $("gook").textContent=WQ.ok;$("gobad").textContent=WQ.bad;
+    const t=WQ.ok+WQ.bad;
+    $("goacc").textContent=(t?Math.round(WQ.ok/t*100):0)+"%";
+    $("gowords").innerHTML=breakdownHTML(WQ.results.filter(r=>!r.ok));
+    show("gameover");return;
+  }
   WQ.i++;
   if(WQ.i>=WQ.queue.length){writeFinish();return}
   renderWrite();
@@ -1861,6 +1715,8 @@ function writeFinish(){
   show("summary");
 }
 function writeEndEarly(){
+  clearInterval(writeTimer);
+  if(WQ)WQ.done=true;
   if(WQ&&WQ.results.length)writeSave();
   show("home");
 }
@@ -1945,11 +1801,29 @@ function writeClear(){WPAD.strokes=[];WPAD.cur=null;redrawWPad()}
 
 /* ---------- sentence quiz engine ---------- */
 let SS=null;
-function startSentQuiz(pool,label){
-  againFn=()=>startSentQuiz(pool,label);
-  SS={label,queue:shuffle([...pool]),i:0,ok:0,bad:0,streak:0,results:[]};
+let sentTimer=null;
+function startSentQuiz(pool,label,variant){
+  againFn=()=>startSentQuiz(pool,label,variant);
+  clearInterval(sentTimer);
+  const lives=variant==="arcade"?5:Infinity;
+  const timed=variant==="timer";
+  SS={variant,timed,lives,label,pool,queue:shuffle([...pool]),i:0,ok:0,bad:0,streak:0,results:[],done:false};
+  if(timed){SS.deadline=Date.now()+120000;sentTimer=setInterval(sentTick,200)}
   setFire("scard",0);
   show("sentquiz");renderSent();
+}
+function sentTick(){
+  if(!SS||SS.done)return;
+  const left=Math.max(0,SS.deadline-Date.now());
+  const s=Math.ceil(left/1000);
+  $("shearts").innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
+  if(left<=0)sentTimeUp();
+}
+function sentTimeUp(){
+  SS.done=true;
+  clearInterval(sentTimer);
+  document.querySelectorAll("#opts-sent .opt").forEach(b=>b.disabled=true);
+  sentFinish();
 }
 function renderSent(){
   const q=SS.queue[SS.i];
@@ -1959,17 +1833,21 @@ function renderSent(){
   $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
   $("sprog").textContent=(SS.i+1)+" / "+SS.queue.length;
   $("sfill").style.width=(SS.i/SS.queue.length*100)+"%";
+  if(!SS.timed){
+    if(SS.variant==="arcade")$("shearts").innerHTML=heartsHTML(SS.lives,false);
+    else $("shearts").textContent="♥ ∞";
+  }
   $("snext").disabled=true;
   const opts=shuffle([q[2],...q[3]]);
   $("opts-sent").innerHTML=opts.map(o=>
     `<button class="opt" onclick="answerSent(this,${o===q[2]})">${o}</button>`).join("");
 }
 function answerSent(btn,right){
-  if(SS.answered)return;SS.answered=true;
+  if(SS.answered||SS.done)return;SS.answered=true;
   const q=SS.queue[SS.i];
   [...$("opts-sent").children].forEach(b=>{b.disabled=true;if(b.textContent===q[2])b.classList.add("right")});
   if(!right)btn.classList.add("wrong");
-  if(right){SS.ok++;SS.streak++}else{SS.bad++;SS.streak=0}
+  if(right){SS.ok++;SS.streak++}else{SS.bad++;SS.streak=0;if(SS.variant==="arcade")SS.lives--}
   setFire("scard",SS.streak);
   if(right&&SS.streak>=5)btn.classList.add("rainbow");
   SS.results.push({c:q[2],ok:right});
@@ -1978,13 +1856,38 @@ function answerSent(btn,right){
   $("srevealen").textContent=q[5];
   $("sreveal").className="reveal show "+(right?"right":"wrong");
   $("sok").textContent="✓ "+SS.ok;$("sbad").textContent="✗ "+SS.bad;
+  if(!SS.timed){
+    if(SS.variant==="arcade")$("shearts").innerHTML=heartsHTML(Math.max(SS.lives,0),!right);
+    else $("shearts").textContent="♥ ∞";
+  }
   $("snext").disabled=false;
-  $("snext").textContent=SS.i+1>=SS.queue.length?"Finish →":"Next →";
+  $("snext").textContent=(!SS.timed&&SS.variant==="arcade"&&SS.lives<=0)?"Results →":((!SS.timed&&SS.i+1>=SS.queue.length)?"Finish →":"Next →");
 }
 function sentNext(){
+  if(SS.done)return;
+  if(SS.timed){
+    SS.i++;
+    if(SS.i>=SS.queue.length){SS.queue=shuffle([...SS.pool]);SS.i=0}
+    renderSent();return;
+  }
+  if(SS.variant==="arcade"&&SS.lives<=0){
+    sentSaveGameOver();return;
+  }
   SS.i++;
   if(SS.i>=SS.queue.length){sentFinish();return}
   renderSent();
+}
+function sentSaveGameOver(){
+  const hist=store.get("hsk_history",[]);
+  hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
+  store.set("hsk_history",hist.slice(0,10));
+  lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
+  $("gobest").classList.toggle("show",lastWasBest);
+  $("gook").textContent=SS.ok;$("gobad").textContent=SS.bad;
+  const t=SS.ok+SS.bad;
+  $("goacc").textContent=(t?Math.round(SS.ok/t*100):0)+"%";
+  $("gowords").innerHTML=breakdownHTML(SS.results.filter(r=>!r.ok));
+  show("gameover");
 }
 function sentFinish(){
   const hist=store.get("hsk_history",[]);
@@ -2000,6 +1903,8 @@ function sentFinish(){
   show("summary");
 }
 function sentEndEarly(){
+  clearInterval(sentTimer);
+  if(SS)SS.done=true;
   if(SS&&SS.results.length)sentFinish();else show("home");
 }
 
@@ -2037,20 +1942,32 @@ function clearHistory(){
 }
 
 /* ---------- word list + detail ---------- */
+const POS_LABEL={noun:"Noun",verb:"Verb",adj:"Adj.",adv:"Adv.",pronoun:"Pron.",function:"Gram.",idiom:"Idiom"};
 let wlTab=1;
+let wlPos="all";
+function renderPosFilters(){
+  const present=new Set(WORDS.filter(w=>w[3]===wlTab).map(w=>w[4]));
+  const opts=[["all","All"],...Object.entries(POS_LABEL).filter(([k])=>present.has(k))];
+  if(!opts.some(([k])=>k===wlPos))wlPos="all";
+  $("wlposfilters").innerHTML=opts.map(([k,label])=>
+    `<button class="tab ${wlPos===k?"on":""}" onclick="wlPos='${k}';renderPosFilters();renderWordlist()">${label}</button>`).join("");
+}
 function openWordlist(){
   $("wltabs").innerHTML=TABS.map(([lv,name])=>
     `<button class="tab ${lv===wlTab?"on":""}" onclick="wlTab=${lv};openWordlist()">${name}</button>`).join("");
+  renderPosFilters();
   renderWordlist();show("wordlist");
 }
 function renderWordlist(){
   const q=$("wlsearch").value.trim().toLowerCase();
-  const list=WORDS.filter(w=>w[3]===wlTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
+  const list=WORDS.filter(w=>w[3]===wlTab&&(wlPos==="all"||w[4]===wlPos)
+    &&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
   const pinned=new Set(store.get("hsk_pins",[]));
   list.sort((a,b)=>(pinned.has(b[0])?1:0)-(pinned.has(a[0])?1:0)); // stable: pinned float up, order kept
   $("wllist").innerHTML=list.map(w=>
     `<button class="wrow" onclick="openDetail('${w[0]}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
+      <span class="poschip ${w[4]}">${POS_LABEL[w[4]]}</span>
       <span class="pin ${pinned.has(w[0])?"on":""}" title="Pin to top"
         onclick="event.stopPropagation();togglePin('${w[0]}')">★</span></button>`).join("")
     ||`<div class="empty">No words match your search</div>`;
@@ -2066,8 +1983,51 @@ function openDetail(c){
   const w=WORDS.find(x=>x[0]===c);if(!w)return;
   $("dchar").textContent=w[0];$("dpy").textContent=pin(w[1]);$("den").textContent=w[2];
   $("dseal").textContent=w[3]===5?"宗":w[3]+"级";
+  const p=$("dpos");p.textContent=POS_LABEL[w[4]];p.className="poschip "+w[4];
+  detailTab("write");
   show("worddetail");
   setupPractice(w[0]);
+  renderMySentences(w[0]);
+}
+function detailTab(which){
+  $("dtabs").children[0].classList.toggle("on",which==="write");
+  $("dtabs").children[1].classList.toggle("on",which==="sentences");
+  $("panel-write").style.display=which==="write"?"block":"none";
+  $("panel-sentences").style.display=which==="sentences"?"block":"none";
+}
+/* ---------- my sentences (word detail) ---------- */
+let mySentChar=null;
+function renderMySentences(c){
+  mySentChar=c;
+  const all=store.get("hsk_mysentences",{});
+  const list=all[c]||[];
+  $("mysentlist").innerHTML=list.length?list.map((s,i)=>
+    `<div class="sent" style="position:relative">
+      <button class="pin" style="position:absolute;top:10px;right:12px;color:var(--seal)" onclick="deleteMySentence(${i})">✕</button>
+      <div class="zh" style="padding-right:22px">${esc(s.zh)}</div>
+      ${s.py?`<div class="py">${esc(s.py)}</div>`:""}
+      ${s.en?`<div class="en">${esc(s.en)}</div>`:""}
+    </div>`).join("")
+    :`<div class="empty">No sentences yet — write your own example below to help it stick</div>`;
+}
+function addMySentence(){
+  const zh=$("msinput").value.trim();
+  if(!zh)return;
+  const py=$("mspyinput").value.trim();
+  const en=$("msenginput").value.trim();
+  const all=store.get("hsk_mysentences",{});
+  if(!all[mySentChar])all[mySentChar]=[];
+  all[mySentChar].push({zh,py,en});
+  store.set("hsk_mysentences",all);
+  $("msinput").value="";$("mspyinput").value="";$("msenginput").value="";
+  renderMySentences(mySentChar);
+}
+function deleteMySentence(i){
+  const all=store.get("hsk_mysentences",{});
+  if(!all[mySentChar])return;
+  all[mySentChar].splice(i,1);
+  store.set("hsk_mysentences",all);
+  renderMySentences(mySentChar);
 }
 
 /* ---------- theme ---------- */
@@ -2188,6 +2148,5 @@ function drawGuideToggle(){
   redrawPad();
 }
 
-updateCustomCount();
 </script></body>
 </html>

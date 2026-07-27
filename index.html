@@ -74,6 +74,19 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radi
   transform:rotate(-2deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 0 0 3px var(--seal)}
 .sealic.quiet{background:var(--seal2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--seal2)}
 html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
+html[data-theme="dark"] .tile.ink,
+html[data-theme="dark"] .tile.jade{
+  background:rgba(31,133,87,.07);
+  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
+html[data-theme="dark"] .tile.ink:hover,
+html[data-theme="dark"] .tile.jade:hover{
+  box-shadow:inset 0 0 0 1px rgba(65,179,131,.32),0 4px 0 rgba(8,55,30,.9),0 9px 20px rgba(0,0,0,.38)}
+html[data-theme="dark"] .tile .sealic.quiet{
+  background:rgba(31,133,87,.13);color:var(--jade);
+  box-shadow:inset 0 0 0 1.5px rgba(65,179,131,.32),inset 0 0 0 4px rgba(65,179,131,.07)}
+html[data-theme="dark"] .tile .sealic.jade{
+  background:rgba(31,133,87,.13);color:var(--jade);
+  box-shadow:inset 0 0 0 1.5px rgba(65,179,131,.35),inset 0 0 0 4px rgba(65,179,131,.08)}
 .sealic.jade{background:var(--jade);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--jade)}
 .sealic.lg{width:56px;height:56px;font-size:26px;border-radius:12px;margin:0 auto}
 
@@ -122,14 +135,25 @@ html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
 .tilegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tile{position:relative;overflow:hidden;text-align:left;border:none;cursor:pointer;
   display:flex;flex-direction:column;gap:8px;border-radius:16px;padding:18px;
-  color:var(--ink);font-family:var(--ui);transition:border-color .12s}
+  color:var(--ink);font-family:var(--ui);transition:border-color .12s,box-shadow .14s,transform .08s}
 .tile.practice{min-height:158px}
-.tile.ink{background:var(--tile-ink-bg);border:1px solid var(--tile-ink-border)}
-.tile.ink:hover{border-color:var(--tile-ink-border-hover)}
-.tile.jade{background:var(--tile-jade-bg);border:1px solid var(--tile-jade-border)}
-.tile.jade:hover{border-color:var(--tile-jade-border-hover)}
-.tile:active{transform:scale(.99)}
+/* mahjong tile style */
+.tile.ink{background:#FDFDF5;border:2px solid var(--jade);
+  box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+.tile.ink:hover{border-color:#2aab6e;
+  box-shadow:inset 0 0 0 1px rgba(31,133,87,.26),0 4px 0 rgba(18,88,55,.52),0 8px 18px rgba(0,0,0,.1)}
+.tile.jade{background:#FDFDF5;border:2px solid var(--jade);
+  box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+.tile.jade:hover{border-color:#2aab6e;
+  box-shadow:inset 0 0 0 1px rgba(31,133,87,.26),0 4px 0 rgba(18,88,55,.52),0 8px 18px rgba(0,0,0,.1)}
+.tile:active{transform:scale(.99) translateY(2px);
+  box-shadow:inset 0 0 0 1px rgba(31,133,87,.18),0 1px 0 rgba(18,88,55,.45),0 2px 6px rgba(0,0,0,.07)!important}
+/* sealic icon inside a tile — mini mahjong tile character */
 .tile .sealic{position:relative;width:42px;height:42px;font-size:19px;border-radius:11px}
+.tile .sealic.quiet{background:#FEFEF8;color:var(--ink);
+  box-shadow:inset 0 0 0 1.5px rgba(31,133,87,.3),inset 0 0 0 4px rgba(31,133,87,.08)}
+.tile .sealic.jade{background:#FEFEF8;color:var(--jade);
+  box-shadow:inset 0 0 0 1.5px rgba(31,133,87,.35),inset 0 0 0 4px rgba(31,133,87,.09)}
 .tile .tt{position:relative;font-size:14.5px;font-weight:600;letter-spacing:-.005em}
 .tile .dd{position:relative;font-size:12px;color:var(--muted);line-height:1.5}
 
@@ -269,6 +293,7 @@ html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
 .poschip.pronoun{background:rgba(140,90,200,.13);color:#8B5CC7}
 .poschip.function{background:var(--line);color:var(--muted)}
 .poschip.idiom{background:rgba(33,36,44,.08);color:var(--ink)}
+.poschip.custom{background:var(--seal-tint);color:var(--seal)}
 html[data-theme="dark"] .poschip.noun{background:rgba(90,150,255,.16);color:#7FB0FF}
 html[data-theme="dark"] .poschip.adv{background:rgba(232,182,76,.16);color:#E8B64C}
 html[data-theme="dark"] .poschip.pronoun{background:rgba(170,130,230,.18);color:#C4A6F0}
@@ -295,7 +320,23 @@ html[data-theme="dark"] .poschip.idiom{background:rgba(255,255,255,.08);color:va
   box-shadow:0 1px 3px rgba(33,36,44,.05)}
 #dcanvas{display:block;margin:0 auto;border-radius:10px;touch-action:none;cursor:crosshair}
 #wcanvas{display:block;margin:0 auto;border-radius:10px;touch-action:none;cursor:crosshair}
-.drawtools{display:flex;gap:7px;margin-top:10px}
+.drawtools{display:flex;align-items:center;gap:7px;margin-top:10px}
+.pencolors{display:none;align-items:center;gap:7px;margin-left:auto}
+.pencolors.show{display:flex}
+.pclabel{font-size:11.5px;color:var(--muted)}
+.pencolor{width:24px;height:24px;border-radius:50%;border:2px solid var(--card);cursor:pointer;padding:0;
+  box-shadow:0 0 0 1.5px var(--line);transition:box-shadow .12s}
+.pencolor.on{box-shadow:0 0 0 2px var(--ink)}
+.pencolor.ink{background:var(--ink)}
+.pencolor.green{background:var(--jade)}
+.pencolor.red{background:var(--seal)}
+.drawthumb{width:34px;height:34px;object-fit:contain;border-radius:7px;border:1px solid var(--line);
+  background:#fff;margin-left:8px;cursor:pointer;flex-shrink:0}
+.lightbox{position:fixed;inset:0;background:rgba(15,16,19,.82);display:none;align-items:center;
+  justify-content:center;z-index:60;padding:26px}
+.lightbox.show{display:flex}
+.lightbox img{max-width:100%;max-height:100%;background:#fff;border-radius:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4)}
 .charchips{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
 .charchip{border:1px solid var(--line);background:var(--card);border-radius:10px;min-width:44px;height:44px;
   font-family:var(--hanzi);font-size:21px;font-weight:600;color:var(--muted);cursor:pointer;padding:0 8px}
@@ -385,6 +426,70 @@ html[data-theme="dark"] .lbrow .rank{color:var(--ink)}
 html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:26px 12px;line-height:1.6;
   background:var(--card);border:1px dashed var(--line);border-radius:12px}
+
+/* ---------- help button ---------- */
+.helptoggle{position:absolute;top:20px;left:18px;display:flex;align-items:center;gap:7px;
+  background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 12px 7px 9px;
+  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;z-index:5}
+.helptoggle:hover{color:var(--ink);border-color:var(--line-strong)}
+.helptoggle .dot{width:19px;height:19px;border-radius:6px;background:var(--seal);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+  flex-shrink:0;position:relative;animation:helpdotpulse 2.6s ease-in-out infinite}
+.helptoggle .dot::after{content:"";position:absolute;inset:0;border-radius:6px;
+  background:var(--seal);animation:helpringpulse 2.6s ease-out infinite}
+@keyframes helpdotpulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(190,52,37,.35)}
+  50%{box-shadow:0 0 0 5px rgba(190,52,37,0)}
+}
+@keyframes helpringpulse{
+  0%{transform:scale(1);opacity:.55}
+  70%{transform:scale(1.7);opacity:0}
+  100%{transform:scale(1.7);opacity:0}
+}
+.helptoggle.seen .dot{animation:none;box-shadow:none}
+.helptoggle.seen .dot::after{animation:none;display:none}
+
+/* ---------- help modal ---------- */
+.helpoverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);pointer-events:none}
+.helpoverlay.show{display:flex}
+.helppanel{background:var(--card);border-radius:28px 28px 0 0;width:100%;max-width:440px;
+  max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -12px 48px rgba(0,0,0,.16);animation:slideup .3s cubic-bezier(.34,.1,.68,1);pointer-events:auto}
+@keyframes slideup{from{transform:translateY(32px);opacity:0}to{transform:none;opacity:1}}
+.helpdrag{width:42px;height:5px;background:var(--line);border-radius:99px;margin:18px auto 14px;flex-shrink:0;opacity:0.6}
+.helpheader{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--line);flex-shrink:0}
+.help-page-counter{font-size:14px;font-weight:600;color:var(--ink)}
+.helpdots{display:flex;gap:10px;align-items:center;justify-content:center}
+.helpdot{height:8px;border-radius:99px;background:var(--line);transition:all .28s cubic-bezier(.34,.1,.68,1);width:8px;display:inline-block;cursor:pointer}
+.helpdot.on{width:28px;background:var(--jade)}
+.helpxbtn{width:34px;height:34px;border-radius:10px;background:var(--bg);
+  border:1px solid var(--line);color:var(--muted);font-size:16px;font-weight:300;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.helpxbtn:active{background:var(--line);color:var(--ink)}
+.helpviewport{overflow:hidden;width:100%;flex:1;min-height:0}
+.helptrack{display:flex;height:100%;transition:transform .35s cubic-bezier(.34,.1,.68,1);will-change:transform}
+.helppage{flex:0 0 100%;overflow:hidden;display:flex;flex-direction:column;padding:32px 26px;box-sizing:border-box;justify-content:space-between}
+.helppage-content{flex:1;display:flex;flex-direction:column;gap:22px;overflow:hidden}
+.helpsub{margin:0}
+.helpsubimg{max-height:170px;object-fit:contain;margin-bottom:6px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))}
+.helpcatrow{display:flex;align-items:center;gap:14px;margin-bottom:0;padding-bottom:0;border-bottom:none}
+.helpcaticon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--hanzi);font-size:19px;font-weight:600;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.helpcatlabel{font-size:11px;font-weight:800;letter-spacing:.32em;color:var(--muted);text-transform:uppercase}
+.helpsubhead{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px;color:var(--ink);line-height:1.35}
+.helpsubtext{font-size:14px;color:var(--muted);line-height:1.7}
+.help-indicator{text-align:center;font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:-.005em}
+.helpnavrow{display:flex;flex-direction:column;gap:18px;padding:22px 26px 32px;border-top:1px solid var(--line);flex-shrink:0;align-items:center;background:var(--card)}
+.helpnavbtn{border-radius:13px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--line);font-family:var(--ui);flex:1;text-align:center;
+  background:var(--card);color:var(--ink);transition:all .2s;letter-spacing:-.005em}
+.helpnavbtn:hover{border-color:var(--fill);background:var(--bg)}
+.helpnavbtn:active{transform:scale(.98);opacity:.9}
+.helpnavbtn.primary{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.helpnavbtn.primary:hover{opacity:.95}
+.helpnavbtn:disabled{opacity:0.4;pointer-events:none;cursor:not-allowed}
+.helpnavbtn-cat{flex:1;min-width:auto}
+.helpnavrow-btns{display:flex;gap:12px;width:100%}
 </style>
 </head>
 <body>
@@ -392,6 +497,9 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 
   <!-- HOME -->
   <section class="screen active" id="scr-home">
+    <button class="helptoggle" onclick="openHelp()" aria-label="How to use">
+      <span class="dot">?</span><span>How to use</span>
+    </button>
     <button class="themetoggle" onclick="toggleTheme()" aria-label="Switch theme">
       <span class="dot" id="themedot">暗</span><span id="themelabel">Dark</span>
     </button>
@@ -502,6 +610,15 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     </div>
     <p class="hint">Each level includes all words from the levels before it</p>
     <div class="rows" id="levelrows"></div>
+    <div id="levelwlsection" style="display:none">
+      <div class="sechead">My wordlists</div>
+      <p class="hint">Select one or more, then continue to filter by level</p>
+      <div class="rows" id="levelwlrows"></div>
+    </div>
+    <div class="stickybar" id="levelwlbar" style="display:none">
+      <div class="cnt"><b id="levelwlcount">0</b> selected</div>
+      <button class="btn primary" style="flex:1" onclick="confirmWordlistSelection()">Continue →</button>
+    </div>
   </section>
 
   <!-- CUSTOM PICKER -->
@@ -513,6 +630,19 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     </div>
     <input class="namebox" id="editorname" type="text" placeholder="Name this wordlist…" oninput="renameCurrentWordlist(this.value)">
     <p class="hint">Pick the words that belong in this list. Changes save automatically.</p>
+    <button class="card" style="margin-bottom:12px" onclick="toggleAddWordForm()">
+      <div class="sealic quiet">＋</div>
+      <div><div class="tt">Add a new word</div>
+      <div class="dd">Not in the HSK lists? Type in your own word to learn</div></div>
+      <div class="chev" id="addwordchev">›</div>
+    </button>
+    <div id="addwordform" style="display:none;margin-bottom:14px">
+      <input class="searchbox" id="neword-zh" type="text" placeholder="Character(s), e.g. 加油">
+      <input class="searchbox" id="neword-py" type="text" placeholder="Pinyin with tone numbers, e.g. jia1you2" oninput="previewNewWordPinyin()">
+      <div class="hint" id="newordpreview" style="margin-top:-8px;min-height:18px"></div>
+      <input class="searchbox" id="neword-en" type="text" placeholder="English meaning, e.g. go for it / keep going">
+      <button class="btn primary" style="width:100%" onclick="addUserWord()">Add to this list</button>
+    </div>
     <div class="tabs" id="editortabs"></div>
     <input class="searchbox" id="editorsearch" type="text" placeholder="Search characters, pinyin or English" oninput="renderEditorList()">
     <div class="minirow">
@@ -546,14 +676,14 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     <div class="rows" id="mywordlistrows"></div>
   </section>
 
-  <!-- WORDLIST PICKER (for practice flow) -->
-  <section class="screen" id="scr-wordlistpick">
+  <!-- WORDLIST LEVEL FILTER -->
+  <section class="screen" id="scr-wordlistlevels">
     <div class="topbar">
       <button class="linkbtn" onclick="show('levels')">← Back</button>
-      <h2>Choose a wordlist</h2>
+      <h2>Choose level</h2>
     </div>
-    <p class="hint">Pick one of your saved wordlists to test in this mode</p>
-    <div class="rows" id="wordlistpickrows"></div>
+    <p class="hint" id="wordlistlevelshint">Only words from your selected wordlist(s) are included</p>
+    <div class="rows" id="wordlistlevelrows"></div>
   </section>
 
   <!-- QUIZ -->
@@ -622,6 +752,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <canvas id="wcanvas"></canvas>
       <div class="drawtools">
         <button class="minibtn" onclick="writeClear()">Clear</button>
+        <div class="pencolors" id="wpencolors">
+          <span class="pclabel">Mark:</span>
+          <button class="pencolor ink on" id="pc-ink" onclick="setPenColor('ink')" aria-label="Default pen"></button>
+          <button class="pencolor green" id="pc-green" onclick="setPenColor('green')" aria-label="Green pen"></button>
+          <button class="pencolor red" id="pc-red" onclick="setPenColor('red')" aria-label="Red pen"></button>
+        </div>
       </div>
     </div>
     <button class="nextbtn" id="wrevealbtn" onclick="writeReveal()" style="margin-top:14px">Reveal →</button>
@@ -758,6 +894,352 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <button class="btn primary" style="width:100%" onclick="addMySentence()">Add sentence</button>
     </div>
   </section>
+
+  <div class="lightbox" id="drawlightbox" onclick="this.classList.remove('show')">
+    <img id="drawlightboximg" src="" alt="Your drawing">
+  </div>
+
+  <!-- HOW TO USE MODAL -->
+  <div class="helpoverlay" id="helpoverlay" onclick="closeHelp(event)">
+    <div class="helppanel" id="helppanel">
+      <div class="helpdrag"></div>
+      <div class="helpheader">
+        <div class="help-page-counter" id="help-page-counter">Page 1/3</div>
+        <button class="helpxbtn" onclick="closeHelp()">✕</button>
+      </div>
+
+      <div class="helpviewport" id="helpviewport"
+           ontouchstart="helpTouchStart(event)" ontouchend="helpTouchEnd(event)">
+        <div class="helptrack" id="helptrack">
+          <!-- PAGE 0 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#BE3425">词</div>
+                  <span class="helpcatlabel">LEARN</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="38" height="16" rx="8" style="fill:var(--fill)"/>
+  <text x="27" y="14" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--on-fill)">HSK 1</text>
+  <rect x="50" y="6" width="38" height="16" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="69" y="14" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--muted)">HSK 2</text>
+  <rect x="92" y="6" width="38" height="16" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="111" y="14" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--muted)">HSK 3</text>
+  <rect x="134" y="6" width="38" height="16" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="153" y="14" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--muted)">HSK 4</text>
+  <rect x="176" y="6" width="42" height="16" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="197" y="14" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--muted)">Pinned</text>
+  <rect x="8" y="26" width="264" height="18" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="19" y="35" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;fill:var(--muted)">Search characters, pinyin or English…</text>
+  <rect x="8" y="48" width="264" height="19" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="18" y="57.5" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:13px;font-weight:600;fill:var(--ink)">爱</text>
+  <text x="39" y="53" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">ài</text>
+  <text x="39" y="63" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">to love</text>
+  <rect x="200" y="53" width="28" height="11" rx="4" style="fill:var(--jade-tint)"/>
+  <text x="214" y="58.5" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7px;font-weight:700;fill:var(--jade)">verb</text>
+  <text x="252" y="57.5" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;fill:#D9A62E">★</text>
+  <rect x="8" y="71" width="264" height="19" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="18" y="80.5" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:13px;font-weight:600;fill:var(--ink)">喝</text>
+  <text x="39" y="76" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">hē</text>
+  <text x="39" y="86" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">to drink</text>
+  <rect x="194" y="76" width="34" height="11" rx="4" style="fill:var(--jade-tint)"/>
+  <text x="211" y="81.5" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7px;font-weight:700;fill:var(--jade)">verb</text>
+</svg></div>
+                  <div class="helpsubhead">Browse every HSK word</div>
+                  <div class="helpsubtext">Filter by level (HSK 1–4), part of speech, or search by character, pinyin, or English. Pin important words to a dedicated tab for quick access.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 1 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#BE3425">词</div>
+                  <span class="helpcatlabel">LEARN</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="18" rx="8" style="fill:var(--card);stroke:var(--fill);stroke-width:1.5"/>
+  <text x="16" y="15" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:11px;font-weight:700;fill:var(--ink)">My Work Vocab</text>
+  <rect x="8" y="28" width="264" height="19" rx="8" style="fill:var(--card);stroke:var(--fill);stroke-width:1.5"/>
+  <text x="18" y="37.5" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:13px;font-weight:600;fill:var(--ink)">工作</text>
+  <text x="46" y="33" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">gōngzuò</text>
+  <text x="46" y="43" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">work</text>
+  <rect x="253" y="33.5" width="13" height="13" rx="4" style="fill:var(--fill)"/>
+  <text x="259.5" y="40" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;fill:var(--on-fill)">✓</text>
+  <rect x="8" y="51" width="264" height="19" rx="8" style="fill:var(--card);stroke:var(--fill);stroke-width:1.5"/>
+  <text x="18" y="60.5" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:13px;font-weight:600;fill:var(--ink)">学习</text>
+  <text x="46" y="56" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">xuéxí</text>
+  <text x="46" y="66" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">to study</text>
+  <rect x="253" y="56.5" width="13" height="13" rx="4" style="fill:var(--fill)"/>
+  <text x="259.5" y="63" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;fill:var(--on-fill)">✓</text>
+  <rect x="8" y="74" width="264" height="17" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="18" y="82.5" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:13px;font-weight:600;fill:var(--ink)">爱好</text>
+  <text x="46" y="78" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">àihào</text>
+  <text x="46" y="87" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">hobby</text>
+  <rect x="253" y="78" width="13" height="13" rx="4" style="fill:none;stroke:var(--line);stroke-width:1.5"/>
+</svg></div>
+                  <div class="helpsubhead">Build your own wordlists</div>
+                  <div class="helpsubtext">Create named sets, mix any HSK levels, and add custom words not in the standard lists — great for vocabulary from classes or daily life.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 2 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#BE3425">词</div>
+                  <span class="helpcatlabel">LEARN</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="22" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="22" y="17" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:14px;font-weight:600;fill:var(--ink)">学</text>
+  <line x1="42" y1="10" x2="42" y2="24" style="stroke:var(--line);stroke-width:1"/>
+  <text x="50" y="13" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">xué</text>
+  <text x="50" y="23" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">to study / learn</text>
+  <rect x="238" y="10" width="26" height="14" rx="5" style="fill:var(--seal)"/>
+  <text x="251" y="17" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:8px;font-weight:600;fill:white">1级</text>
+  <rect x="8" y="32" width="264" height="54" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <line x1="8" y1="59" x2="272" y2="59" stroke-dasharray="4,4" style="stroke:var(--line);stroke-width:1"/>
+  <line x1="140" y1="32" x2="140" y2="86" stroke-dasharray="4,4" style="stroke:var(--line);stroke-width:1"/>
+  <line x1="8" y1="32" x2="272" y2="86" stroke-dasharray="4,4" style="stroke:var(--line);stroke-width:1"/>
+  <line x1="272" y1="32" x2="8" y2="86" stroke-dasharray="4,4" style="stroke:var(--line);stroke-width:1"/>
+  <text x="140" y="62" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:30px;font-weight:600;fill:var(--ink);opacity:0.12">学</text>
+</svg></div>
+                  <div class="helpsubhead">Dive into any word</div>
+                  <div class="helpsubtext">Tap a word to open its detail view. Trace the character on a guided practice grid, or save your own example sentences with pinyin and English.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 3 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#3A5A78">认</div>
+                  <span class="helpcatlabel">PRACTICE</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="48" rx="11" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <rect x="242" y="11" width="24" height="14" rx="5" style="fill:var(--seal)"/>
+  <text x="254" y="18" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:8px;font-weight:600;fill:white">1级</text>
+  <text x="140" y="34" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:28px;font-weight:600;fill:var(--ink)">学</text>
+  <text x="140" y="48" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;letter-spacing:.1em;fill:var(--muted)">WHAT IS THIS?</text>
+  <rect x="8" y="58" width="127" height="15" rx="6" style="fill:var(--jade-tint);stroke:var(--jade);stroke-width:1.5"/>
+  <text x="71.5" y="65.5" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9.5px;font-weight:500;fill:var(--jade)">to study</text>
+  <rect x="141" y="58" width="131" height="15" rx="6" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="206.5" y="65.5" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9.5px;font-weight:500;fill:var(--ink)">to eat</text>
+  <rect x="8" y="77" width="127" height="15" rx="6" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="71.5" y="84.5" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9.5px;font-weight:500;fill:var(--ink)">to drink</text>
+  <rect x="141" y="77" width="131" height="15" rx="6" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="206.5" y="84.5" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9.5px;font-weight:500;fill:var(--ink)">to go</text>
+</svg></div>
+                  <div class="helpsubhead">Meaning — spot the right translation</div>
+                  <div class="helpsubtext">See the character and choose the correct English meaning, then pick the pinyin. Two questions per word to lock in both.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 4 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#3A5A78">认</div>
+                  <span class="helpcatlabel">PRACTICE</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="36" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <rect x="244" y="10" width="24" height="14" rx="5" style="fill:var(--seal)"/>
+  <text x="256" y="17" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:8px;font-weight:600;fill:white">1级</text>
+  <text x="140" y="26" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:24px;font-weight:600;fill:var(--ink)">写</text>
+  <text x="140" y="38" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;letter-spacing:.1em;fill:var(--muted)">TYPE THE PINYIN</text>
+  <rect x="8" y="46" width="264" height="20" rx="8" style="fill:var(--jade-tint);stroke:var(--jade);stroke-width:1.5"/>
+  <text x="140" y="56" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;fill:var(--jade)">xiě</text>
+  <text x="140" y="74" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:600;fill:var(--jade)">✓ Correct!</text>
+  <text x="140" y="86" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:10px;font-weight:600;fill:var(--seal)">写 · xiě · to write</text>
+</svg></div>
+                  <div class="helpsubhead">Pronunciation & Writing — recall from memory</div>
+                  <div class="helpsubtext">Pinyin Typing asks you to type syllables from memory. Character Writing shows the English — you draw the hanzi on a practice grid and grade yourself.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 5 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#3A5A78">认</div>
+                  <span class="helpcatlabel">PRACTICE</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="40" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="95" y="26" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:18px;font-weight:600;fill:var(--ink)">我想</text>
+  <rect x="133" y="16" width="22" height="20" rx="3" style="fill:var(--tile-ink-bg);stroke:var(--muted);stroke-width:1"/>
+  <text x="157" y="26" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:18px;font-weight:600;fill:var(--ink)">书。</text>
+  <text x="140" y="41" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:6.5px;letter-spacing:.07em;fill:var(--muted)">CHOOSE THE WORD THAT COMPLETES THE SENTENCE</text>
+  <rect x="8" y="50" width="127" height="20" rx="8" style="fill:var(--jade-tint);stroke:var(--jade);stroke-width:1.5"/>
+  <text x="71.5" y="60" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:600;fill:var(--jade)">读</text>
+  <rect x="141" y="50" width="131" height="20" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="206.5" y="60" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:600;fill:var(--ink)">写</text>
+  <rect x="8" y="74" width="127" height="18" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="71.5" y="83" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:600;fill:var(--ink)">买</text>
+  <rect x="141" y="74" width="131" height="18" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="206.5" y="83" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:600;fill:var(--ink)">看</text>
+</svg></div>
+                  <div class="helpsubhead">Sentence use — fill in the blank</div>
+                  <div class="helpsubtext">A sentence with a missing word is shown in Chinese. Choose the correct character from four options — HSK-style comprehension.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 6 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#1F8557">录</div>
+                  <span class="helpcatlabel">REVIEW</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="44" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="16" y="17" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:600;fill:var(--ink)">Recognition · HSK 1</text>
+  <text x="263" y="17" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;fill:var(--muted)">Today</text>
+  <text x="16" y="28" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--jade)">✓ 15</text>
+  <text x="50" y="28" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--seal)">✗ 3</text>
+  <rect x="16" y="34" width="30" height="12" rx="5" style="fill:var(--jade-tint);stroke:var(--jade);stroke-width:1"/>
+  <text x="31" y="40" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:9px;fill:var(--jade)">爱</text>
+  <rect x="50" y="34" width="30" height="12" rx="5" style="fill:var(--seal-tint);stroke:var(--seal);stroke-width:1"/>
+  <text x="65" y="40" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:9px;fill:var(--seal)">难</text>
+  <rect x="84" y="34" width="30" height="12" rx="5" style="fill:var(--jade-tint);stroke:var(--jade);stroke-width:1"/>
+  <text x="99" y="40" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:9px;fill:var(--jade)">学</text>
+  <text x="228" y="40" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">+ more…</text>
+  <rect x="8" y="54" width="264" height="17" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="16" y="62.5" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;font-weight:600;fill:var(--ink)">Writing · HSK 1</text>
+  <text x="162" y="62.5" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;font-weight:600;fill:var(--jade)">✓ 9</text>
+  <text x="183" y="62.5" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;font-weight:600;fill:var(--seal)">✗ 6</text>
+  <text x="263" y="62.5" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">Yesterday</text>
+  <rect x="8" y="75" width="264" height="17" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <text x="16" y="83.5" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;font-weight:600;fill:var(--ink)">Timer · HSK 2</text>
+  <text x="156" y="83.5" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;font-weight:600;fill:var(--jade)">✓ 12</text>
+  <text x="180" y="83.5" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8px;font-weight:600;fill:var(--seal)">✗ 4</text>
+  <text x="263" y="83.5" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">Mon</text>
+</svg></div>
+                  <div class="helpsubhead">Past scores — full session breakdown</div>
+                  <div class="helpsubtext">Your last 10 sessions with mode, level, and date. Tap any session to expand it and see a word-by-word breakdown of what you got right or wrong.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 7 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#1F8557">录</div>
+                  <span class="helpcatlabel">REVIEW</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="30" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <rect x="14" y="10" width="18" height="18" rx="5" style="fill:var(--seal2)"/>
+  <text x="23" y="19" text-anchor="middle" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:11px;font-weight:600;fill:white">温</text>
+  <text x="38" y="17" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9.5px;font-weight:700;fill:var(--ink)">Refresher</text>
+  <text x="38" y="28" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">Only words you got wrong from last 3 sessions</text>
+  <rect x="8" y="40" width="264" height="14" rx="5" style="fill:var(--card);stroke:var(--seal);stroke-width:1"/>
+  <text x="16" y="47" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:11px;font-weight:600;fill:var(--ink)">难</text>
+  <text x="30" y="47" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">nán</text>
+  <text x="52" y="47" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">difficult · session 1</text>
+  <text x="263" y="47" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:10px;font-weight:700;fill:var(--seal)">✗</text>
+  <rect x="8" y="58" width="264" height="14" rx="5" style="fill:var(--card);stroke:var(--seal);stroke-width:1"/>
+  <text x="16" y="65" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:11px;font-weight:600;fill:var(--ink)">贵</text>
+  <text x="30" y="65" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">guì</text>
+  <text x="52" y="65" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">expensive · session 2</text>
+  <text x="263" y="65" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:10px;font-weight:700;fill:var(--seal)">✗</text>
+  <rect x="8" y="76" width="264" height="14" rx="5" style="fill:var(--card);stroke:var(--seal);stroke-width:1"/>
+  <text x="16" y="83" dominant-baseline="middle" style="font-family:'Noto Serif SC',serif;font-size:11px;font-weight:600;fill:var(--ink)">快</text>
+  <text x="30" y="83" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;font-weight:600;fill:var(--seal)">kuài</text>
+  <text x="50" y="83" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:7.5px;fill:var(--muted)">fast · session 3</text>
+  <text x="263" y="83" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:10px;font-weight:700;fill:var(--seal)">✗</text>
+</svg></div>
+                  <div class="helpsubhead">Refresher — only what went wrong</div>
+                  <div class="helpsubtext">No setup needed. Refresher automatically collects every word you got wrong across your last 3 sessions and drills just those.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGE 8 -->
+          <div class="helppage">
+            <div class="helppage-content">
+              <div>
+                <div class="helpcatrow">
+                  <div class="helpcaticon" style="background:#1F8557">录</div>
+                  <span class="helpcatlabel">REVIEW</span>
+                </div>
+                <div class="helpsub">
+                  <div class="helpsubimg"><svg viewBox="0 0 280 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.05))">
+  <rect width="280" height="92" style="fill:var(--bg)"/>
+  <rect x="8" y="6" width="264" height="26" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <rect x="14" y="10" width="18" height="18" rx="5" style="fill:var(--seal2)"/>
+  <text x="23" y="19" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;fill:white">1</text>
+  <text x="38" y="19" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--ink)">Recognition · HSK 1</text>
+  <text x="263" y="19" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:17px;font-weight:800;fill:var(--jade)">24</text>
+  <rect x="8" y="36" width="264" height="26" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <rect x="14" y="40" width="18" height="18" rx="5" style="fill:var(--seal2)"/>
+  <text x="23" y="49" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;fill:white">2</text>
+  <text x="38" y="49" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--ink)">Timer · HSK 2</text>
+  <text x="263" y="49" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:17px;font-weight:800;fill:var(--jade)">18</text>
+  <rect x="8" y="66" width="264" height="26" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1"/>
+  <rect x="14" y="70" width="18" height="18" rx="5" style="fill:var(--seal2)"/>
+  <text x="23" y="79" text-anchor="middle" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;fill:white">3</text>
+  <text x="38" y="79" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:8.5px;font-weight:600;fill:var(--ink)">Arcade · HSK 1</text>
+  <text x="263" y="79" text-anchor="end" dominant-baseline="middle" style="font-family:Inter,sans-serif;font-size:17px;font-weight:800;fill:var(--jade)">15</text>
+</svg></div>
+                  <div class="helpsubhead">Leaderboard — your personal bests</div>
+                  <div class="helpsubtext">Your highest correct-answer count for every mode and level. Beat a record and the results screen shows ★ New personal best.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /helptrack -->
+      </div><!-- /helpviewport -->
+
+      <div class="helpnavrow">
+        <div class="helpdots">
+          <span class="helpdot" id="helpdot-0"></span>
+          <span class="helpdot" id="helpdot-1"></span>
+          <span class="helpdot" id="helpdot-2"></span>
+        </div>
+        <div class="helpnavrow-btns">
+          <button class="helpnavbtn" id="help-btn-back" onclick="helpNavCat(-1)">Back</button>
+          <button class="helpnavbtn" id="help-btn-fwd" onclick="helpNavCat(1)">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
 </div>
 <script>
@@ -1077,6 +1559,7 @@ function show(name){
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","HSK 1 + new words","二"],[3,"HSK 3","All beginner + intermediate","三"],[4,"HSK 4","Everything up to HSK 4","四"]];
 const TABS=[...LEVELS,[5,"Master"]];
+const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
 /* ---------- level select ---------- */
 const CATEGORY_TITLE={guessing:"Recognition",typing:"Typing",writing:"Writing",sentences:"Fill-in-the-Blank"};
@@ -1108,12 +1591,31 @@ function goLevels(category){
       <div class="dd">Rare characters, trap readings and literary chengyu — hard even for native speakers · ${mn} words</div></div>
       <div class="chev">›</div></button>`);
   }
-  rows.push(`<button class="card" onclick="openWordlistPick()">
-    <div class="sealic">词</div><div><div class="tt">My wordlists</div>
-    <div class="dd">Test one of your own named wordlists in this mode</div></div>
-    <div class="chev">›</div></button>`);
   $("levelrows").innerHTML=rows.join("");
+  pendingWordlistIds=new Set();
+  renderLevelWordlists();
   show("levels");
+}
+function renderLevelWordlists(){
+  const lists=getWordlists();
+  const entries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
+  $("levelwlsection").style.display=entries.length?"block":"none";
+  $("levelwlrows").innerHTML=entries.map(([id,l])=>{
+    const on=pendingWordlistIds.has(id);
+    return `<button class="wrow ${on?"sel":""}" onclick="toggleLevelWordlist('${id}')">
+      <span style="font-family:var(--ui);font-size:14.5px;font-weight:600;min-width:0">${esc(l.name||"Untitled list")}</span>
+      <span><div class="en">${l.words.length} word${l.words.length===1?"":"s"}</div></span>
+      <span class="tick">✓</span></button>`;
+  }).join("");
+  updateLevelWordlistBar();
+}
+function toggleLevelWordlist(id){
+  pendingWordlistIds.has(id)?pendingWordlistIds.delete(id):pendingWordlistIds.add(id);
+  renderLevelWordlists();
+}
+function updateLevelWordlistBar(){
+  $("levelwlcount").textContent=pendingWordlistIds.size;
+  $("levelwlbar").style.display=pendingWordlistIds.size>0?"flex":"none";
 }
 function startMaster(){
   const cat=pendingCategory,variant=pendingVariant;
@@ -1141,12 +1643,15 @@ function startRefresher(){
   const hist=store.get("hsk_history",[]);
   const chars=new Set();
   hist.slice(0,3).forEach(s=>s.words.forEach(w=>{if(!w.ok)chars.add(w.c)}));
-  const pool=WORDS.filter(w=>chars.has(w[0]));
+  const pool=allWords().filter(w=>chars.has(w[0]));
   if(!pool.length){alert("No wrong words in your last 3 sessions — nothing to refresh! 🎉");return}
   startQuiz(pool,"Refresher","unlimited");
 }
 
 /* ---------- custom wordlists (create, edit, pick for testing) ---------- */
+function getUserWords(){return store.get("hsk_userwords",[])}
+function saveUserWords(arr){store.set("hsk_userwords",arr)}
+function allWords(){return [...WORDS,...getUserWords()]}
 function getWordlists(){return store.get("hsk_wordlists",{})}
 function saveWordlists(obj){store.set("hsk_wordlists",obj)}
 // one-time migration from the old single anonymous selection, if present
@@ -1184,18 +1689,20 @@ function openWordlistEditor(id){
   show("wordlisteditor");
 }
 function renderEditorTabs(){
-  $("editortabs").innerHTML=TABS.map(([lv,name])=>
+  $("editortabs").innerHTML=EDITOR_TABS.map(([lv,name])=>
     `<button class="tab ${lv===editorTab?"on":""}" onclick="editorTab=${lv};renderEditorTabs();renderEditorList()">${name}</button>`).join("");
 }
 function editorVisible(){
   const q=$("editorsearch").value.trim().toLowerCase();
-  return WORDS.filter(w=>w[3]===editorTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
+  return allWords().filter(w=>w[3]===editorTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
 }
 function renderEditorList(){
   $("editorlist").innerHTML=editorVisible().map(w=>{
     const on=editorSel.has(w[0]);
+    const badge=w[3]===6?`<span class="poschip custom">Custom</span>`:"";
     return `<button class="wrow ${on?"sel":""}" onclick="toggleEditorWord('${w[0]}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
+      ${badge}
       <span class="tick">✓</span></button>`;
   }).join("")||`<div class="empty">No words match your search</div>`;
   updateEditorCount();
@@ -1205,6 +1712,35 @@ function persistEditorSel(){
   if(!lists[editingListId])return;
   lists[editingListId].words=[...editorSel];
   saveWordlists(lists);
+}
+function toggleAddWordForm(){
+  const f=$("addwordform");
+  const open=f.style.display!=="none";
+  f.style.display=open?"none":"block";
+  $("addwordchev").textContent=open?"›":"▾";
+  if(!open)$("neword-zh").focus();
+}
+function previewNewWordPinyin(){
+  const raw=$("neword-py").value.trim();
+  $("newordpreview").textContent=raw?("Preview: "+pin(raw)):"";
+}
+function addUserWord(){
+  const zh=$("neword-zh").value.trim();
+  const py=$("neword-py").value.trim();
+  const en=$("neword-en").value.trim();
+  if(!zh||!py||!en){alert("Please fill in the character(s), pinyin, and meaning.");return}
+  if(allWords().some(w=>w[0]===zh)){alert("That word already exists — search for it above instead of adding a duplicate.");return}
+  const words=getUserWords();
+  words.push([zh,py,en,6,"custom"]);
+  saveUserWords(words);
+  editorSel.add(zh);
+  persistEditorSel();
+  editorTab=6;
+  $("neword-zh").value="";$("neword-py").value="";$("neword-en").value="";
+  $("newordpreview").textContent="";
+  toggleAddWordForm();
+  renderEditorTabs();
+  renderEditorList();
 }
 function toggleEditorWord(c){
   editorSel.has(c)?editorSel.delete(c):editorSel.add(c);
@@ -1242,32 +1778,74 @@ function renderMyWordlists(){
       <div class="chev">›</div></button>`).join("")
     :`<div class="empty">No wordlists yet — tap "New wordlist" above to create your first one</div>`;
 }
-function openWordlistPick(){
-  const lists=getWordlists();
-  const entries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
-  $("wordlistpickrows").innerHTML=entries.length?entries.map(([id,l])=>
-    `<button class="card" onclick="startWithWordlist('${id}')">
-      <div class="sealic quiet">词</div>
-      <div><div class="tt">${esc(l.name||"Untitled list")}</div>
-      <div class="dd">${l.words.length} word${l.words.length===1?"":"s"}</div></div>
-      <div class="chev">›</div></button>`).join("")
-    :`<div class="empty">No wordlists yet. Go to Word list → My wordlists to build one, then come back here to test it.</div>`;
-  show("wordlistpick");
+let pendingWordlistIds=new Set();
+let pendingWordlistPool=[];
+let pendingWordlistLabel="";
+function wordLevelOf(c){
+  const w=allWords().find(x=>x[0]===c);
+  return w?w[3]:null;
 }
-function startWithWordlist(id){
-  const list=getWordlists()[id];
-  if(!list)return;
+function confirmWordlistSelection(){
+  const lists=getWordlists();
+  const chars=new Set();
+  const names=[];
+  [...pendingWordlistIds].forEach(id=>{
+    const l=lists[id];
+    if(!l)return;
+    names.push(l.name||"Untitled list");
+    l.words.forEach(c=>chars.add(c));
+  });
+  pendingWordlistPool=[...chars];
+  pendingWordlistLabel=names.length===1?names[0]:`${names.length} wordlists`;
+  renderWordlistLevels();
+  show("wordlistlevels");
+}
+const WL_LEVEL_META={5:["宗","Master 宗师"],6:["＋","My Words"]};
+function renderWordlistLevels(){
+  const wset=new Set(pendingWordlistPool);
+  const matched=allWords().filter(w=>wset.has(w[0]));
+  if(!matched.length){
+    $("wordlistlevelrows").innerHTML=`<div class="empty">Your selected wordlist(s) don't have any words in them yet.</div>`;
+    return;
+  }
+  const byLevel={};
+  matched.forEach(w=>{(byLevel[w[3]]=byLevel[w[3]]||[]).push(w)});
+  const rows=[];
+  rows.push(`<button class="card" onclick="startWordlistFiltered(null)">
+    <div class="sealic">词</div><div><div class="tt">All words</div>
+    <div class="dd">Everything in ${esc(pendingWordlistLabel)} · ${matched.length} word${matched.length===1?"":"s"}</div></div>
+    <div class="chev">›</div></button>`);
+  LEVELS.forEach(([lv,name,desc,em])=>{
+    const n=(byLevel[lv]||[]).length;
+    if(!n)return;
+    rows.push(`<button class="card" onclick="startWordlistFiltered(${lv})">
+      <div class="sealic quiet">${em}</div><div><div class="tt">${name}</div>
+      <div class="dd">Only the ${n} ${name} word${n===1?"":"s"} from your selection</div></div>
+      <div class="chev">›</div></button>`);
+  });
+  [5,6].forEach(lv=>{
+    const n=(byLevel[lv]||[]).length;
+    if(!n)return;
+    const [em,name]=WL_LEVEL_META[lv];
+    rows.push(`<button class="card" onclick="startWordlistFiltered(${lv})">
+      <div class="sealic ${lv===6?"quiet":""}">${em}</div><div><div class="tt">${name}</div>
+      <div class="dd">Only the ${n} word${n===1?"":"s"} from your selection</div></div>
+      <div class="chev">›</div></button>`);
+  });
+  $("wordlistlevelrows").innerHTML=rows.join("");
+}
+function startWordlistFiltered(level){
+  const wset=new Set(pendingWordlistPool);
   const cat=pendingCategory,variant=pendingVariant;
-  const label=`${list.name||"Untitled list"} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
+  const levelName=level===null?"All words":level===5?"Master":level===6?"My Words":`HSK ${level}`;
+  const label=`${pendingWordlistLabel} · ${levelName} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
   if(cat==="sentences"){
-    const wset=new Set(list.words);
-    const pool=SENTQ.filter(s=>wset.has(s[2]));
-    if(!pool.length){alert("None of the sentence questions in this app target words from this list yet — try a different practice category.");return}
+    const pool=SENTQ.filter(s=>wset.has(s[2])&&(level===null||wordLevelOf(s[2])===level));
+    if(!pool.length){alert("None of the sentence questions in this app target matching words yet — try a different level or practice category.");return}
     startSentQuiz(pool,label,variant);
     return;
   }
-  const wset=new Set(list.words);
-  const pool=WORDS.filter(w=>wset.has(w[0]));
+  const pool=allWords().filter(w=>wset.has(w[0])&&(level===null||w[3]===level));
   if(!pool.length)return;
   if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
   if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
@@ -1454,11 +2032,17 @@ function saveSession(){
 }
 function breakdownHTML(results){
   return results.map(r=>{
-    const w=WORDS.find(x=>x[0]===r.c)||[r.c,"",""];
+    const w=allWords().find(x=>x[0]===r.c)||[r.c,"",""];
+    const thumb=r.drawing?`<img class="drawthumb" src="${r.drawing}" onclick="event.stopPropagation();showDrawingLightbox(this.src)" alt="Your drawing of ${w[0]}">`:"";
     return `<div class="bitem ${r.ok?"ok":"bad"}"><span class="zh">${w[0]}</span>
       <span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
+      ${thumb}
       <span class="mark">${r.ok?"✓":"✗"}</span></div>`;
   }).join("");
+}
+function showDrawingLightbox(src){
+  $("drawlightboximg").src=src;
+  $("drawlightbox").classList.add("show");
 }
 function showSummary(){
   $("sumbest").classList.toggle("show",lastWasBest);
@@ -1616,7 +2200,7 @@ function typeEndEarly(){
 /* ---------- writing quiz engine (flashcard, self-graded) ---------- */
 let WQ=null;
 let writeTimer=null;
-const WPAD={strokes:[],cur:null,size:0,cells:1};
+const WPAD={strokes:[],cur:null,size:0,cells:1,color:null};
 function startWriteQuiz(pool,label,variant){
   againFn=()=>startWriteQuiz(pool,label,variant);
   clearInterval(writeTimer);
@@ -1654,6 +2238,8 @@ function renderWrite(){
   $("wreveal").classList.remove("show");
   $("wgrade").classList.remove("show");
   $("wrevealbtn").style.display="block";
+  setPenColor("ink");
+  $("wpencolors").classList.remove("show");
   WPAD.strokes=[];WPAD.cur=null;
   WPAD.cells=Math.min([...w[0]].length,4);
   sizeWCanvas();redrawWPad();
@@ -1667,11 +2253,18 @@ function writeReveal(){
   $("wreveal").classList.add("show");
   $("wrevealbtn").style.display="none";
   $("wgrade").classList.add("show");
+  $("wpencolors").classList.add("show");
+}
+function setPenColor(key){
+  WPAD.color=key==="ink"?null:key;
+  ["ink","green","red"].forEach(k=>$("pc-"+k).classList.toggle("on",k===key));
 }
 function writeGrade(right){
   if(WQ.done)return;
   const w=WQ.queue[WQ.i];
-  WQ.results.push({c:w[0],ok:right});
+  let drawing=null;
+  try{ drawing=$("wcanvas").toDataURL("image/png"); }catch(e){}
+  WQ.results.push({c:w[0],ok:right,drawing});
   if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0;if(WQ.variant==="arcade")WQ.lives--}
   setFire("wcard",WQ.streak);
   const seen=store.get("hsk_seen",{});
@@ -1756,19 +2349,20 @@ function redrawWPad(){
   }
   ctx.restore();
   ctx.save();
-  ctx.strokeStyle=cssVar("--ink");
   ctx.lineWidth=Math.max(5,cell/40);
   ctx.lineCap="round";ctx.lineJoin="round";
   const s=cell; // strokes normalised to cell height; x spans 0..n
+  const COLORS={green:cssVar("--jade"),red:cssVar("--seal")};
   for(const st of WPAD.strokes){
-    if(st.length<2)continue;
+    if(st.pts.length<2)continue;
+    ctx.strokeStyle=COLORS[st.color]||cssVar("--ink");
     ctx.beginPath();
-    ctx.moveTo(st[0].x*s,st[0].y*s);
-    for(let i=1;i<st.length-1;i++){
-      const mx=(st[i].x+st[i+1].x)/2*s,my=(st[i].y+st[i+1].y)/2*s;
-      ctx.quadraticCurveTo(st[i].x*s,st[i].y*s,mx,my);
+    ctx.moveTo(st.pts[0].x*s,st.pts[0].y*s);
+    for(let i=1;i<st.pts.length-1;i++){
+      const mx=(st.pts[i].x+st.pts[i+1].x)/2*s,my=(st.pts[i].y+st.pts[i+1].y)/2*s;
+      ctx.quadraticCurveTo(st.pts[i].x*s,st.pts[i].y*s,mx,my);
     }
-    const l=st[st.length-1];
+    const l=st.pts[st.pts.length-1];
     ctx.lineTo(l.x*s,l.y*s);
     ctx.stroke();
   }
@@ -1783,13 +2377,13 @@ function wPadPoint(e){
   c.addEventListener("pointerdown",e=>{
     e.preventDefault();
     c.setPointerCapture(e.pointerId);
-    WPAD.cur=[wPadPoint(e)];
+    WPAD.cur={pts:[wPadPoint(e)],color:WPAD.color};
     WPAD.strokes.push(WPAD.cur);
   },{passive:false});
   c.addEventListener("pointermove",e=>{
     if(!WPAD.cur)return;
     e.preventDefault();
-    WPAD.cur.push(wPadPoint(e));
+    WPAD.cur.pts.push(wPadPoint(e));
     redrawWPad();
   },{passive:false});
   const end=()=>{WPAD.cur=null};
@@ -2033,6 +2627,89 @@ function deleteMySentence(i){
   renderMySentences(mySentChar);
 }
 
+/* ---------- help modal ---------- */
+let _hp=0,_htx=null,_hty=null;
+const _TOTAL=9;
+function openHelp(){
+  _hp=0;
+  _helpSync(false);
+  document.getElementById("helpoverlay").classList.add("show");
+  document.documentElement.style.overflow='hidden';
+  document.body.style.overflow='hidden';
+  const toggle=document.querySelector(".helptoggle");
+  if(toggle)toggle.classList.add("seen");
+  store.set("hsk_help_seen","1");
+}
+function closeHelp(e){
+  if(!e||e.target===document.getElementById("helpoverlay")){
+    document.getElementById("helpoverlay").classList.remove("show");
+    document.documentElement.style.overflow='';
+    document.body.style.overflow='';
+  }
+}
+function helpNavPage(d){
+  const cat=Math.floor(_hp/3);
+  const idx=_hp%3;
+  const newIdx=idx+d;
+  if(newIdx<0||newIdx>=3){
+    // crossed a category boundary — jump to next/prev category, always landing on page 1
+    const newCat=cat+d;
+    if(newCat<0||newCat>=3)return;
+    _hp=newCat*3;
+    _helpSync(true);
+    return;
+  }
+  _hp=cat*3+newIdx;
+  _helpSync(true);
+}
+function helpNavCat(d){
+  const cat=Math.floor(_hp/3);
+  const newCat=cat+d;
+  if(newCat<0||newCat>=3)return;
+  _hp=newCat*3;
+  _helpSync(true);
+}
+function _helpSync(anim){
+  const tr=document.getElementById("helptrack");
+  tr.style.transition=anim?"transform .35s cubic-bezier(.34,.1,.68,1)":"none";
+  tr.style.transform="translateX("+(-_hp*100)+"%)";
+  const cat=Math.floor(_hp/3);
+  const idx=_hp%3;
+  
+  // Update page counter in header
+  const counter=document.getElementById("help-page-counter");
+  if(counter)counter.textContent=`Page ${idx+1}/3`;
+  
+  // Update page dots (3 dots for current page position within category)
+  document.querySelectorAll(".helpdot").forEach((d,i)=>d.classList.toggle("on",i===idx));
+  
+  // Update category button states
+  const back=document.getElementById("help-btn-back");
+  const fwd=document.getElementById("help-btn-fwd");
+  
+  if(back)back.disabled=cat===0;
+  if(fwd)fwd.disabled=cat===2;
+}
+function helpTouchStart(e){_htx=e.touches[0].clientX;_hty=e.touches[0].clientY}
+function helpTouchMove(e){if(_htx===null)return;if(Math.abs(e.touches[0].clientX-_htx)>Math.abs(e.touches[0].clientY-_hty)+6)e.preventDefault()}
+function helpTouchEnd(e){
+  if(_htx===null)return;
+  const dx=e.changedTouches[0].clientX-_htx;_htx=null;_hty=null;
+  if(Math.abs(dx)>80)helpNavPage(dx<0?1:-1);
+}
+(function(){
+  const vp=document.getElementById("helpviewport");
+  if(vp)vp.addEventListener("touchmove",helpTouchMove,{passive:false});
+})();
+document.addEventListener("keydown",e=>{
+  if(!document.getElementById("helpoverlay").classList.contains("show"))return;
+  if(e.key==="ArrowRight")helpNavPage(1);
+  if(e.key==="ArrowLeft")helpNavPage(-1);
+  if(e.key==="ArrowUp"||e.key===" ")helpNavCat(-1);
+  if(e.key==="ArrowDown")helpNavCat(1);
+  if(e.key==="Escape")closeHelp();
+});
+
 /* ---------- theme ---------- */
 function applyTheme(t){
   document.documentElement.dataset.theme=t;
@@ -2048,6 +2725,10 @@ function toggleTheme(){
   applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
 }
 applyTheme(store.get("hsk_theme",window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+if(store.get("hsk_help_seen",false)){
+  const toggle=document.querySelector(".helptoggle");
+  if(toggle)toggle.classList.add("seen");
+}
 
 /* ---------- writing practice pad (word detail) ---------- */
 const DW={chars:[],idx:0,strokes:[],cur:null,guide:true,size:0};

@@ -68,7 +68,7 @@ html,body{height:100%;overscroll-behavior:none}
 body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.45;
   -webkit-font-smoothing:antialiased}
 .app{max-width:440px;margin:0 auto;min-height:100vh;padding:22px 18px 44px;position:relative}
-.screen{display:none;animation:fade .16s ease}
+.screen{display:none;animation:fade .16s ease;contain:layout paint}
 .screen.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.screen{animation:none}}
@@ -260,6 +260,14 @@ html[data-theme="dark"] .card .sealic{
 .stat .v{font-size:23px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .stat .l{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
 .stat.ok .v{color:var(--jade)} .stat.bad .v{color:var(--seal)} .stat.acc .v{color:var(--ink)}
+.compentry{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-top:16px}
+.compentry .sechead{margin:0 0 10px}
+.compentry-row{display:flex;gap:8px}
+.compentry-input{flex:1;padding:12px 14px;border-radius:11px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font-size:14px;font-family:var(--ui)}
+.compentry-input::placeholder{color:var(--muted)}
+.compentry-row .btn{flex:0 0 auto;padding:12px 20px}
+.compentry-done{color:var(--jade);font-size:13px;font-weight:600;margin-top:10px;text-align:center}
 .breakdown{display:flex;flex-direction:column;gap:7px;margin-top:4px}
 .bitem{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
   border-radius:11px;padding:9px 13px;font-size:12.5px}
@@ -363,6 +371,49 @@ html[data-theme="dark"] .poschip.idiom{background:rgba(255,255,255,.08);color:va
 .charchip{border:1px solid var(--line);background:var(--card);border-radius:10px;min-width:44px;height:44px;
   font-family:var(--hanzi);font-size:21px;font-weight:600;color:var(--muted);cursor:pointer;padding:0 8px}
 .charchip.on{border-color:var(--seal);color:var(--seal);box-shadow:0 0 0 1px var(--seal)}
+
+/* ---------- home quick-write widget ---------- */
+.qwritecard{background:#FDFDF5;border:2px solid var(--jade);border-radius:18px;padding:16px;margin-bottom:22px;
+  box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+html[data-theme="dark"] .qwritecard{
+  background:rgba(31,133,87,.07);
+  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
+.qwrite-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.qwrite-word{display:flex;align-items:center;gap:10px;min-width:0}
+.qwrite-zh{font-family:var(--hanzi);font-size:22px;font-weight:600;flex-shrink:0;color:var(--seal);
+  width:42px;height:42px;border-radius:11px;background:#FEFEF8;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 1.5px rgba(31,133,87,.3),inset 0 0 0 4px rgba(31,133,87,.08)}
+html[data-theme="dark"] .qwrite-zh{background:rgba(31,133,87,.13)}
+.qwrite-meta{min-width:0}
+.qwrite-py{font-size:11.5px;font-weight:600;color:var(--seal)}
+.qwrite-en{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qwrite-pick{flex-shrink:0;border:1.5px solid var(--jade);background:#FEFEF8;color:var(--jade);
+  border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--ui)}
+html[data-theme="dark"] .qwrite-pick{background:rgba(31,133,87,.13)}
+.qwritecard .drawwrap{background:#FEFEF8;border-color:rgba(31,133,87,.3)}
+html[data-theme="dark"] .qwritecard .drawwrap{background:rgba(31,133,87,.05);border-color:rgba(65,179,131,.25)}
+.qwritecard .minibtn{border-color:var(--jade);color:var(--jade);background:#FEFEF8}
+html[data-theme="dark"] .qwritecard .minibtn{background:rgba(31,133,87,.13)}
+#qcanvas{display:block;margin:0 auto;border-radius:10px;cursor:crosshair;touch-action:pan-y}
+.qwrite-padwrap{position:relative;width:fit-content;margin:0 auto}
+.qwrite-padwrap.focused #qcanvas{touch-action:none}
+.qwrite-tap{position:absolute;inset:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.03);backdrop-filter:blur(1px);cursor:pointer;transition:opacity .15s}
+.qwrite-tap span{font-size:11.5px;font-weight:600;color:var(--muted);background:var(--card);
+  border:1px solid var(--line);border-radius:99px;padding:6px 12px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.qwrite-padwrap.focused .qwrite-tap{display:none}
+
+/* quick word-picker sheet */
+.qpicksheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55;display:none;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.qpicksheet.show{display:flex}
+.qpickpanel{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:480px;
+  max-height:80vh;display:flex;flex-direction:column;box-shadow:0 -12px 48px rgba(0,0,0,.16)}
+.qpickhead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.qpickhead h3{font-size:16px;font-weight:700}
+.qpicksearch{margin:14px 20px 10px;padding:11px 14px;border-radius:11px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font-size:13.5px;font-family:var(--ui)}
+.qpicklist{overflow-y:auto;padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}
 .timerbig{font-variant-numeric:tabular-nums;font-size:36px;font-weight:700;color:var(--ink);letter-spacing:.02em}
 .timerbig.low{color:var(--seal);animation:timerpulse .5s ease-in-out infinite alternate}
 @keyframes timerpulse{from{opacity:1}to{opacity:.55}}
@@ -377,6 +428,49 @@ html[data-theme="dark"] .lbrow .rank{color:var(--ink)}
 .lbrow .lbl{font-weight:600;font-size:13.5px}
 .lbrow .meta{font-size:11.5px;color:var(--muted);margin-top:2px}
 .lbrow .best{margin-left:auto;font-size:17px;font-weight:800;color:var(--jade);font-variant-numeric:tabular-nums}
+
+/* ---------- statistics screen ---------- */
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.statcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+.statcard .num{font-size:24px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.statcard .num.jade{color:var(--jade)}
+.statcard .num.seal{color:var(--seal)}
+.statcard .lbl{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;margin-top:3px}
+.statfilters{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.statfilters .chip{flex-shrink:0;padding:7px 13px;border-radius:99px;border:1px solid var(--line);
+  background:var(--card);color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.statfilters .chip.active{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.wordstat-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:11px 14px}
+.wordstat-row .zh{font-family:var(--hanzi);font-size:19px;font-weight:600;width:38px;flex-shrink:0;text-align:center}
+.wordstat-row .info{flex:1;min-width:0}
+.wordstat-row .py{font-size:11.5px;font-weight:600;color:var(--seal)}
+.wordstat-row .en{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wordstat-row .stat-nums{text-align:right;flex-shrink:0}
+.wordstat-row .stat-acc{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.wordstat-row .stat-acc.high{color:var(--jade)}
+.wordstat-row .stat-acc.mid{color:#C08A2E}
+.wordstat-row .stat-acc.low{color:var(--seal)}
+.wordstat-row .stat-counts{font-size:10.5px;color:var(--muted);margin-top:1px}
+.stat-searchbar{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);font-size:13.5px;font-family:var(--ui);margin-bottom:12px}
+.stat-searchbar::placeholder{color:var(--muted)}
+
+/* ---------- statistics charts ---------- */
+.chartcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.chartcard .chead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.chartcard .chead .ct{font-size:13px;font-weight:700;color:var(--ink)}
+.chartcard .chead .cs{font-size:11px;color:var(--muted)}
+.chartcard svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-empty{text-align:center;font-size:12.5px;color:var(--muted);padding:22px 10px}
+.chart-tt{font-size:9.5px;font-weight:600;fill:var(--muted)}
+.chart-bar{fill:var(--jade)}
+.chart-bar.empty{fill:var(--line)}
+.chart-bar.today{fill:var(--seal)}
+.chart-axis{stroke:var(--line);stroke-width:1}
+.chart-dot{fill:var(--jade)}
+.chart-line{fill:none;stroke:var(--jade);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chart-fill{fill:var(--jade);opacity:.08}
 /* streak (5+) rainbow ring */
 .onfire{border-color:transparent!important}
 .onfire::before{content:"";position:absolute;inset:-3px;z-index:-1;border-radius:21px;
@@ -534,6 +628,29 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="sub">HSK 1-4 preparation | Custom learning</div>
       </div>
     </div>
+    <div class="qwritecard">
+      <div class="qwrite-head">
+        <div class="qwrite-word">
+          <div class="qwrite-zh" id="qzh">爱</div>
+          <div class="qwrite-meta">
+            <div class="qwrite-py" id="qpy">ài</div>
+            <div class="qwrite-en" id="qen">to love</div>
+          </div>
+        </div>
+        <button class="qwrite-pick" onclick="openQuickPicker()">Change word ›</button>
+      </div>
+      <div class="drawwrap">
+        <div class="qwrite-padwrap" id="qpadwrap" onclick="focusQuickPad()">
+          <canvas id="qcanvas"></canvas>
+          <div class="qwrite-tap" id="qtaphint"><span>Tap to write</span></div>
+        </div>
+        <div class="drawtools">
+          <button class="minibtn" onclick="quickDrawClear()">Clear</button>
+          <button class="minibtn" id="qguidebtn" onclick="quickGuideToggle()">Guide: on</button>
+        </div>
+      </div>
+    </div>
+
     <div class="sechead">Learn</div>
     <div class="cards">
       <button class="card hero" onclick="openWordlist()">
@@ -585,7 +702,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="ghost tileghost jadeghost" style="font-size:104px">录</div>
         <div class="sealic jade" style="transform:rotate(-2deg)">录</div>
         <div class="tt">Past scores</div>
-        <div class="dd">Your last 10 sessions, full breakdown</div>
+        <div class="dd">Your session history, full breakdown</div>
       </button>
       <button class="tile jade" onclick="renderLeaderboard();show('leaderboard')">
         <div class="ghost tileghost jadeghost" style="font-size:104px">榜</div>
@@ -593,8 +710,14 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="tt">Leaderboard</div>
         <div class="dd">Your personal best in every mode</div>
       </button>
+      <button class="tile jade" onclick="renderStats();show('stats')" style="grid-column:1 / -1">
+        <div class="ghost tileghost jadeghost" style="font-size:104px">统</div>
+        <div class="sealic jade" style="transform:rotate(-1deg)">统</div>
+        <div class="tt">Statistics</div>
+        <div class="dd">Overall progress and per-word mastery, across every mode</div>
+      </button>
     </div>
-    <div class="versionfooter">v7.0 · Made by Marcus Lim @marcuslim621</div>
+    <div class="versionfooter">v11.2 · Made by Marcus Lim @marcuslim621</div>
   </section>
 
   <!-- MODE SELECT -->
@@ -609,6 +732,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="sealic">闯</div>
         <div><div class="tt">Arcade</div>
         <div class="dd">5 lives — one wrong answer costs a heart. Lose them all and it's game over</div></div>
+        <div class="chev">›</div>
+      </button>
+      <button class="card" id="ms-competition" onclick="pickVariant('competition')">
+        <div class="sealic">赛</div>
+        <div><div class="tt">Competition</div>
+        <div class="dd">3 lives — enter your name when it's over and see who tops the board</div></div>
         <div class="chev">›</div>
       </button>
       <button class="card" onclick="pickVariant('unlimited')">
@@ -833,12 +962,20 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 
   <!-- GAME OVER -->
   <section class="screen" id="scr-gameover">
-    <div class="centerpiece"><div class="sealic lg quiet">败</div><h2>Game over</h2><p>You used all 5 lives</p>
+    <div class="centerpiece"><div class="sealic lg quiet">败</div><h2>Game over</h2><p id="golivestext">You used all 5 lives</p>
       <p class="bestflag" id="gobest">★ New personal best</p></div>
     <div class="bigstats">
       <div class="stat ok"><div class="v" id="gook">0</div><div class="l">Correct</div></div>
       <div class="stat bad"><div class="v" id="gobad">0</div><div class="l">Wrong</div></div>
       <div class="stat acc"><div class="v" id="goacc">0%</div><div class="l">Accuracy</div></div>
+    </div>
+    <div class="compentry" id="compentry" style="display:none">
+      <div class="sechead">Enter your name for the leaderboard</div>
+      <div class="compentry-row">
+        <input class="compentry-input" id="compname" maxlength="18" placeholder="Your name" autocomplete="off">
+        <button class="btn primary" id="compsubmitbtn" onclick="submitCompetitionScore()">Submit</button>
+      </div>
+      <p class="compentry-done" id="compdone" style="display:none">✓ Saved to the HSK <span id="compdonelevel"></span> leaderboard</p>
     </div>
     <div class="btnrow">
       <button class="btn primary" onclick="playAgain()">Try again</button>
@@ -867,6 +1004,42 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     </div>
     <p class="hint">Your highest number of correct answers in a single session, per mode</p>
     <div class="rows" id="lblist"></div>
+
+    <div class="sechead" style="margin-top:26px;display:flex;align-items:center;justify-content:space-between">
+      <span>🏆 Competition — by level</span>
+      <button class="linkbtn" onclick="clearCompBoard()" style="text-transform:none;letter-spacing:0;font-weight:600">Clear all</button>
+    </div>
+    <div class="statfilters" id="compboardtabs"></div>
+    <div class="rows" id="compboardlist"></div>
+  </section>
+
+  <!-- STATISTICS -->
+  <section class="screen" id="scr-stats">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('home')">← Home</button>
+      <h2>Statistics</h2>
+      <button class="linkbtn" onclick="clearWordStats()">Clear all</button>
+    </div>
+    <div class="statgrid" id="statoverview"></div>
+
+    <div class="chartcard">
+      <div class="chead"><span class="ct">Accuracy trend</span><span class="cs" id="chartacctitle"></span></div>
+      <div id="chartacc"></div>
+    </div>
+    <div class="chartcard">
+      <div class="chead"><span class="ct">Practice activity</span><span class="cs">Last 14 days</span></div>
+      <div id="chartactivity"></div>
+    </div>
+
+    <div class="sechead">Word mastery</div>
+    <input class="stat-searchbar" id="statsearch" placeholder="Search characters, pinyin or English…" oninput="renderStatWords()">
+    <div class="statfilters" id="statfilters">
+      <div class="chip active" data-sort="worst" onclick="setStatSort('worst')">Needs work</div>
+      <div class="chip" data-sort="best" onclick="setStatSort('best')">Mastered</div>
+      <div class="chip" data-sort="recent" onclick="setStatSort('recent')">Recently seen</div>
+      <div class="chip" data-sort="most" onclick="setStatSort('most')">Most practiced</div>
+    </div>
+    <div class="rows" id="statwordlist"></div>
   </section>
 
   <!-- WORD LIST -->
@@ -921,6 +1094,18 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 
   <div class="lightbox" id="drawlightbox" onclick="this.classList.remove('show')">
     <img id="drawlightboximg" src="" alt="Your drawing">
+  </div>
+
+  <!-- QUICK WORD PICKER (home Quick Write widget) -->
+  <div class="qpicksheet" id="qpicksheet" onclick="if(event.target===this)closeQuickPicker()">
+    <div class="qpickpanel">
+      <div class="qpickhead">
+        <h3>Pick a word</h3>
+        <button class="helpxbtn" onclick="closeQuickPicker()">✕</button>
+      </div>
+      <input class="qpicksearch" id="qpicksearch" placeholder="Search characters, pinyin or English…" oninput="renderQuickPicker()">
+      <div class="qpicklist" id="qpicklist"></div>
+    </div>
   </div>
 
   <!-- HOW TO USE MODAL -->
@@ -1420,12 +1605,13 @@ const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
 /* ---------- level select ---------- */
 const CATEGORY_TITLE={guessing:"Recognition",typing:"Typing",writing:"Writing",sentences:"Fill-in-the-Blank"};
-const VARIANT_LABEL={arcade:"Arcade",unlimited:"Unlimited",timer:"Timer"};
+const VARIANT_LABEL={arcade:"Arcade",unlimited:"Unlimited",timer:"Timer",competition:"Competition"};
 let pendingCategory="guessing";
 let pendingVariant="arcade";
 function goCategory(cat){
   pendingCategory=cat;
   $("mstitle").textContent=CATEGORY_TITLE[cat];
+  $("ms-competition").style.display=cat==="guessing"?"":"none";
   show("modeselect");
 }
 function pickVariant(v){
@@ -1746,7 +1932,7 @@ let quizTimer=null;
 function startQuiz(pool,label,variant){
   againFn=()=>startQuiz(pool,label,variant);
   clearInterval(quizTimer);
-  const lives=variant==="arcade"?5:Infinity;
+  const lives=variant==="arcade"?5:variant==="competition"?3:Infinity;
   const timed=variant==="timer";
   S={variant,timed,label,pool,lives,queue:buildQueue(pool),i:0,ok:0,bad:0,streak:0,results:[],done:false};
   if(timed){S.deadline=Date.now()+120000;quizTimer=setInterval(quizTick,200)}
@@ -1788,7 +1974,7 @@ function renderQ(){
   if(S.timed){
     const left=Math.max(0,S.deadline-Date.now());const s=Math.ceil(left/1000);
     $("qhearts").innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
-  }else if(S.variant==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,false);
+  }else if((S.variant==="arcade"||S.variant==="competition"))$("qhearts").innerHTML=heartsHTML(S.lives,false);
   else $("qhearts").textContent="♥ ∞";
   $("qok").textContent="✓ "+S.ok;$("qbad").textContent="✗ "+S.bad;
   $("qprog").textContent=(S.i+1)+" / "+S.queue.length+" words";
@@ -1837,18 +2023,18 @@ function finishWord(){
   const seen=store.get("hsk_seen",{});
   seen[w[0]]=(seen[w[0]]||0)+1;
   store.set("hsk_seen",seen);
-  if(S.phase.wrong){S.bad++;S.streak=0;if(S.variant==="arcade")S.lives--}else{S.ok++;S.streak++}
+  if(S.phase.wrong){S.bad++;S.streak=0;if((S.variant==="arcade"||S.variant==="competition"))S.lives--}else{S.ok++;S.streak++}
   setFire("qcard",S.streak);
   if(!S.phase.wrong&&S.streak>=5)
     document.querySelectorAll("#opts-en .opt.right,#opts-py .opt.right")
       .forEach(b=>b.classList.add("rainbow"));
   $("qok").textContent="✓ "+S.ok;$("qbad").textContent="✗ "+S.bad;
   if(!S.timed){
-    if(S.variant==="arcade")$("qhearts").innerHTML=heartsHTML(S.lives,S.phase.wrong);
+    if((S.variant==="arcade"||S.variant==="competition"))$("qhearts").innerHTML=heartsHTML(S.lives,S.phase.wrong);
     else $("qhearts").textContent="♥ ∞";
   }
   $("qnext").disabled=false;
-  $("qnext").textContent=(!S.timed&&S.variant==="arcade"&&S.lives<=0)?"Results →":((!S.timed&&S.i+1>=S.queue.length)?"Finish →":"Next →");
+  $("qnext").textContent=(!S.timed&&(S.variant==="arcade"||S.variant==="competition")&&S.lives<=0)?"Results →":((!S.timed&&S.i+1>=S.queue.length)?"Finish →":"Next →");
 }
 function nextWord(){
   if(S.done)return;
@@ -1857,7 +2043,7 @@ function nextWord(){
     if(S.i>=S.queue.length){S.queue=shuffle([...S.pool]);S.i=0}
     renderQ();return;
   }
-  if(S.variant==="arcade"&&S.lives<=0){saveSession();showGameOver();return}
+  if((S.variant==="arcade"||S.variant==="competition")&&S.lives<=0){saveSession();showGameOver();return}
   S.i++;
   if(S.i>=S.queue.length){saveSession();showSummary();return}
   renderQ();
@@ -1881,10 +2067,22 @@ function recordBest(label,ok,bad){
   }
   return false;
 }
+/* ---------- lifetime word-mastery stats (never trimmed) ---------- */
+function recordWordStats(results){
+  const stats=store.get("hsk_word_stats",{});
+  results.forEach(r=>{
+    const s=stats[r.c]||{ok:0,bad:0,lastSeen:0};
+    if(r.ok)s.ok++;else s.bad++;
+    s.lastSeen=Date.now();
+    stats[r.c]=s;
+  });
+  store.set("hsk_word_stats",stats);
+}
 function saveSession(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:S.label,ok:S.ok,bad:S.bad,words:S.results});
-  store.set("hsk_history",hist.slice(0,10));
+  store.set("hsk_history",hist.slice(0,200));
+  recordWordStats(S.results);
   lastWasBest=recordBest(S.label,S.ok,S.bad);
 }
 function breakdownHTML(results){
@@ -1912,7 +2110,38 @@ function showGameOver(){
   $("gobest").classList.toggle("show",lastWasBest);
   $("gook").textContent=S.ok;$("gobad").textContent=S.bad;$("goacc").textContent=accuracy()+"%";
   $("gowords").innerHTML=breakdownHTML(S.results.filter(r=>!r.ok));
+  const isComp=S.variant==="competition";
+  $("golivestext").textContent=isComp?"You used all 3 lives":"You used all 5 lives";
+  $("compentry").style.display=isComp?"":"none";
+  if(isComp){
+    $("compname").value=store.get("hsk_last_name","");
+    $("compdone").style.display="none";
+    $("compname").disabled=false;
+    $("compsubmitbtn").disabled=false;
+    $("compsubmitbtn").textContent="Submit";
+  }
   show("gameover");
+}
+function competitionScopeKey(label){
+  // label looks like "HSK 2 · Recognition · Competition" or "Master · Recognition · Competition"
+  return (label||"").split("·")[0].trim()||"Unknown";
+}
+function submitCompetitionScore(){
+  const name=($("compname").value||"").trim().slice(0,18);
+  if(!name){$("compname").focus();return}
+  store.set("hsk_last_name",name);
+  const scope=competitionScopeKey(S.label);
+  const board=store.get("hsk_competition",{});
+  const list=board[scope]||[];
+  list.push({name,ok:S.ok,bad:S.bad,acc:accuracy(),t:Date.now()});
+  list.sort((a,b)=>b.ok-a.ok||b.acc-a.acc);
+  board[scope]=list.slice(0,50);
+  store.set("hsk_competition",board);
+  $("compdonelevel").textContent=scope;
+  $("compdone").style.display="";
+  $("compname").disabled=true;
+  $("compsubmitbtn").disabled=true;
+  $("compsubmitbtn").textContent="Saved ✓";
 }
 function playAgain(){if(againFn)againFn()}
 
@@ -2011,7 +2240,8 @@ function typeCheck(){
 function typeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
-  store.set("hsk_history",hist.slice(0,10));
+  store.set("hsk_history",hist.slice(0,200));
+  recordWordStats(TS.results);
   lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
 }
 function typeNext(){
@@ -2153,7 +2383,8 @@ function writeGrade(right){
 function writeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
-  store.set("hsk_history",hist.slice(0,10));
+  store.set("hsk_history",hist.slice(0,200));
+  recordWordStats(WQ.results);
   lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
 }
 function writeFinish(){
@@ -2334,7 +2565,8 @@ function sentNext(){
 function sentSaveGameOver(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
-  store.set("hsk_history",hist.slice(0,10));
+  store.set("hsk_history",hist.slice(0,200));
+  recordWordStats(SS.results);
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
   $("gobest").classList.toggle("show",lastWasBest);
   $("gook").textContent=SS.ok;$("gobad").textContent=SS.bad;
@@ -2346,7 +2578,8 @@ function sentSaveGameOver(){
 function sentFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
-  store.set("hsk_history",hist.slice(0,10));
+  store.set("hsk_history",hist.slice(0,200));
+  recordWordStats(SS.results);
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
   $("sumbest").classList.toggle("show",lastWasBest);
   $("sumlabel").textContent=SS.label;
@@ -2374,9 +2607,190 @@ function renderLeaderboard(){
       <div class="meta">${v.acc}% accuracy · ${date}</div></div>
       <div class="best">✓ ${v.ok}</div></div>`;
   }).join(""):`<div class="empty">No records yet — finish a session in any mode and your best score will appear here</div>`;
+  renderCompBoard();
 }
 function clearBest(){
   if(confirm("Clear all personal bests?")){store.del("hsk_best");renderLeaderboard()}
+}
+
+/* ---------- competition leaderboard (named, per-level) ---------- */
+let compBoardScope=null;
+const COMP_SCOPE_ORDER=["HSK 1","HSK 2","HSK 3","HSK 4","Master"];
+function renderCompBoard(){
+  const board=store.get("hsk_competition",{});
+  const scopes=Object.keys(board).sort((a,b)=>{
+    const ia=COMP_SCOPE_ORDER.indexOf(a),ib=COMP_SCOPE_ORDER.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+  if(!scopes.length){
+    $("compboardtabs").innerHTML="";
+    $("compboardlist").innerHTML=`<div class="empty">No competition scores yet — play Recognition → Competition and enter your name after a game to appear here</div>`;
+    return;
+  }
+  if(!compBoardScope||!scopes.includes(compBoardScope))compBoardScope=scopes[0];
+  $("compboardtabs").innerHTML=scopes.map(s=>
+    `<div class="chip ${s===compBoardScope?"active":""}" onclick="setCompBoardScope('${esc(s)}')">${esc(s)}</div>`
+  ).join("");
+  const list=(board[compBoardScope]||[]).slice().sort((a,b)=>b.ok-a.ok||b.acc-a.acc);
+  $("compboardlist").innerHTML=list.length?list.map((e,i)=>{
+    const d=new Date(e.t);
+    const date=d.toLocaleDateString(undefined,{day:"numeric",month:"short"});
+    return `<div class="lbrow"><div class="rank">${i+1}</div>
+      <div><div class="lbl">${esc(e.name)}</div>
+      <div class="meta">${e.acc}% accuracy · ${date}</div></div>
+      <div class="best">✓ ${e.ok}</div></div>`;
+  }).join(""):`<div class="empty">No scores yet for ${esc(compBoardScope)}</div>`;
+}
+function setCompBoardScope(s){compBoardScope=s;renderCompBoard()}
+function clearCompBoard(){
+  if(confirm("Clear all competition leaderboard scores?")){store.del("hsk_competition");compBoardScope=null;renderCompBoard()}
+}
+
+/* ---------- statistics ---------- */
+let statSort="worst";
+function setStatSort(mode){
+  statSort=mode;
+  document.querySelectorAll("#statfilters .chip").forEach(c=>c.classList.toggle("active",c.dataset.sort===mode));
+  renderStatWords();
+}
+function renderStats(){
+  statSort="worst";
+  document.querySelectorAll("#statfilters .chip").forEach(c=>c.classList.toggle("active",c.dataset.sort==="worst"));
+  $("statsearch").value="";
+  const hist=store.get("hsk_history",[]);
+  const wstats=store.get("hsk_word_stats",{});
+  const wordEntries=Object.entries(wstats);
+
+  const totalSessions=hist.length;
+  const totalOk=hist.reduce((a,h)=>a+h.ok,0);
+  const totalBad=hist.reduce((a,h)=>a+h.bad,0);
+  const totalAttempts=totalOk+totalBad;
+  const overallAcc=totalAttempts?Math.round(totalOk/totalAttempts*100):0;
+  const uniqueWords=wordEntries.length;
+  const totalVocab=allWords().length;
+  const daysActive=new Set(hist.map(h=>new Date(h.t).toDateString())).size;
+  const masteredCount=wordEntries.filter(([,s])=>{
+    const t=s.ok+s.bad;return t>=2&&Math.round(s.ok/t*100)>=80;
+  }).length;
+
+  $("statoverview").innerHTML=`
+    <div class="statcard"><div class="num">${totalSessions}</div><div class="lbl">Sessions played</div></div>
+    <div class="statcard"><div class="num jade">${overallAcc}%</div><div class="lbl">Overall accuracy</div></div>
+    <div class="statcard"><div class="num">${uniqueWords}<span style="font-size:14px;color:var(--muted);font-weight:600"> / ${totalVocab}</span></div><div class="lbl">Words practiced</div></div>
+    <div class="statcard"><div class="num jade">${masteredCount}</div><div class="lbl">Words mastered (80%+)</div></div>
+    <div class="statcard"><div class="num seal">${totalBad}</div><div class="lbl">Total mistakes</div></div>
+    <div class="statcard"><div class="num">${daysActive}</div><div class="lbl">Days active</div></div>
+  `;
+  renderAccuracyChart(hist);
+  renderActivityChart(hist);
+  renderStatWords();
+}
+function renderAccuracyChart(hist){
+  const el=$("chartacc");
+  if(!hist.length){
+    $("chartacctitle").textContent="";
+    el.innerHTML=`<div class="chart-empty">No sessions yet — play a round and your trend will show up here</div>`;
+    return;
+  }
+  // hist is newest-first; take the most recent 20 and put in chronological order
+  const recent=hist.slice(0,20).slice().reverse();
+  $("chartacctitle").textContent=`Last ${recent.length} session${recent.length===1?"":"s"}`;
+  const pts=recent.map(h=>{
+    const t=h.ok+h.bad;
+    return t?Math.round(h.ok/t*100):0;
+  });
+  const W=280,H=90,pad=8;
+  const n=pts.length;
+  const stepX=n>1?(W-pad*2)/(n-1):0;
+  const toXY=(v,i)=>{
+    const x=pad+i*stepX;
+    const y=pad+(H-pad*2)*(1-v/100);
+    return [x,y];
+  };
+  const coords=pts.map((v,i)=>toXY(v,i));
+  const linePath=coords.map(([x,y],i)=>(i===0?"M":"L")+x.toFixed(1)+","+y.toFixed(1)).join(" ");
+  const fillPath=linePath+` L${coords[coords.length-1][0].toFixed(1)},${H-pad} L${coords[0][0].toFixed(1)},${H-pad} Z`;
+  const dots=coords.map(([x,y],i)=>
+    `<circle class="chart-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i===coords.length-1?3.5:2.2}"></circle>`
+  ).join("");
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <line class="chart-axis" x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}"></line>
+    <line class="chart-axis" x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}"></line>
+    <path class="chart-fill" d="${fillPath}"></path>
+    <path class="chart-line" d="${linePath}"></path>
+    ${dots}
+  </svg>`;
+}
+function renderActivityChart(hist){
+  const el=$("chartactivity");
+  const DAYS=14;
+  const today=new Date();today.setHours(0,0,0,0);
+  const buckets=[];
+  for(let i=DAYS-1;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    buckets.push({date:d,count:0,ok:0,bad:0});
+  }
+  hist.forEach(h=>{
+    const d=new Date(h.t);d.setHours(0,0,0,0);
+    const idx=buckets.findIndex(b=>b.date.getTime()===d.getTime());
+    if(idx>=0){buckets[idx].count++;buckets[idx].ok+=h.ok;buckets[idx].bad+=h.bad}
+  });
+  const hasAny=buckets.some(b=>b.count>0);
+  if(!hasAny){
+    el.innerHTML=`<div class="chart-empty">No activity in the last ${DAYS} days yet</div>`;
+    return;
+  }
+  const W=280,H=90,pad=6,gap=3;
+  const barW=(W-pad*2-gap*(DAYS-1))/DAYS;
+  const maxCount=Math.max(1,...buckets.map(b=>b.count));
+  const bars=buckets.map((b,i)=>{
+    const x=pad+i*(barW+gap);
+    const h=b.count?Math.max(4,(H-pad*2)*(b.count/maxCount)):2;
+    const y=H-pad-h;
+    const isToday=i===DAYS-1;
+    const cls=b.count?(isToday?"chart-bar today":"chart-bar"):"chart-bar empty";
+    const label=b.date.toLocaleDateString(undefined,{weekday:"narrow"});
+    return `<rect class="${cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="2"></rect>
+      <text class="chart-tt" x="${(x+barW/2).toFixed(1)}" y="${H-pad+11}" text-anchor="middle">${label}</text>`;
+  }).join("");
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H+14}" preserveAspectRatio="none">${bars}</svg>`;
+}
+function renderStatWords(){
+  const wstats=store.get("hsk_word_stats",{});
+  const q=($("statsearch").value||"").trim().toLowerCase();
+  const dict=allWords();
+  let rows=Object.entries(wstats).map(([c,s])=>{
+    const w=dict.find(x=>x[0]===c)||[c,"",""];
+    const t=s.ok+s.bad;
+    const acc=t?Math.round(s.ok/t*100):0;
+    return {c,py:w[1],en:w[2],ok:s.ok,bad:s.bad,acc,total:t,lastSeen:s.lastSeen||0};
+  });
+  if(q){
+    rows=rows.filter(r=>r.c.includes(q)||pin(r.py).toLowerCase().includes(q)||r.en.toLowerCase().includes(q));
+  }
+  switch(statSort){
+    case "worst": rows.sort((a,b)=>a.acc-b.acc||b.total-a.total); break;
+    case "best": rows.sort((a,b)=>b.acc-a.acc||b.total-a.total); break;
+    case "recent": rows.sort((a,b)=>b.lastSeen-a.lastSeen); break;
+    case "most": rows.sort((a,b)=>b.total-a.total); break;
+  }
+  $("statwordlist").innerHTML=rows.length?rows.map(r=>{
+    const accClass=r.acc>=80?"high":r.acc>=50?"mid":"low";
+    return `<div class="wordstat-row">
+      <div class="zh">${r.c}</div>
+      <div class="info"><div class="py">${pin(r.py)}</div><div class="en">${esc(r.en)}</div></div>
+      <div class="stat-nums">
+        <div class="stat-acc ${accClass}">${r.acc}%</div>
+        <div class="stat-counts">✓${r.ok} ✗${r.bad}</div>
+      </div>
+    </div>`;
+  }).join(""):`<div class="empty">${q?"No words match your search":"No words practiced yet — finish a session and word-level stats will appear here"}</div>`;
+}
+function clearWordStats(){
+  if(confirm("Clear all statistics? This removes word mastery data but keeps your past scores and leaderboard.")){
+    store.del("hsk_word_stats");
+    renderStats();
+  }
 }
 
 /* ---------- history ---------- */
@@ -2696,6 +3110,128 @@ function drawGuideToggle(){
   $("dguidebtn").textContent="Guide: "+(DW.guide?"on":"off");
   redrawPad();
 }
+
+/* ---------- home quick-write widget (independent canvas, same approach as DW) ---------- */
+const QW={char:"",strokes:[],cur:null,guide:true,size:0,focused:false};
+function initQuickWrite(){
+  const saved=store.get("hsk_quick_word",null);
+  const w=(saved&&allWords().find(x=>x[0]===saved))||WORDS[0];
+  setQuickWord(w[0]);
+}
+function focusQuickPad(){
+  if(QW.focused)return;
+  QW.focused=true;
+  $("qpadwrap").classList.add("focused");
+}
+function setQuickWord(c){
+  const w=allWords().find(x=>x[0]===c);if(!w)return;
+  QW.char=w[0];QW.strokes=[];QW.cur=null;
+  $("qzh").textContent=w[0];$("qpy").textContent=pin(w[1]);$("qen").textContent=w[2];
+  store.set("hsk_quick_word",w[0]);
+  requestAnimationFrame(()=>{sizeQuickCanvas();redrawQuickPad()});
+}
+function sizeQuickCanvas(){
+  const c=$("qcanvas");
+  const w=Math.min(c.parentElement.clientWidth-20,200);
+  if(w<=0)return;
+  const dpr=window.devicePixelRatio||1;
+  QW.size=w;
+  c.width=w*dpr;c.height=w*dpr;
+  c.style.width=w+"px";c.style.height=w+"px";
+  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function redrawQuickPad(){
+  const c=$("qcanvas"),ctx=c.getContext("2d"),s=QW.size;
+  if(!s)return;
+  ctx.clearRect(0,0,s,s);
+  ctx.save();
+  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);
+  ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);
+  ctx.moveTo(0,0);ctx.lineTo(s,s);
+  ctx.moveTo(s,0);ctx.lineTo(0,s);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeRect(.5,.5,s-1,s-1);
+  ctx.restore();
+  if(QW.guide&&QW.char){
+    ctx.save();
+    ctx.globalAlpha=.14;
+    ctx.fillStyle=cssVar("--ink");
+    ctx.font=`600 ${s*.72}px "Noto Serif SC","Songti SC","SimSun",serif`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(QW.char,s/2,s*.54);
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.strokeStyle=cssVar("--ink");
+  ctx.lineWidth=Math.max(5,s/40);
+  ctx.lineCap="round";ctx.lineJoin="round";
+  for(const st of QW.strokes)drawStroke(ctx,st,s);
+  ctx.restore();
+}
+function quickPadPoint(e){
+  const r=$("qcanvas").getBoundingClientRect();
+  return {x:(e.clientX-r.left)/QW.size,y:(e.clientY-r.top)/QW.size};
+}
+(function(){
+  const c=$("qcanvas");
+  c.addEventListener("pointerdown",e=>{
+    if(!QW.focused){focusQuickPad();return}
+    e.preventDefault();
+    c.setPointerCapture(e.pointerId);
+    QW.cur=[quickPadPoint(e)];
+    QW.strokes.push(QW.cur);
+  },{passive:false});
+  c.addEventListener("pointermove",e=>{
+    if(!QW.focused||!QW.cur)return;
+    e.preventDefault();
+    QW.cur.push(quickPadPoint(e));
+    redrawQuickPad();
+  },{passive:false});
+  const end=()=>{QW.cur=null};
+  c.addEventListener("pointerup",end);
+  c.addEventListener("pointercancel",end);
+  c.addEventListener("touchmove",e=>{if(QW.focused)e.preventDefault()},{passive:false});
+  window.addEventListener("resize",()=>{
+    if($("scr-home").classList.contains("active")){sizeQuickCanvas();redrawQuickPad()}
+  });
+})();
+function quickDrawClear(){QW.strokes=[];QW.cur=null;redrawQuickPad()}
+function quickGuideToggle(){
+  QW.guide=!QW.guide;
+  $("qguidebtn").textContent="Guide: "+(QW.guide?"on":"off");
+  redrawQuickPad();
+}
+
+/* ---------- quick word picker sheet ---------- */
+function openQuickPicker(){
+  $("qpicksearch").value="";
+  renderQuickPicker();
+  $("qpicksheet").classList.add("show");
+}
+function closeQuickPicker(){
+  $("qpicksheet").classList.remove("show");
+}
+function renderQuickPicker(){
+  const q=($("qpicksearch").value||"").trim().toLowerCase();
+  let list=allWords();
+  if(q){
+    list=list.filter(w=>w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[2].toLowerCase().includes(q));
+  }
+  list=list.slice(0,80);
+  $("qpicklist").innerHTML=list.length?list.map(w=>
+    `<button class="wrow" onclick="pickQuickWord('${w[0]}')">
+      <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
+    </button>`
+  ).join(""):`<div class="empty">No words match your search</div>`;
+}
+function pickQuickWord(c){
+  setQuickWord(c);
+  closeQuickPicker();
+}
+initQuickWrite();
 
 </script></body>
 </html>

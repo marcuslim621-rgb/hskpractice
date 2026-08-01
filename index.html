@@ -117,6 +117,18 @@ html[data-theme="dark"] .card .sealic{
 .sechead{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin:20px 0 10px}
 .versionfooter{text-align:center;font-size:11px;color:var(--muted);opacity:0.55;margin:28px 0 8px;letter-spacing:.02em}
 .hint{color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.55}
+.levelhintrow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.levelhintrow .hint{margin-bottom:0;flex:1}
+.multitogglebtn{flex-shrink:0;border:1px solid var(--line);background:var(--card);color:var(--muted);
+  border-radius:99px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--ui);
+  white-space:nowrap}
+.multitogglebtn.on{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.card.multisel{border-color:var(--jade)}
+.card .multitick{display:none;flex-shrink:0;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);
+  align-items:center;justify-content:center;color:transparent;font-size:13px;font-weight:800}
+.card.multimode .multitick{display:flex}
+.card.multimode .chev{display:none}
+.card.multisel .multitick{background:var(--jade);border-color:var(--jade);color:#fff}
 
 /* ---------- home cards ---------- */
 .cards{display:flex;flex-direction:column;gap:10px}
@@ -131,6 +143,15 @@ html[data-theme="dark"] .card .sealic{
 .card .tt{font-size:14.5px;font-weight:600;letter-spacing:-.005em}
 .card .dd{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
 .card .chev{margin-left:auto;color:#C4C4BD;font-size:16px}
+.refresherbadge{flex-shrink:0;background:var(--seal);color:#fff;font-size:11.5px;font-weight:700;
+  border-radius:99px;padding:3px 9px;margin-left:8px}
+.refresherstart{display:flex;align-items:center;gap:14px;background:none;border:none;padding:0;
+  cursor:pointer;text-align:left;color:var(--ink);width:100%;font-family:var(--ui)}
+.refresherscope{display:flex;align-items:center;justify-content:space-between;background:var(--bg);
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;
+  font-size:12.5px;color:var(--muted);font-family:var(--ui);width:100%}
+.refresherscope b{color:var(--ink);font-weight:600}
+.refresherscope .chev{color:#C4C4BD;font-size:15px}
 .card .sealic{background:#FEFEF8;color:var(--seal);
   box-shadow:inset 0 0 0 1.5px rgba(31,133,87,.3),inset 0 0 0 4px rgba(31,133,87,.08)}
 
@@ -155,6 +176,31 @@ html[data-theme="dark"] .card .sealic{
 
 /* ---------- 2-column tinted tile grid (Practice / Review) ---------- */
 .tilegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ---------- home list-row card ---------- */
+.rowcard{background:#FDFDF5;border:2px solid var(--jade);border-radius:18px;padding:8px 16px 16px;
+  margin-bottom:22px;box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+html[data-theme="dark"] .rowcard{
+  background:rgba(31,133,87,.07);
+  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
+.rowsechead{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:14px 4px 10px}
+.listrow{display:flex;align-items:center;gap:13px;width:100%;background:none;border:none;
+  border-top:1px solid rgba(31,133,87,.15);padding:13px 4px;cursor:pointer;text-align:left;
+  color:var(--ink);font-family:var(--ui)}
+html[data-theme="dark"] .listrow{border-top-color:rgba(65,179,131,.18)}
+.listrow:first-of-type{border-top:none}
+.listrow .sealic{width:36px;height:36px;font-size:16px;border-radius:9px;flex-shrink:0}
+.listrow .tt{flex:1;font-size:14.5px;font-weight:600;letter-spacing:-.005em;background:none;border:none;
+  color:var(--ink);font-family:var(--ui);text-align:left;padding:0;cursor:pointer}
+.listrow .chev{color:#C4C4BD;font-size:17px;flex-shrink:0;background:none;border:none;cursor:pointer;padding:0}
+.listrow-static{border-top:1px solid rgba(31,133,87,.15)}
+.listrow-maintap{padding:0}
+.refresherscope-row{display:block;margin:0 4px 4px;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;padding:8px 12px;font-size:11.5px;color:var(--muted);font-family:var(--ui);
+  cursor:pointer;text-align:left}
+.refresherscope-row b{color:var(--ink);font-weight:600}
+.listrow .refresherbadge{margin-left:8px;padding:2px 7px;font-size:10px;vertical-align:middle}
 .tile{position:relative;overflow:hidden;text-align:left;border:none;cursor:pointer;
   display:flex;flex-direction:column;gap:8px;border-radius:16px;padding:18px;
   color:var(--ink);font-family:var(--ui);transition:border-color .12s,box-shadow .14s,transform .08s}
@@ -279,7 +325,7 @@ html[data-theme="dark"] .card .sealic{
 .btn{flex:1;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--line)}
 .btn.primary{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
 .btn.primary:disabled{opacity:.3;cursor:default}
-.btn.ghost{background:var(--card);color:var(--ink)}
+.btn.outline{background:var(--card);color:var(--ink)}
 
 .hitem{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px;cursor:pointer}
 .hitem .top{display:flex;align-items:center;gap:8px;font-size:13.5px}
@@ -394,6 +440,20 @@ html[data-theme="dark"] .qwrite-pick{background:rgba(31,133,87,.13)}
 html[data-theme="dark"] .qwritecard .drawwrap{background:rgba(31,133,87,.05);border-color:rgba(65,179,131,.25)}
 .qwritecard .minibtn{border-color:var(--jade);color:var(--jade);background:#FEFEF8}
 html[data-theme="dark"] .qwritecard .minibtn{background:rgba(31,133,87,.13)}
+.qwritecard-collapsed{padding:14px 16px}
+.qwritecard-collapsed .qwrite-head{margin-bottom:10px}
+.qwrite-expand{display:flex;align-items:center;justify-content:space-between;width:100%;
+  background:#FEFEF8;border:1px solid rgba(31,133,87,.3);border-radius:10px;padding:10px 12px;
+  cursor:pointer;font-family:var(--ui);font-size:12.5px;font-weight:600;color:var(--jade)}
+html[data-theme="dark"] .qwrite-expand{background:rgba(31,133,87,.1)}
+.qwrite-expand .qwe-icon{font-family:var(--hanzi);font-style:normal;margin-right:6px}
+.qwrite-expand .chev{color:var(--jade);font-size:15px}
+.qwritecard-open .qwrite-expand{display:none}
+.refresherscope-inline{display:block;margin-top:8px;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;padding:7px 10px;font-size:11.5px;color:var(--muted);font-family:var(--ui);
+  cursor:pointer;text-align:left;width:fit-content}
+.refresherscope-inline b{color:var(--ink);font-weight:600}
+.tile .refresherbadge{margin-left:8px;padding:2px 7px;font-size:10px;vertical-align:middle}
 #qcanvas{display:block;margin:0 auto;border-radius:10px;cursor:crosshair;touch-action:pan-y}
 .qwrite-padwrap{position:relative;width:fit-content;margin:0 auto}
 .qwrite-padwrap.focused #qcanvas{touch-action:none}
@@ -628,7 +688,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="sub">HSK 1-4 preparation | Custom learning</div>
       </div>
     </div>
-    <div class="qwritecard">
+    <div class="qwritecard qwritecard-collapsed" id="qwritecard">
       <div class="qwrite-head">
         <div class="qwrite-word">
           <div class="qwrite-zh" id="qzh">爱</div>
@@ -637,9 +697,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
             <div class="qwrite-en" id="qen">to love</div>
           </div>
         </div>
-        <button class="qwrite-pick" onclick="openQuickPicker()">Change word ›</button>
+        <button class="qwrite-pick" onclick="event.stopPropagation();openQuickPicker()">Change ›</button>
       </div>
-      <div class="drawwrap">
+      <button class="qwrite-expand" id="qwriteexpand" onclick="expandQuickWrite()">
+        <span><i class="qwe-icon">写</i> Quick write practice</span><span class="chev">›</span>
+      </button>
+      <div class="drawwrap" id="qwritebody" style="display:none">
         <div class="qwrite-padwrap" id="qpadwrap" onclick="focusQuickPad()">
           <canvas id="qcanvas"></canvas>
           <div class="qwrite-tap" id="qtaphint"><span>Tap to write</span></div>
@@ -651,73 +714,58 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       </div>
     </div>
 
-    <div class="sechead">Learn</div>
-    <div class="cards">
-      <button class="card hero" onclick="openWordlist()">
-        <div class="ghost cardghost">词</div>
+    <div class="rowcard">
+      <div class="rowsechead">Learn &amp; Practice</div>
+      <button class="listrow" onclick="openWordlist()">
         <div class="sealic">词</div>
-        <div style="position:relative">
-          <div class="tt">Word list</div>
-          <div class="dd">Browse every word by level, filter by part of speech, and pin the ones to focus on</div>
-          <div class="cta">Browse words <span>→</span></div>
-        </div>
+        <div class="tt">Word list</div>
+        <div class="chev">›</div>
       </button>
-    </div>
-    <div class="sechead">Practice</div>
-    <div class="tilegrid">
-      <button class="tile practice ink" onclick="goCategory('guessing')">
-        <div class="ghost tileghost">认</div>
-        <div class="sealic quiet" style="transform:rotate(-3deg)">认</div>
+      <button class="listrow" onclick="goCategory('guessing')">
+        <div class="sealic quiet">认</div>
         <div class="tt">Recognition</div>
-        <div class="dd">See the character, pick the translation and pinyin</div>
+        <div class="chev">›</div>
       </button>
-      <button class="tile practice ink" onclick="goCategory('typing')">
-        <div class="ghost tileghost">拼</div>
-        <div class="sealic quiet" style="transform:rotate(2deg)">拼</div>
+      <button class="listrow" onclick="goCategory('typing')">
+        <div class="sealic quiet">拼</div>
         <div class="tt">Pinyin Typing</div>
-        <div class="dd">Type the pinyin yourself — no tone marks needed</div>
+        <div class="chev">›</div>
       </button>
-      <button class="tile practice ink" onclick="goCategory('writing')">
-        <div class="ghost tileghost">写</div>
-        <div class="sealic quiet" style="transform:rotate(-2deg)">写</div>
+      <button class="listrow" onclick="goCategory('writing')">
+        <div class="sealic quiet">写</div>
         <div class="tt">Character Writing</div>
-        <div class="dd">See the English, draw the hanzi, grade yourself</div>
+        <div class="chev">›</div>
       </button>
-      <button class="tile practice ink" onclick="goCategory('sentences')">
-        <div class="ghost tileghost">填</div>
-        <div class="sealic quiet" style="transform:rotate(3deg)">填</div>
+      <button class="listrow" onclick="goCategory('sentences')">
+        <div class="sealic quiet">填</div>
         <div class="tt">Fill-in-the-Blank</div>
-        <div class="dd">HSK-style fill-in-the-blank practice</div>
+        <div class="chev">›</div>
       </button>
-    </div>
-    <button class="card" style="margin-top:10px" onclick="startRefresher()">
-      <div class="sealic quiet">温</div>
-      <div><div class="tt">Refresher</div>
-      <div class="dd">Drill only the words you got wrong in your last 3 sessions</div></div>
-      <div class="chev">›</div>
-    </button>
-    <div class="sechead">Review</div>
-    <div class="tilegrid">
-      <button class="tile jade" onclick="renderHistory();show('history')">
-        <div class="ghost tileghost jadeghost" style="font-size:104px">录</div>
-        <div class="sealic jade" style="transform:rotate(-2deg)">录</div>
+      <div class="listrow listrow-static">
+        <div class="sealic quiet">温</div>
+        <button class="tt listrow-maintap" onclick="startRefresher()">Refresher<span class="refresherbadge" id="refresherbadge" style="display:none"></span></button>
+        <button class="chev listrow-maintap" onclick="startRefresher()">›</button>
+      </div>
+      <button class="refresherscope-row" onclick="openRefresherScope()">Scope: <b id="refresherscopelabel">All HSK levels</b> ›</button>
+
+      <div class="rowsechead" style="margin-top:20px">Review</div>
+      <button class="listrow" onclick="renderHistory();show('history')">
+        <div class="sealic jade">录</div>
         <div class="tt">Past scores</div>
-        <div class="dd">Your session history, full breakdown</div>
+        <div class="chev">›</div>
       </button>
-      <button class="tile jade" onclick="renderLeaderboard();show('leaderboard')">
-        <div class="ghost tileghost jadeghost" style="font-size:104px">榜</div>
-        <div class="sealic jade" style="transform:rotate(2deg)">榜</div>
+      <button class="listrow" onclick="renderLeaderboard();show('leaderboard')">
+        <div class="sealic jade">榜</div>
         <div class="tt">Leaderboard</div>
-        <div class="dd">Your personal best in every mode</div>
+        <div class="chev">›</div>
       </button>
-      <button class="tile jade" onclick="renderStats();show('stats')" style="grid-column:1 / -1">
-        <div class="ghost tileghost jadeghost" style="font-size:104px">统</div>
-        <div class="sealic jade" style="transform:rotate(-1deg)">统</div>
+      <button class="listrow listrow-last" onclick="renderStats();show('stats')">
+        <div class="sealic jade">统</div>
         <div class="tt">Statistics</div>
-        <div class="dd">Overall progress and per-word mastery, across every mode</div>
+        <div class="chev">›</div>
       </button>
     </div>
-    <div class="versionfooter">v11.2 · Made by Marcus Lim @marcuslim621</div>
+    <div class="versionfooter">v15.0 · Made by Marcus Lim @marcuslim621</div>
   </section>
 
   <!-- MODE SELECT -->
@@ -761,16 +809,23 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <button class="linkbtn" onclick="show('modeselect')">← Back</button>
       <h2>Choose level</h2>
     </div>
-    <p class="hint">Each level includes all words from the levels before it</p>
+    <div class="levelhintrow">
+      <p class="hint" id="levelhint">Each level tests only the words introduced at that level</p>
+      <button class="multitogglebtn" id="multitogglebtn" onclick="toggleMultiLevelMode()">Select multiple</button>
+    </div>
     <div class="rows" id="levelrows"></div>
     <div id="levelwlsection" style="display:none">
       <div class="sechead">My wordlists</div>
-      <p class="hint">Select one or more, then continue to filter by level</p>
+      <p class="hint">Select one, then continue to filter by level</p>
       <div class="rows" id="levelwlrows"></div>
     </div>
     <div class="stickybar" id="levelwlbar" style="display:none">
       <div class="cnt"><b id="levelwlcount">0</b> selected</div>
       <button class="btn primary" style="flex:1" onclick="confirmWordlistSelection()">Continue →</button>
+    </div>
+    <div class="stickybar" id="multilevelbar" style="display:none">
+      <div class="cnt"><b id="multilevelcount">0</b> levels selected</div>
+      <button class="btn primary" style="flex:1" onclick="startMultiLevel()">Continue →</button>
     </div>
   </section>
 
@@ -956,7 +1011,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     <div class="breakdown" id="sumwords"></div>
     <div class="btnrow">
       <button class="btn primary" onclick="playAgain()">Play again</button>
-      <button class="btn ghost" onclick="show('home')">Home</button>
+      <button class="btn outline" onclick="show('home')">Home</button>
     </div>
   </section>
 
@@ -979,7 +1034,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     </div>
     <div class="btnrow">
       <button class="btn primary" onclick="playAgain()">Try again</button>
-      <button class="btn ghost" onclick="show('home')">Home</button>
+      <button class="btn outline" onclick="show('home')">Home</button>
     </div>
     <div class="sechead">Words you got wrong</div>
     <div class="breakdown" id="gowords"></div>
@@ -1105,6 +1160,20 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       </div>
       <input class="qpicksearch" id="qpicksearch" placeholder="Search characters, pinyin or English…" oninput="renderQuickPicker()">
       <div class="qpicklist" id="qpicklist"></div>
+    </div>
+  </div>
+
+  <!-- REFRESHER SCOPE PICKER -->
+  <div class="qpicksheet" id="refscopesheet" onclick="if(event.target===this)closeRefresherScope()">
+    <div class="qpickpanel">
+      <div class="qpickhead">
+        <h3>Refresher scope</h3>
+        <button class="helpxbtn" onclick="closeRefresherScope()">✕</button>
+      </div>
+      <div class="qpicklist" id="refscopelist" style="padding-top:14px"></div>
+      <div style="padding:4px 20px 20px">
+        <button class="btn primary" style="width:100%" onclick="saveRefresherScope()">Done</button>
+      </div>
     </div>
   </div>
 
@@ -1597,9 +1666,24 @@ function show(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   $("scr-"+name).classList.add("active");
   window.scrollTo(0,0);
+  if(name==="home"){updateRefresherBadge();updateRefresherScopeLabel()}
+}
+function updateRefresherBadge(){
+  const badge=$("refresherbadge");
+  if(!badge)return;
+  const dueSet=new Set(wordsDueToday());
+  const scopedChars=new Set(refresherScopedDict().map(w=>w[0]));
+  let n=0;
+  dueSet.forEach(c=>{if(scopedChars.has(c))n++});
+  if(n>0){
+    badge.textContent=n+" due";
+    badge.style.display="";
+  }else{
+    badge.style.display="none";
+  }
 }
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
-const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","HSK 1 + new words","二"],[3,"HSK 3","All beginner + intermediate","三"],[4,"HSK 4","Everything up to HSK 4","四"]];
+const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","New HSK 2 words only","二"],[3,"HSK 3","New HSK 3 words only","三"],[4,"HSK 4","New HSK 4 words only","四"]];
 const TABS=[...LEVELS,[5,"Master"]];
 const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
@@ -1618,16 +1702,34 @@ function pickVariant(v){
   pendingVariant=v;
   goLevels(pendingCategory);
 }
+let multiLevelMode=false;
+let multiLevelSel=new Set();
 function goLevels(category){
   pendingCategory=category;
+  multiLevelMode=false;
+  multiLevelSel=new Set();
+  renderLevelRows();
+  $("multitogglebtn").classList.remove("on");
+  $("multitogglebtn").textContent="Select multiple";
+  $("multilevelbar").style.display="none";
+  pendingWordlistIds=new Set();
+  renderLevelWordlists();
+  show("levels");
+}
+function renderLevelRows(){
+  const category=pendingCategory;
   const rows=LEVELS.map(([lv,name,desc,em])=>{
-    const n=category==="sentences"?SENTQ.filter(s=>s[0]<=lv).length:WORDS.filter(w=>w[3]<=lv).length;
+    const n=category==="sentences"?SENTQ.filter(s=>s[0]===lv).length:WORDS.filter(w=>w[3]===lv).length;
     const unit=category==="sentences"?"sentences":"words";
-    return `<button class="card" onclick="startLevel(${lv})">
+    const sel=multiLevelSel.has(lv);
+    const cls=`card${multiLevelMode?" multimode":""}${sel?" multisel":""}`;
+    const action=multiLevelMode?`toggleMultiLevel(${lv})`:`startLevel(${lv})`;
+    return `<button class="${cls}" onclick="${action}">
       <div class="sealic quiet">${em}</div><div><div class="tt">${name}</div>
-      <div class="dd">${desc} · ${n} ${unit}</div></div><div class="chev">›</div></button>`;
+      <div class="dd">${desc} · ${n} ${unit}</div></div>
+      <div class="multitick">✓</div><div class="chev">›</div></button>`;
   });
-  if(category==="guessing"||category==="typing"||category==="writing"){
+  if(!multiLevelMode&&(category==="guessing"||category==="typing"||category==="writing")){
     const mn=WORDS.filter(w=>w[3]===5).length;
     rows.push(`<button class="card" onclick="startMaster()">
       <div class="sealic">宗</div><div><div class="tt">Master 宗师</div>
@@ -1635,9 +1737,35 @@ function goLevels(category){
       <div class="chev">›</div></button>`);
   }
   $("levelrows").innerHTML=rows.join("");
-  pendingWordlistIds=new Set();
-  renderLevelWordlists();
-  show("levels");
+}
+function toggleMultiLevelMode(){
+  multiLevelMode=!multiLevelMode;
+  multiLevelSel=new Set();
+  $("multitogglebtn").classList.toggle("on",multiLevelMode);
+  $("multitogglebtn").textContent=multiLevelMode?"Cancel":"Select multiple";
+  $("levelhint").textContent=multiLevelMode?"Tap all the levels you want to include":"Each level tests only the words introduced at that level";
+  $("multilevelbar").style.display="none";
+  renderLevelRows();
+}
+function toggleMultiLevel(lv){
+  multiLevelSel.has(lv)?multiLevelSel.delete(lv):multiLevelSel.add(lv);
+  renderLevelRows();
+  $("multilevelcount").textContent=multiLevelSel.size;
+  $("multilevelbar").style.display=multiLevelSel.size>0?"flex":"none";
+}
+function startMultiLevel(){
+  const cat=pendingCategory,variant=pendingVariant;
+  const levels=[...multiLevelSel].sort((a,b)=>a-b);
+  if(!levels.length)return;
+  const label=`HSK ${levels.join("+")} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
+  if(cat==="sentences"){
+    startSentQuiz(SENTQ.filter(s=>levels.includes(s[0])),label,variant);
+    return;
+  }
+  const pool=WORDS.filter(w=>levels.includes(w[3]));
+  if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
+  if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
+  startQuiz(pool,label,variant);
 }
 function renderLevelWordlists(){
   const lists=getWordlists();
@@ -1653,7 +1781,7 @@ function renderLevelWordlists(){
   updateLevelWordlistBar();
 }
 function toggleLevelWordlist(id){
-  pendingWordlistIds.has(id)?pendingWordlistIds.delete(id):pendingWordlistIds.add(id);
+  pendingWordlistIds=pendingWordlistIds.has(id)&&pendingWordlistIds.size===1?new Set():new Set([id]);
   renderLevelWordlists();
 }
 function updateLevelWordlistBar(){
@@ -1672,22 +1800,134 @@ function startLevel(lv){
   const cat=pendingCategory,variant=pendingVariant;
   const label=`HSK ${lv} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
   if(cat==="sentences"){
-    startSentQuiz(SENTQ.filter(s=>s[0]<=lv),label,variant);
+    startSentQuiz(SENTQ.filter(s=>s[0]===lv),label,variant);
     return;
   }
-  const pool=WORDS.filter(w=>w[3]<=lv);
+  const pool=WORDS.filter(w=>w[3]===lv);
   if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
   if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
   startQuiz(pool,label,variant);
 }
 
 /* ---------- refresher ---------- */
+/* ---------- refresher scope (which words Refresher draws from) ---------- */
+function getRefresherScope(){
+  return store.get("hsk_refresher_scope",{mode:"all",levels:[],wordlistIds:[]});
+}
+function saveRefresherScopeObj(scope){store.set("hsk_refresher_scope",scope)}
+function refresherScopedDict(){
+  const scope=getRefresherScope();
+  const dict=allWords();
+  if(scope.mode==="all")return dict;
+  if(scope.mode==="levels"){
+    if(!scope.levels.length)return dict;
+    return dict.filter(w=>scope.levels.includes(w[3]));
+  }
+  if(scope.mode==="wordlists"){
+    if(!scope.wordlistIds.length)return dict;
+    const lists=getWordlists();
+    const chars=new Set();
+    scope.wordlistIds.forEach(id=>{
+      const l=lists[id];
+      if(l)l.words.forEach(c=>chars.add(c));
+    });
+    return dict.filter(w=>chars.has(w[0]));
+  }
+  return dict;
+}
+function refresherScopeLabel(){
+  const scope=getRefresherScope();
+  if(scope.mode==="all")return "All HSK levels";
+  if(scope.mode==="levels"){
+    if(!scope.levels.length)return "All HSK levels";
+    return scope.levels.map(lv=>"HSK "+lv).join(", ");
+  }
+  if(scope.mode==="wordlists"){
+    if(!scope.wordlistIds.length)return "All HSK levels";
+    const lists=getWordlists();
+    const names=scope.wordlistIds.map(id=>lists[id]?lists[id].name||"Untitled":null).filter(Boolean);
+    if(!names.length)return "All HSK levels";
+    return names.length===1?names[0]:names.length+" wordlists";
+  }
+  return "All HSK levels";
+}
+function updateRefresherScopeLabel(){
+  const el=$("refresherscopelabel");
+  if(el)el.textContent=refresherScopeLabel();
+}
+let refScopeDraft=null;
+function openRefresherScope(){
+  const current=getRefresherScope();
+  refScopeDraft={mode:current.mode,levels:[...current.levels],wordlistIds:[...current.wordlistIds]};
+  renderRefresherScopeSheet();
+  $("refscopesheet").classList.add("show");
+}
+function closeRefresherScope(){
+  $("refscopesheet").classList.remove("show");
+}
+function refScopeSetAll(){
+  refScopeDraft={mode:"all",levels:[],wordlistIds:[]};
+  renderRefresherScopeSheet();
+}
+function refScopeToggleLevel(lv){
+  refScopeDraft.mode="levels";
+  const i=refScopeDraft.levels.indexOf(lv);
+  if(i>=0)refScopeDraft.levels.splice(i,1);else refScopeDraft.levels.push(lv);
+  renderRefresherScopeSheet();
+}
+function refScopeToggleWordlist(id){
+  refScopeDraft.mode="wordlists";
+  const i=refScopeDraft.wordlistIds.indexOf(id);
+  if(i>=0)refScopeDraft.wordlistIds.splice(i,1);else refScopeDraft.wordlistIds.push(id);
+  renderRefresherScopeSheet();
+}
+function renderRefresherScopeSheet(){
+  const lists=getWordlists();
+  const listEntries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
+  let html="";
+  html+=`<button class="wrow ${refScopeDraft.mode==="all"?"sel":""}" onclick="refScopeSetAll()">
+    <span><div class="py">All HSK levels</div><div class="en">Every word you've ever practiced</div></span>
+    <span class="tick">✓</span></button>`;
+  html+=`<div class="sechead" style="margin-top:14px">By level</div>`;
+  LEVELS.forEach(([lv,name])=>{
+    const on=refScopeDraft.mode==="levels"&&refScopeDraft.levels.includes(lv);
+    html+=`<button class="wrow ${on?"sel":""}" onclick="refScopeToggleLevel(${lv})">
+      <span><div class="py">${esc(name)}</div></span>
+      <span class="tick">✓</span></button>`;
+  });
+  if(listEntries.length){
+    html+=`<div class="sechead" style="margin-top:14px">By wordlist</div>`;
+    listEntries.forEach(([id,l])=>{
+      const on=refScopeDraft.mode==="wordlists"&&refScopeDraft.wordlistIds.includes(id);
+      html+=`<button class="wrow ${on?"sel":""}" onclick="refScopeToggleWordlist('${id}')">
+        <span><div class="py">${esc(l.name||"Untitled list")}</div><div class="en">${l.words.length} word${l.words.length===1?"":"s"}</div></span>
+        <span class="tick">✓</span></button>`;
+    });
+  }
+  $("refscopelist").innerHTML=html;
+}
+function saveRefresherScope(){
+  saveRefresherScopeObj(refScopeDraft);
+  updateRefresherScopeLabel();
+  updateRefresherBadge();
+  closeRefresherScope();
+}
+
 function startRefresher(){
-  const hist=store.get("hsk_history",[]);
-  const chars=new Set();
-  hist.slice(0,3).forEach(s=>s.words.forEach(w=>{if(!w.ok)chars.add(w.c)}));
-  const pool=allWords().filter(w=>chars.has(w[0]));
-  if(!pool.length){alert("No wrong words in your last 3 sessions — nothing to refresh! 🎉");return}
+  const stats=store.get("hsk_word_stats",{});
+  const dueChars=new Set(wordsDueToday());
+  const dict=refresherScopedDict();
+  let pool=dict.filter(w=>dueChars.has(w[0]));
+
+  // mix in a few brand-new (never-practiced) words from the scoped set, Duolingo-style
+  const NEW_WORD_COUNT=3;
+  const unseen=dict.filter(w=>!stats[w[0]]);
+  if(unseen.length){
+    const shuffled=shuffle([...unseen]);
+    pool=pool.concat(shuffled.slice(0,NEW_WORD_COUNT));
+  }
+
+  if(!pool.length){alert("Nothing due right now within this scope — check back later, or widen the scope! 🎉");return}
   startQuiz(pool,"Refresher","unlimited");
 }
 
@@ -2067,16 +2307,25 @@ function recordBest(label,ok,bad){
   }
   return false;
 }
-/* ---------- lifetime word-mastery stats (never trimmed) ---------- */
+/* ---------- lifetime word-mastery stats (never trimmed) + SRS scheduling ---------- */
+const SRS_DAY=86400000;
 function recordWordStats(results){
   const stats=store.get("hsk_word_stats",{});
+  const today=Date.now();
   results.forEach(r=>{
-    const s=stats[r.c]||{ok:0,bad:0,lastSeen:0};
-    if(r.ok)s.ok++;else s.bad++;
-    s.lastSeen=Date.now();
+    const s=stats[r.c]||{ok:0,bad:0,lastSeen:0,interval:1,due:0};
+    if(r.ok){s.ok++;s.interval=Math.round((s.interval||1)*2.3)||1}
+    else{s.bad++;s.interval=1}
+    s.lastSeen=today;
+    s.due=today+s.interval*SRS_DAY;
     stats[r.c]=s;
   });
   store.set("hsk_word_stats",stats);
+}
+function wordsDueToday(){
+  const stats=store.get("hsk_word_stats",{});
+  const now=Date.now();
+  return Object.entries(stats).filter(([,s])=>s.due<=now).map(([c])=>c);
 }
 function saveSession(){
   const hist=store.get("hsk_history",[]);
@@ -3118,6 +3367,15 @@ function initQuickWrite(){
   const w=(saved&&allWords().find(x=>x[0]===saved))||WORDS[0];
   setQuickWord(w[0]);
 }
+function openScopeFromTile(e){
+  if(e){e.stopPropagation();e.preventDefault()}
+  openRefresherScope();
+}
+function expandQuickWrite(){
+  $("qwritecard").classList.add("qwritecard-open");
+  $("qwritebody").style.display="";
+  requestAnimationFrame(()=>{sizeQuickCanvas();redrawQuickPad()});
+}
 function focusQuickPad(){
   if(QW.focused)return;
   QW.focused=true;
@@ -3232,6 +3490,8 @@ function pickQuickWord(c){
   closeQuickPicker();
 }
 initQuickWrite();
+updateRefresherBadge();
+updateRefresherScopeLabel();
 
 </script></body>
 </html>

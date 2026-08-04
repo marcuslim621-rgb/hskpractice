@@ -765,7 +765,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="chev">›</div>
       </button>
     </div>
-    <div class="versionfooter">v15.0 · Made by Marcus Lim @marcuslim621</div>
+    <div class="versionfooter">v17.0 · Made by Marcus Lim @marcuslim621</div>
   </section>
 
   <!-- MODE SELECT -->
@@ -959,6 +959,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     <div class="drawwrap">
       <canvas id="wcanvas"></canvas>
       <div class="drawtools">
+        <button class="minibtn" onclick="writeUndo()">Undo</button>
         <button class="minibtn" onclick="writeClear()">Clear</button>
         <div class="pencolors" id="wpencolors">
           <span class="pclabel">Mark:</span>
@@ -1564,7 +1565,71 @@ const WORDS=[
 ["一蹴而就","yi2cu4er2jiu4","to succeed in a single step",5,"idiom"],
 ["鞭辟入里","bian1pi4ru4li3","penetrating; incisive",5,"idiom"],
 ["荷枪实弹","he4qiang1shi2dan4","armed with loaded rifles",5,"idiom"],
-["拾级而上","she4ji2er2shang4","to ascend step by step",5,"idiom"]
+["拾级而上","she4ji2er2shang4","to ascend step by step",5,"idiom"],
+
+/* ---- MASTER II (level 7): literary register, classical allusion, abstract/philosophical
+   vocabulary — the kind that trips up native speakers in essays and formal prose ---- */
+["之乎者也","zhi1hu1zhe3ye3","stilted, archaic-sounding language",7,"idiom"],
+["文以载道","wen2yi3zai4dao4","literature should convey moral truth",7,"idiom"],
+["形而上","xing2er2shang4","metaphysical",7,"adj"],
+["形而下","xing2er2xia4","physical; concrete (opp. of metaphysical)",7,"adj"],
+["不刊之论","bu4kan1zhi1lun4","an irrefutable statement",7,"idiom"],
+["振聋发聩","zhen4long2fa1kui4","a wake-up call; startling truth",7,"idiom"],
+["空谷足音","kong1gu3zu2yin1","a rare and welcome visitor/event",7,"idiom"],
+["曲高和寡","qu3gao1he4gua3","too refined to be popular",7,"idiom"],
+["附庸风雅","fu4yong1feng1ya3","to affect cultural refinement",7,"idiom"],
+["东施效颦","dong1shi1xiao4pin2","clumsy imitation that backfires",7,"idiom"],
+["买椟还珠","mai3du2huan2zhu1","to miss the point; value the wrong thing",7,"idiom"],
+["叶公好龙","ye4gong1hao4long2","professed love that crumbles when real",7,"idiom"],
+["杞人忧天","qi3ren2you1tian1","needless anxiety over the impossible",7,"idiom"],
+["塞翁失马","sai4weng1shi1ma3","a blessing in disguise",7,"idiom"],
+["朝三暮四","zhao1san1mu4si4","fickle; playing word games to deceive",7,"idiom"],
+["邯郸学步","han2dan1xue2bu4","losing one's own identity imitating others",7,"idiom"],
+["刻舟求剑","ke4zhou1qiu2jian4","rigidly failing to adapt to change",7,"idiom"],
+["南辕北辙","nan2yuan2bei3zhe2","actions that contradict one's goal",7,"idiom"],
+["望洋兴叹","wang4yang2xing1tan4","to feel humbled before something vast",7,"idiom"],
+["越俎代庖","yue4zu3dai4pao2","to overstep one's role; meddle",7,"idiom"],
+["物是人非","wu4shi4ren2fei1","things unchanged, but people are gone",7,"idiom"],
+["世事无常","shi4shi4wu2chang2","the impermanence of worldly affairs",7,"idiom"],
+["沧海桑田","cang1hai3sang1tian2","great changes over time",7,"idiom"],
+["白驹过隙","bai2ju1guo4xi4","time flies swiftly",7,"idiom"],
+["韶光易逝","shao2guang1yi4shi4","beautiful time passes quickly",7,"idiom"],
+["物换星移","wu4huan4xing1yi2","the passage of time; seasons changing",7,"idiom"],
+["寄人篱下","ji4ren2li2xia4","to live under another's roof, dependent",7,"idiom"],
+["形单影只","xing2dan1ying3zhi1","utterly alone; solitary",7,"idiom"],
+["顾影自怜","gu4ying3zi4lian2","to feel sorry for oneself",7,"idiom"],
+["自怨自艾","zi4yuan4zi4yi4","to reproach and blame oneself",7,"idiom"],
+["咎由自取","jiu4you2zi4qu3","to bring trouble on oneself",7,"idiom"],
+["自食其果","zi4shi2qi2guo3","to reap what one sows",7,"idiom"],
+["殊途同归","shu1tu2tong2gui1","different paths, same destination",7,"idiom"],
+["大相径庭","da4xiang1jing4ting2","widely divergent; poles apart",7,"idiom"],
+["南辕北辙式","nan2yuan2bei3zhe2shi4","(lit. style) working against one's aim",7,"adj"],
+["言犹在耳","yan2you2zai4er3","the words still ring in one's ears",7,"idiom"],
+["余音绕梁","yu2yin1rao4liang2","lingering, unforgettable impression",7,"idiom"],
+["字字珠玑","zi4zi4zhu1ji1","every word a pearl; exquisite writing",7,"idiom"],
+["洛阳纸贵","luo4yang2zhi3gui4","a work so popular it causes a sensation",7,"idiom"],
+["江郎才尽","jiang1lang2cai2jin4","to have exhausted one's creative talent",7,"idiom"],
+["妙笔生花","miao4bi3sheng1hua1","a gifted, flowering pen; brilliant writing",7,"idiom"],
+["画龙点睛","hua4long2dian3jing1","the crucial finishing touch",7,"idiom"],
+["入木三分","ru4mu4san1fen1","penetrating and incisive (of writing/views)",7,"idiom"],
+["言外之意","yan2wai4zhi1yi4","the implied meaning beyond the words",7,"noun"],
+["弦外之音","xian2wai4zhi1yin1","an implied, unspoken meaning",7,"noun"],
+["微言大义","wei1yan2da4yi4","profound meaning in few words",7,"idiom"],
+["咬文嚼字","yao3wen2jiao2zi4","to fuss pedantically over wording",7,"idiom"],
+["无病呻吟","wu2bing4shen1yin2","affected sentimentality; feigned suffering",7,"idiom"],
+["矫揉造作","jiao3rou2zao4zuo4","affected; artificial in manner",7,"idiom"],
+["言不由衷","yan2bu4you2zhong1","insincere words; not from the heart",7,"idiom"],
+["虚与委蛇","xu1yu3wei1yi2","to feign politeness insincerely",7,"idiom"],
+["阳奉阴违","yang2feng4yin1wei2","outward compliance, secret defiance",7,"idiom"],
+["口是心非","kou3shi4xin1fei1","saying one thing, meaning another",7,"idiom"],
+["言而无信","yan2er2wu2xin4","to break one's word",7,"idiom"],
+["言必有中","yan2bi4you3zhong4","every word hits the mark",7,"idiom"],
+["一语中的","yi4yu3zhong4di4","a remark that hits the nail on the head",7,"idiom"],
+["一针见血","yi4zhen1jian4xie3","incisive; straight to the point",7,"idiom"],
+["切中肯綮","qie4zhong4ken3qing4","to hit the crux of the matter exactly",7,"idiom"],
+["不落窠臼","bu4luo4ke1jiu4","original; not following convention",7,"idiom"],
+["独树一帜","du2shu4yi2zhi4","to establish a school of one's own",7,"idiom"],
+["别具匠心","bie2ju4jiang4xin1","showing ingenious, original craftsmanship",7,"idiom"]
 ];
 
 /* HSK-style fill-in-the-blank practice questions.
@@ -1658,6 +1723,12 @@ function pin(p){
     return cap?r[0].toUpperCase()+r.slice(1):r;
   });
 }
+function levelBadge(lv){
+  if(lv===5)return"宗";
+  if(lv===7)return"文";
+  if(lv===6)return"＋";
+  return lv+"级";
+}
 
 /* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
@@ -1684,7 +1755,7 @@ function updateRefresherBadge(){
 }
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","New HSK 2 words only","二"],[3,"HSK 3","New HSK 3 words only","三"],[4,"HSK 4","New HSK 4 words only","四"]];
-const TABS=[...LEVELS,[5,"Master"]];
+const TABS=[...LEVELS,[5,"Master"],[7,"Master II"]];
 const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
 /* ---------- level select ---------- */
@@ -1731,9 +1802,14 @@ function renderLevelRows(){
   });
   if(!multiLevelMode&&(category==="guessing"||category==="typing"||category==="writing")){
     const mn=WORDS.filter(w=>w[3]===5).length;
-    rows.push(`<button class="card" onclick="startMaster()">
+    const mn2=WORDS.filter(w=>w[3]===7).length;
+    rows.push(`<button class="card" onclick="startMaster(5)">
       <div class="sealic">宗</div><div><div class="tt">Master 宗师</div>
       <div class="dd">Rare characters, trap readings and literary chengyu — hard even for native speakers · ${mn} words</div></div>
+      <div class="chev">›</div></button>`);
+    rows.push(`<button class="card" onclick="startMaster(7)">
+      <div class="sealic">文</div><div><div class="tt">Master II 文哲</div>
+      <div class="dd">Literary allusions, classical idioms and abstract vocabulary from essays and prose — hard even for native speakers · ${mn2} words</div></div>
       <div class="chev">›</div></button>`);
   }
   $("levelrows").innerHTML=rows.join("");
@@ -1788,10 +1864,12 @@ function updateLevelWordlistBar(){
   $("levelwlcount").textContent=pendingWordlistIds.size;
   $("levelwlbar").style.display=pendingWordlistIds.size>0?"flex":"none";
 }
-function startMaster(){
+function startMaster(level){
+  const lv=level||5;
   const cat=pendingCategory,variant=pendingVariant;
-  const pool=WORDS.filter(w=>w[3]===5);
-  const label=`Master · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
+  const pool=WORDS.filter(w=>w[3]===lv);
+  const tierName=lv===7?"Master II":"Master";
+  const label=`${tierName} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
   if(cat==="typing")startTypeQuiz(pool,label,variant);
   else if(cat==="writing")startWriteQuiz(pool,label,variant);
   else startQuiz(pool,label,variant);
@@ -1914,21 +1992,7 @@ function saveRefresherScope(){
 }
 
 function startRefresher(){
-  const stats=store.get("hsk_word_stats",{});
-  const dueChars=new Set(wordsDueToday());
-  const dict=refresherScopedDict();
-  let pool=dict.filter(w=>dueChars.has(w[0]));
-
-  // mix in a few brand-new (never-practiced) words from the scoped set, Duolingo-style
-  const NEW_WORD_COUNT=3;
-  const unseen=dict.filter(w=>!stats[w[0]]);
-  if(unseen.length){
-    const shuffled=shuffle([...unseen]);
-    pool=pool.concat(shuffled.slice(0,NEW_WORD_COUNT));
-  }
-
-  if(!pool.length){alert("Nothing due right now within this scope — check back later, or widen the scope! 🎉");return}
-  startQuiz(pool,"Refresher","unlimited");
+  startRefresherMixed();
 }
 
 /* ---------- custom wordlists (create, edit, pick for testing) ---------- */
@@ -2083,7 +2147,7 @@ function confirmWordlistSelection(){
   renderWordlistLevels();
   show("wordlistlevels");
 }
-const WL_LEVEL_META={5:["宗","Master 宗师"],6:["＋","My Words"]};
+const WL_LEVEL_META={5:["宗","Master 宗师"],7:["文","Master II 文哲"],6:["＋","My Words"]};
 function renderWordlistLevels(){
   const wset=new Set(pendingWordlistPool);
   const matched=allWords().filter(w=>wset.has(w[0]));
@@ -2106,7 +2170,7 @@ function renderWordlistLevels(){
       <div class="dd">Only the ${n} ${name} word${n===1?"":"s"} from your selection</div></div>
       <div class="chev">›</div></button>`);
   });
-  [5,6].forEach(lv=>{
+  [5,7,6].forEach(lv=>{
     const n=(byLevel[lv]||[]).length;
     if(!n)return;
     const [em,name]=WL_LEVEL_META[lv];
@@ -2120,7 +2184,7 @@ function renderWordlistLevels(){
 function startWordlistFiltered(level){
   const wset=new Set(pendingWordlistPool);
   const cat=pendingCategory,variant=pendingVariant;
-  const levelName=level===null?"All words":level===5?"Master":level===6?"My Words":`HSK ${level}`;
+  const levelName=level===null?"All words":level===5?"Master":level===7?"Master II":level===6?"My Words":`HSK ${level}`;
   const label=`${pendingWordlistLabel} · ${levelName} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
   if(cat==="sentences"){
     const pool=SENTQ.filter(s=>wset.has(s[2])&&(level===null||wordLevelOf(s[2])===level));
@@ -2210,7 +2274,7 @@ function renderQ(){
   const w=S.queue[S.i];
   S.phase={enDone:false,pyDone:false,wrong:false};
   $("qchar").textContent=w[0];
-  $("qseal").textContent=w[3]===5?"宗":w[3]+"级";
+  $("qseal").textContent=levelBadge(w[3]);
   if(S.timed){
     const left=Math.max(0,S.deadline-Date.now());const s=Math.ceil(left/1000);
     $("qhearts").innerHTML=`<span class="timerbig ${s<=10?"low":""}">${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span>`;
@@ -2285,12 +2349,16 @@ function nextWord(){
   }
   if((S.variant==="arcade"||S.variant==="competition")&&S.lives<=0){saveSession();showGameOver();return}
   S.i++;
-  if(S.i>=S.queue.length){saveSession();showSummary();return}
+  if(S.i>=S.queue.length){
+    if(REFR&&REFR.active){recordWordStats(S.results,"guessing");if(refrAdvance(S.results))return}
+    saveSession();showSummary();return;
+  }
   renderQ();
 }
 function endEarly(){
   clearInterval(quizTimer);
   if(S)S.done=true;
+  if(REFR&&REFR.active){refrEndEarly();return}
   if(S&&S.results.length)saveSession();
   show("home");
 }
@@ -2309,29 +2377,135 @@ function recordBest(label,ok,bad){
 }
 /* ---------- lifetime word-mastery stats (never trimmed) + SRS scheduling ---------- */
 const SRS_DAY=86400000;
-function recordWordStats(results){
+const SRS_MODES=["guessing","typing","writing","sentences"];
+function emptyModeStat(){return {ok:0,bad:0,interval:1,due:0}}
+function recordWordStats(results,mode){
   const stats=store.get("hsk_word_stats",{});
   const today=Date.now();
   results.forEach(r=>{
-    const s=stats[r.c]||{ok:0,bad:0,lastSeen:0,interval:1,due:0};
-    if(r.ok){s.ok++;s.interval=Math.round((s.interval||1)*2.3)||1}
-    else{s.bad++;s.interval=1}
+    const s=stats[r.c]||{lastSeen:0,byMode:{}};
+    if(!s.byMode)s.byMode={};
+    const m=s.byMode[mode]||emptyModeStat();
+    if(r.ok){m.ok++;m.interval=Math.round((m.interval||1)*2.3)||1}
+    else{m.bad++;m.interval=1}
+    m.due=today+m.interval*SRS_DAY;
+    s.byMode[mode]=m;
     s.lastSeen=today;
-    s.due=today+s.interval*SRS_DAY;
     stats[r.c]=s;
   });
   store.set("hsk_word_stats",stats);
 }
 function wordsDueToday(){
+  // back-compat helper: any word due in ANY mode (used by the home badge count)
   const stats=store.get("hsk_word_stats",{});
   const now=Date.now();
-  return Object.entries(stats).filter(([,s])=>s.due<=now).map(([c])=>c);
+  const out=new Set();
+  Object.entries(stats).forEach(([c,s])=>{
+    if(!s.byMode)return;
+    Object.values(s.byMode).forEach(m=>{if(m.due<=now)out.add(c)});
+  });
+  return [...out];
+}
+function dueQueueForScope(scopedChars){
+  // returns [{c, mode}] for every word×mode combo that's due, restricted to scopedChars (Set or null=all)
+  const stats=store.get("hsk_word_stats",{});
+  const now=Date.now();
+  const out=[];
+  Object.entries(stats).forEach(([c,s])=>{
+    if(scopedChars&&!scopedChars.has(c))return;
+    if(!s.byMode)return;
+    SRS_MODES.forEach(mode=>{
+      const m=s.byMode[mode];
+      if(m&&m.due<=now)out.push({c,mode});
+    });
+  });
+  return out;
+}
+
+/* ---------- mixed-mode refresher orchestrator ----------
+   Drives the 4 existing quiz engines one question at a time, in whichever
+   mode each due word was last wrong/scheduled in, so a single Refresher
+   session can jump between Recognition/Typing/Writing/Sentences per-word. */
+let REFR=null;
+function refrBuildQueue(){
+  const dict=allWords();
+  const dueChars=new Set(wordsDueToday());
+  const scopedChars=new Set(refresherScopedDict().map(w=>w[0]));
+  let items=dueQueueForScope(scopedChars).filter(it=>dueChars.has(it.c));
+
+  // mix in a few brand-new (never-practiced) words, Duolingo-style — default to Recognition
+  const stats=store.get("hsk_word_stats",{});
+  const NEW_WORD_COUNT=3;
+  const scopedDict=refresherScopedDict();
+  const unseen=scopedDict.filter(w=>!stats[w[0]]);
+  if(unseen.length){
+    shuffle([...unseen]).slice(0,NEW_WORD_COUNT).forEach(w=>items.push({c:w[0],mode:"guessing"}));
+  }
+  return shuffle(items);
+}
+function startRefresherMixed(){
+  const queue=refrBuildQueue();
+  if(!queue.length){alert("Nothing due right now within this scope — check back later, or widen the scope! 🎉");return}
+  REFR={active:true,queue,i:0,ok:0,bad:0,results:[],startedAt:Date.now()};
+  refrRunCurrent();
+}
+function refrRunCurrent(){
+  if(!REFR||REFR.i>=REFR.queue.length){refrFinish();return}
+  const {c,mode}=REFR.queue[REFR.i];
+  const dict=allWords();
+  const w=dict.find(x=>x[0]===c);
+  if(!w){REFR.i++;refrRunCurrent();return} // word no longer exists (e.g. deleted custom word)
+  const label="Refresher · "+CATEGORY_TITLE[mode];
+  if(mode==="guessing")startQuiz([w],label,"unlimited");
+  else if(mode==="typing")startTypeQuiz([w],label,"unlimited");
+  else if(mode==="writing")startWriteQuiz([w],label,"unlimited");
+  else if(mode==="sentences"){
+    const sentMatches=SENTQ.filter(s=>s[2]===c);
+    if(!sentMatches.length){REFR.i++;refrRunCurrent();return} // no sentence exists for this word
+    startSentQuiz(sentMatches.slice(0,1),label,"unlimited");
+  }
+}
+// called by each engine's own single-question "finished" branch when a refresher session is active
+function refrAdvance(results){
+  if(!REFR)return false;
+  results.forEach(r=>{
+    REFR.results.push(r);
+    if(r.ok)REFR.ok++;else REFR.bad++;
+  });
+  REFR.i++;
+  refrRunCurrent();
+  return true;
+}
+function refrFinish(){
+  const results=REFR.results,ok=REFR.ok,bad=REFR.bad;
+  const hist=store.get("hsk_history",[]);
+  hist.unshift({t:Date.now(),label:"Refresher (mixed)",ok,bad,words:results});
+  store.set("hsk_history",hist.slice(0,200));
+  lastWasBest=recordBest("Refresher (mixed)",ok,bad);
+  REFR=null;
+  $("sumbest").classList.toggle("show",lastWasBest);
+  $("sumlabel").textContent="Refresher · mixed practice";
+  $("sumok").textContent=ok;$("sumbad").textContent=bad;
+  const t=ok+bad;
+  $("sumacc").textContent=(t?Math.round(ok/t*100):0)+"%";
+  $("sumwords").innerHTML=breakdownHTML(results);
+  show("summary");
+}
+function refrEndEarly(){
+  if(REFR&&REFR.results.length){
+    const hist=store.get("hsk_history",[]);
+    hist.unshift({t:Date.now(),label:"Refresher (mixed)",ok:REFR.ok,bad:REFR.bad,words:REFR.results});
+    store.set("hsk_history",hist.slice(0,200));
+    recordBest("Refresher (mixed)",REFR.ok,REFR.bad);
+  }
+  REFR=null;
+  show("home");
 }
 function saveSession(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:S.label,ok:S.ok,bad:S.bad,words:S.results});
   store.set("hsk_history",hist.slice(0,200));
-  recordWordStats(S.results);
+  recordWordStats(S.results,"guessing");
   lastWasBest=recordBest(S.label,S.ok,S.bad);
 }
 function breakdownHTML(results){
@@ -2490,7 +2664,7 @@ function typeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
   store.set("hsk_history",hist.slice(0,200));
-  recordWordStats(TS.results);
+  recordWordStats(TS.results,"typing");
   lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
 }
 function typeNext(){
@@ -2510,6 +2684,7 @@ function typeNext(){
   }
   TS.i++;
   if(TS.i>=TS.queue.length){
+    if(REFR&&REFR.active){recordWordStats(TS.results,"typing");if(refrAdvance(TS.results))return}
     typeSave();
     $("sumlabel").textContent=TS.label;
     $("sumok").textContent=TS.ok;$("sumbad").textContent=TS.bad;
@@ -2529,6 +2704,7 @@ document.addEventListener("keydown",e=>{
 function typeEndEarly(){
   clearInterval(typeTimer);
   if(TS)TS.done=true;
+  if(REFR&&REFR.active){refrEndEarly();return}
   if(TS&&TS.results.length)typeSave();
   show("home");
 }
@@ -2536,7 +2712,7 @@ function typeEndEarly(){
 /* ---------- writing quiz engine (flashcard, self-graded) ---------- */
 let WQ=null;
 let writeTimer=null;
-const WPAD={strokes:[],cur:null,size:0,cells:1,color:null};
+const WPAD={strokes:[],cur:null,size:0,cells:1,color:null,lockedCount:0};
 function startWriteQuiz(pool,label,variant){
   againFn=()=>startWriteQuiz(pool,label,variant);
   clearInterval(writeTimer);
@@ -2576,7 +2752,7 @@ function renderWrite(){
   $("wrevealbtn").style.display="block";
   setPenColor("ink");
   $("wpencolors").classList.remove("show");
-  WPAD.strokes=[];WPAD.cur=null;
+  WPAD.strokes=[];WPAD.cur=null;WPAD.lockedCount=0;
   WPAD.cells=Math.min([...w[0]].length,4);
   sizeWCanvas();redrawWPad();
 }
@@ -2590,6 +2766,8 @@ function writeReveal(){
   $("wrevealbtn").style.display="none";
   $("wgrade").classList.add("show");
   $("wpencolors").classList.add("show");
+  WPAD.lockedCount=WPAD.strokes.length;
+  setPenColor("red");
 }
 function setPenColor(key){
   WPAD.color=key==="ink"?null:key;
@@ -2626,14 +2804,17 @@ function writeGrade(right){
     show("gameover");return;
   }
   WQ.i++;
-  if(WQ.i>=WQ.queue.length){writeFinish();return}
+  if(WQ.i>=WQ.queue.length){
+    if(REFR&&REFR.active){recordWordStats(WQ.results,"writing");if(refrAdvance(WQ.results))return}
+    writeFinish();return;
+  }
   renderWrite();
 }
 function writeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
   store.set("hsk_history",hist.slice(0,200));
-  recordWordStats(WQ.results);
+  recordWordStats(WQ.results,"writing");
   lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
 }
 function writeFinish(){
@@ -2649,6 +2830,7 @@ function writeFinish(){
 function writeEndEarly(){
   clearInterval(writeTimer);
   if(WQ)WQ.done=true;
+  if(REFR&&REFR.active){refrEndEarly();return}
   if(WQ&&WQ.results.length)writeSave();
   show("home");
 }
@@ -2731,7 +2913,17 @@ function wPadPoint(e){
     if($("scr-writequiz").classList.contains("active")){sizeWCanvas();redrawWPad()}
   });
 })();
-function writeClear(){WPAD.strokes=[];WPAD.cur=null;redrawWPad()}
+function writeClear(){
+  WPAD.strokes=WPAD.strokes.slice(0,WPAD.lockedCount);
+  WPAD.cur=null;
+  redrawWPad();
+}
+function writeUndo(){
+  if(WPAD.strokes.length<=WPAD.lockedCount)return;
+  WPAD.strokes.pop();
+  WPAD.cur=null;
+  redrawWPad();
+}
 
 /* ---------- sentence quiz engine ---------- */
 let SS=null;
@@ -2808,14 +3000,17 @@ function sentNext(){
     sentSaveGameOver();return;
   }
   SS.i++;
-  if(SS.i>=SS.queue.length){sentFinish();return}
+  if(SS.i>=SS.queue.length){
+    if(REFR&&REFR.active){recordWordStats(SS.results,"sentences");if(refrAdvance(SS.results))return}
+    sentFinish();return;
+  }
   renderSent();
 }
 function sentSaveGameOver(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,200));
-  recordWordStats(SS.results);
+  recordWordStats(SS.results,"sentences");
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
   $("gobest").classList.toggle("show",lastWasBest);
   $("gook").textContent=SS.ok;$("gobad").textContent=SS.bad;
@@ -2828,7 +3023,7 @@ function sentFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,200));
-  recordWordStats(SS.results);
+  recordWordStats(SS.results,"sentences");
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
   $("sumbest").classList.toggle("show",lastWasBest);
   $("sumlabel").textContent=SS.label;
@@ -2841,6 +3036,7 @@ function sentFinish(){
 function sentEndEarly(){
   clearInterval(sentTimer);
   if(SS)SS.done=true;
+  if(REFR&&REFR.active){refrEndEarly();return}
   if(SS&&SS.results.length)sentFinish();else show("home");
 }
 
@@ -2864,7 +3060,7 @@ function clearBest(){
 
 /* ---------- competition leaderboard (named, per-level) ---------- */
 let compBoardScope=null;
-const COMP_SCOPE_ORDER=["HSK 1","HSK 2","HSK 3","HSK 4","Master"];
+const COMP_SCOPE_ORDER=["HSK 1","HSK 2","HSK 3","HSK 4","Master","Master II"];
 function renderCompBoard(){
   const board=store.get("hsk_competition",{});
   const scopes=Object.keys(board).sort((a,b)=>{
@@ -3099,7 +3295,7 @@ function togglePin(c){
 function openDetail(c){
   const w=WORDS.find(x=>x[0]===c);if(!w)return;
   $("dchar").textContent=w[0];$("dpy").textContent=pin(w[1]);$("den").textContent=w[2];
-  $("dseal").textContent=w[3]===5?"宗":w[3]+"级";
+  $("dseal").textContent=levelBadge(w[3]);
   const p=$("dpos");p.textContent=POS_LABEL[w[4]];p.className="poschip "+w[4];
   detailTab("write");
   show("worddetail");

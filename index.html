@@ -12,19 +12,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EBEBE6;        /* page surface, sits behind cards */
+  --bg:#F0F1EE;        /* page surface, sits behind cards */
   --card:#FFFFFF;
-  --ink:#21242C;
-  --muted:#70757F;
-  --line:#E5E5DF;
-  --line-strong:#CFCFC7;
-  --seal:#BE3425;      /* cinnabar */
-  --seal-tint:#FCEFEC;
-  --jade:#1F8557;
-  --jade-tint:#EAF4EF;
-  --fill:#21242C;      /* filled controls */
+  --ink:#1B1D24;
+  --muted:#6B6E6A;
+  --line:#E1E3DE;
+  --line-strong:#CBCEC6;
+  --seal:#DB3A1B;      /* cinnabar, more saturated */
+  --seal-tint:#FCEBE5;
+  --jade:#0E8F55;
+  --jade-tint:#E4F3EA;
+  --gold:#B87D0C;      /* new accent for the quiet seals */
+  --fill:#1B1D24;      /* filled controls */
   --on-fill:#FFFFFF;
-  --seal2:#21242C;     /* quiet seal stamps */
+  --seal2:#DB3A1B;     /* quiet seal stamps — aligned to seal color */
   --tile-ink-bg:rgba(33,36,44,.05);
   --tile-ink-border:rgba(33,36,44,.15);
   --tile-ink-border-hover:rgba(33,36,44,.25);
@@ -35,19 +36,20 @@
   --ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 html[data-theme="dark"]{
-  --bg:#0F1013;        /* page surface, deeper than card in dark mode too */
+  --bg:#14161C;        /* page surface, deeper than card in dark mode too */
   --card:#1E2028;
   --ink:#ECEBE6;
   --muted:#8B8F99;
   --line:#2D3039;
   --line-strong:#3B3F4A;
-  --seal:#D14A37;
-  --seal-tint:rgba(209,74,55,.13);
+  --seal:#EE5A38;
+  --seal-tint:rgba(238,90,56,.15);
   --jade:#41B383;
   --jade-tint:rgba(65,179,131,.13);
+  --gold:#E0A83C;
   --fill:#ECEBE6;
   --on-fill:#17181C;
-  --seal2:#2B2E37;
+  --seal2:#EE5A38;
   --tile-ink-bg:rgba(236,235,230,.11);
   --tile-ink-border:rgba(236,235,230,.23);
   --tile-ink-border-hover:rgba(236,235,230,.33);
@@ -67,10 +69,14 @@ html,body{height:100%;overscroll-behavior:none}
 }
 body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.45;
   -webkit-font-smoothing:antialiased}
-.app{max-width:440px;margin:0 auto;min-height:100vh;padding:22px 18px 44px;position:relative}
-.screen{display:none;animation:fade .16s ease;contain:layout paint}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(180deg, #C7CAC3 0px, #C7CAC3 140px, rgba(199,202,195,0) 320px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  background-repeat:no-repeat,repeat;opacity:1}
+html[data-theme="dark"] body::before{background-image:linear-gradient(180deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,0) 320px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");}
+.app{max-width:440px;margin:0 auto;min-height:100vh;padding:22px 18px 44px;position:relative;z-index:1}
+.screen{display:none;animation:slidein .32s cubic-bezier(.22,.68,0,1);contain:layout paint}
 .screen.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+@keyframes slidein{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.screen{animation:none}}
 button{font-family:var(--ui)}
 button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:8px}
@@ -78,13 +84,13 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radi
 /* ---------- seal monogram (signature element) ---------- */
 .sealic{width:40px;height:40px;flex-shrink:0;background:var(--seal);color:#fff;border-radius:9px;
   display:flex;align-items:center;justify-content:center;font-family:var(--hanzi);font-size:18px;font-weight:600;
-  transform:rotate(-2deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 0 0 3px var(--seal)}
-.sealic.quiet{background:var(--seal2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--seal2)}
-html[data-theme="dark"] .sealic.quiet{color:var(--ink)}
+  transform:rotate(-2deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 0 0 3px var(--seal),0 0 0 2px var(--jade)}
+.sealic.quiet{background:var(--seal2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--seal2),0 0 0 2px var(--jade)}
+html[data-theme="dark"] .sealic.quiet{color:#fff}
 html[data-theme="dark"] .tile.ink,
 html[data-theme="dark"] .tile.jade{
-  background:rgba(31,133,87,.07);
-  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
+  background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.03));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.12),inset 0 0 0 1px rgba(65,179,131,.18),0 12px 26px -6px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3)}
 html[data-theme="dark"] .tile.ink:hover,
 html[data-theme="dark"] .tile.jade:hover{
   box-shadow:inset 0 0 0 1px rgba(65,179,131,.32),0 4px 0 rgba(8,55,30,.9),0 9px 20px rgba(0,0,0,.38)}
@@ -95,14 +101,14 @@ html[data-theme="dark"] .tile .sealic.jade{
   background:#FEFEF8;color:var(--seal);
   box-shadow:inset 0 0 0 1.5px rgba(31,133,87,.35),inset 0 0 0 4px rgba(31,133,87,.09)}
 html[data-theme="dark"] .card{
-  background:rgba(31,133,87,.07);
-  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
+  background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.03));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.12),inset 0 0 0 1px rgba(65,179,131,.18),0 12px 26px -6px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3)}
 html[data-theme="dark"] .card:hover{
   box-shadow:inset 0 0 0 1px rgba(65,179,131,.32),0 4px 0 rgba(8,55,30,.9),0 9px 20px rgba(0,0,0,.38)}
 html[data-theme="dark"] .card .sealic{
   background:#FEFEF8;color:var(--seal);
   box-shadow:inset 0 0 0 1.5px rgba(31,133,87,.3),inset 0 0 0 4px rgba(31,133,87,.08)}
-.sealic.jade{background:var(--jade);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px var(--jade)}
+.sealic.jade{background:#fff;color:var(--jade);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 3px #fff,0 0 0 2px var(--jade)}
 .sealic.lg{width:56px;height:56px;font-size:26px;border-radius:12px;margin:0 auto}
 
 /* ---------- header ---------- */
@@ -117,25 +123,27 @@ html[data-theme="dark"] .card .sealic{
 .sechead{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin:20px 0 10px}
 .versionfooter{text-align:center;font-size:11px;color:var(--muted);opacity:0.55;margin:28px 0 8px;letter-spacing:.02em}
 .hint{color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.55}
-.levelhintrow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
-.levelhintrow .hint{margin-bottom:0;flex:1}
-.multitogglebtn{flex-shrink:0;border:1px solid var(--line);background:var(--card);color:var(--muted);
-  border-radius:99px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--ui);
-  white-space:nowrap}
-.multitogglebtn.on{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
-.card.multisel{border-color:var(--jade)}
-.card .multitick{display:none;flex-shrink:0;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);
-  align-items:center;justify-content:center;color:transparent;font-size:13px;font-weight:800}
-.card.multimode .multitick{display:flex}
-.card.multimode .chev{display:none}
-.card.multisel .multitick{background:var(--jade);border-color:var(--jade);color:#fff}
 
 /* ---------- home cards ---------- */
 .cards{display:flex;flex-direction:column;gap:10px}
-.card{display:flex;align-items:center;gap:14px;background:#FDFDF5;border:2px solid var(--jade);
-  border-radius:14px;padding:15px 16px;cursor:pointer;text-align:left;color:var(--ink);width:100%;
-  box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08);
+.cards:has(.card:not(.hero)), .rows:has(.card:not(.hero)){position:relative;background:linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.32));backdrop-filter:blur(26px) saturate(200%);-webkit-backdrop-filter:blur(26px) saturate(200%);border:1px solid rgba(255,255,255,.75);border-radius:22px;padding:4px 14px;gap:0;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.9),inset 0 0 0 1px rgba(31,133,87,.12),0 14px 30px -8px rgba(18,88,55,.26),0 2px 8px rgba(0,0,0,.08)}
+.cards .card:not(.hero), .rows .card:not(.hero){background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;box-shadow:none;border-radius:10px;padding:13px 2px;transition:background .15s ease}
+.cards .card:not(.hero)::before,.cards .card:not(.hero)::after, .rows .card:not(.hero)::before,.rows .card:not(.hero)::after{display:none}
+.cards .card:not(.hero):hover, .rows .card:not(.hero):hover{background:rgba(0,0,0,.05)}
+html[data-theme="dark"] .cards .card:not(.hero):hover, html[data-theme="dark"] .rows .card:not(.hero):hover{background:rgba(255,255,255,.06)}
+.cards .card:not(.hero)+.card:not(.hero), .rows .card:not(.hero)+.card:not(.hero){border-top:1px solid rgba(31,133,87,.14)}
+html[data-theme="dark"] .cards .card:not(.hero)+.card:not(.hero), html[data-theme="dark"] .rows .card:not(.hero)+.card:not(.hero){border-top-color:rgba(65,179,131,.18)}
+.cards .card:not(.hero) .sealic, .rows .card:not(.hero) .sealic{transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.cards .card:not(.hero):hover .sealic, .rows .card:not(.hero):hover .sealic{transform:rotate(-10deg) scale(1.06)}
+.card{display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.32));backdrop-filter:blur(26px) saturate(200%);-webkit-backdrop-filter:blur(26px) saturate(200%);border:1px solid rgba(255,255,255,.75);
+  border-radius:20px;padding:15px 16px;cursor:pointer;text-align:left;color:var(--ink);width:100%;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.9),inset 0 0 0 1px rgba(31,133,87,.12),0 14px 30px -8px rgba(18,88,55,.26),0 2px 8px rgba(0,0,0,.08);
   transition:border-color .12s,box-shadow .14s,transform .08s}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:50%;pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0));border-radius:20px 20px 0 0}
+.card::after{content:"";position:absolute;top:-40%;left:-15%;width:60%;height:100%;pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,255,255,.55), rgba(255,255,255,0) 70%);transform:rotate(-15deg)}
 .card:hover{border-color:#2aab6e;
   box-shadow:inset 0 0 0 1px rgba(31,133,87,.26),0 4px 0 rgba(18,88,55,.52),0 8px 18px rgba(0,0,0,.1)}
 .card:active{transform:scale(.99) translateY(2px);
@@ -176,42 +184,17 @@ html[data-theme="dark"] .card .sealic{
 
 /* ---------- 2-column tinted tile grid (Practice / Review) ---------- */
 .tilegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-/* ---------- home list-row card ---------- */
-.rowcard{background:#FDFDF5;border:2px solid var(--jade);border-radius:18px;padding:8px 16px 16px;
-  margin-bottom:22px;box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
-html[data-theme="dark"] .rowcard{
-  background:rgba(31,133,87,.07);
-  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
-.rowsechead{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  padding:14px 4px 10px}
-.listrow{display:flex;align-items:center;gap:13px;width:100%;background:none;border:none;
-  border-top:1px solid rgba(31,133,87,.15);padding:13px 4px;cursor:pointer;text-align:left;
-  color:var(--ink);font-family:var(--ui)}
-html[data-theme="dark"] .listrow{border-top-color:rgba(65,179,131,.18)}
-.listrow:first-of-type{border-top:none}
-.listrow .sealic{width:36px;height:36px;font-size:16px;border-radius:9px;flex-shrink:0}
-.listrow .tt{flex:1;font-size:14.5px;font-weight:600;letter-spacing:-.005em;background:none;border:none;
-  color:var(--ink);font-family:var(--ui);text-align:left;padding:0;cursor:pointer}
-.listrow .chev{color:#C4C4BD;font-size:17px;flex-shrink:0;background:none;border:none;cursor:pointer;padding:0}
-.listrow-static{border-top:1px solid rgba(31,133,87,.15)}
-.listrow-maintap{padding:0}
-.refresherscope-row{display:block;margin:0 4px 4px;background:var(--bg);border:1px solid var(--line);
-  border-radius:9px;padding:8px 12px;font-size:11.5px;color:var(--muted);font-family:var(--ui);
-  cursor:pointer;text-align:left}
-.refresherscope-row b{color:var(--ink);font-weight:600}
-.listrow .refresherbadge{margin-left:8px;padding:2px 7px;font-size:10px;vertical-align:middle}
 .tile{position:relative;overflow:hidden;text-align:left;border:none;cursor:pointer;
   display:flex;flex-direction:column;gap:8px;border-radius:16px;padding:18px;
   color:var(--ink);font-family:var(--ui);transition:border-color .12s,box-shadow .14s,transform .08s}
 .tile.practice{min-height:158px}
 /* mahjong tile style */
-.tile.ink{background:#FDFDF5;border:2px solid var(--jade);
-  box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+.tile.ink{position:relative;background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.22));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.55);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.8),inset 0 0 0 1px rgba(31,133,87,.12),0 10px 24px -6px rgba(18,88,55,.22),0 2px 6px rgba(0,0,0,.06)}
 .tile.ink:hover{border-color:#2aab6e;
   box-shadow:inset 0 0 0 1px rgba(31,133,87,.26),0 4px 0 rgba(18,88,55,.52),0 8px 18px rgba(0,0,0,.1)}
-.tile.jade{background:#FDFDF5;border:2px solid var(--jade);
-  box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+.tile.jade{position:relative;background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.22));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.55);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.8),inset 0 0 0 1px rgba(31,133,87,.12),0 10px 24px -6px rgba(18,88,55,.22),0 2px 6px rgba(0,0,0,.06)}
 .tile.jade:hover{border-color:#2aab6e;
   box-shadow:inset 0 0 0 1px rgba(31,133,87,.26),0 4px 0 rgba(18,88,55,.52),0 8px 18px rgba(0,0,0,.1)}
 .tile:active{transform:scale(.99) translateY(2px);
@@ -455,6 +438,29 @@ html[data-theme="dark"] .qwrite-expand{background:rgba(31,133,87,.1)}
 .refresherscope-inline b{color:var(--ink);font-weight:600}
 .tile .refresherbadge{margin-left:8px;padding:2px 7px;font-size:10px;vertical-align:middle}
 #qcanvas{display:block;margin:0 auto;border-radius:10px;cursor:crosshair;touch-action:pan-y}
+
+/* ---------- simplified single-list home ---------- */
+.applist{position:relative;background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.22));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.55);border-radius:22px;padding:4px 14px;margin-bottom:6px;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.8),inset 0 0 0 1px rgba(31,133,87,.12),0 10px 24px -6px rgba(18,88,55,.22),0 2px 6px rgba(0,0,0,.06)}
+html[data-theme="dark"] .applist{background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.03));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.12),inset 0 0 0 1px rgba(65,179,131,.18),0 12px 26px -6px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3)}
+.applist .arow{display:flex;align-items:center;gap:13px;padding:13px 2px;background:none;border:none;
+  width:100%;text-align:left;color:var(--ink);cursor:pointer;font-family:var(--ui);border-radius:10px;transition:background .15s ease}
+.applist .arow:hover{background:rgba(0,0,0,.05)}
+html[data-theme="dark"] .applist .arow:hover{background:rgba(255,255,255,.06)}
+.applist .arow+.arow{border-top:1px solid rgba(31,133,87,.14)}
+html[data-theme="dark"] .applist .arow+.arow{border-top-color:rgba(65,179,131,.18)}
+.applist .arow .sealic{width:36px;height:36px;font-size:16px;border-radius:9px;flex-shrink:0;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.applist .arow:hover .sealic{transform:rotate(-10deg) scale(1.06)}
+.applist .arow .tt{font-size:14px;font-weight:600;flex:1}
+.applist .arow .chev{color:#C4C4BD;font-size:16px;flex-shrink:0}
+.applist .sublabel{padding:14px 2px 7px;font-size:10.5px;color:var(--muted);font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase}
+.applist .sublabel:first-child{padding-top:10px}
+.applist .refresherrow{flex-direction:column;align-items:stretch;gap:0}
+.applist .refresherrow .rtop{display:flex;align-items:center;gap:13px}
+.applist .refresherrow .rtop .tt{display:flex;align-items:center}
+.applist .refresherrow .refresherscope-inline{margin:8px 0 4px 49px;width:calc(100% - 49px)}
 .qwrite-padwrap{position:relative;width:fit-content;margin:0 auto}
 .qwrite-padwrap.focused #qcanvas{touch-action:none}
 .qwrite-tap{position:absolute;inset:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
@@ -667,6 +673,65 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 .helpnavbtn:disabled{opacity:0.4;pointer-events:none;cursor:not-allowed}
 .helpnavbtn-cat{flex:1;min-width:auto}
 .helpnavrow-btns{display:flex;gap:12px;width:100%}
+
+
+/* ===== functionality-specific styles (custom word lists, multi-level, refresher, word editing) ===== */
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.levelhintrow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.levelhintrow .hint{margin-bottom:0;flex:1}
+.multitogglebtn{flex-shrink:0;border:1px solid var(--line);background:var(--card);color:var(--muted);
+  border-radius:99px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--ui);
+  white-space:nowrap}
+.multitogglebtn.on{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.card.multisel{border-color:var(--jade)}
+.card .multitick{display:none;flex-shrink:0;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);
+  align-items:center;justify-content:center;color:transparent;font-size:13px;font-weight:800}
+.card.multimode .multitick{display:flex}
+.card.multimode .chev{display:none}
+.card.multisel .multitick{background:var(--jade);border-color:var(--jade);color:#fff}
+.rowcard{background:#FDFDF5;border:2px solid var(--jade);border-radius:18px;padding:8px 16px 16px;
+  margin-bottom:22px;box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
+html[data-theme="dark"] .rowcard{background:rgba(31,133,87,.07);
+  box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
+.rowsechead{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:14px 4px 10px}
+.listrow{display:flex;align-items:center;gap:13px;width:100%;background:none;border:none;
+  border-top:1px solid rgba(31,133,87,.15);padding:13px 4px;cursor:pointer;text-align:left;
+  color:var(--ink);font-family:var(--ui)}
+html[data-theme="dark"] .listrow{border-top-color:rgba(65,179,131,.18)}
+.listrow:first-of-type{border-top:none}
+.listrow .sealic{width:36px;height:36px;font-size:16px;border-radius:9px;flex-shrink:0}
+.listrow .tt{flex:1;font-size:14.5px;font-weight:600;letter-spacing:-.005em;background:none;border:none;
+  color:var(--ink);font-family:var(--ui);text-align:left;padding:0;cursor:pointer}
+.listrow .chev{color:#C4C4BD;font-size:17px;flex-shrink:0;background:none;border:none;cursor:pointer;padding:0}
+.listrow-static{border-top:1px solid rgba(31,133,87,.15)}
+.listrow-maintap{padding:0}
+.refresherscope-row{display:block;margin:0 4px 4px;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;padding:8px 12px;font-size:11.5px;color:var(--muted);font-family:var(--ui);
+  cursor:pointer;text-align:left}
+.refresherscope-row b{color:var(--ink);font-weight:600}
+.listrow .refresherbadge{margin-left:8px;padding:2px 7px;font-size:10px;vertical-align:middle}
+.tab.wl{border-color:var(--seal);color:var(--seal);background:var(--seal-tint)}
+.tab.wl.on{background:var(--seal);border-color:var(--seal);color:#fff}
+.wrow-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.wrow-edit,.wrow-del{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+  background:var(--card);color:var(--muted);font-size:13px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;flex-shrink:0}
+.wrow-del{color:var(--seal);border-color:rgba(190,52,37,.25)}
+.addwordcard{background:var(--seal-tint);border:1.5px dashed var(--seal);border-radius:14px;
+  margin-bottom:13px;overflow:hidden}
+.addwordcard .awc-head{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer;
+  color:var(--seal);font-weight:700;font-size:13.5px}
+.addwordcard .awc-body{display:none;padding:0 15px 15px}
+.addwordcard.open .awc-body{display:block}
+.addwordcard input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);font-size:13.5px;font-family:var(--ui);margin-bottom:8px}
+.addwordcard .awc-preview{font-size:11.5px;color:var(--seal);min-height:16px;margin:-4px 0 8px 2px}
+.awc-poslabel{font-size:11.5px;color:var(--muted);font-weight:600;margin:2px 2px 6px}
+.awc-poschips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.awc-poschip{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:99px;
+  padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--ui)}
+.awc-poschip.on{background:var(--seal);border-color:var(--seal);color:#fff}
 </style>
 </head>
 <body>
@@ -765,7 +830,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
         <div class="chev">›</div>
       </button>
     </div>
-    <div class="versionfooter">v17.0 · Made by Marcus Lim @marcuslim621</div>
+    <div class="versionfooter">v18.3 · Made by Marcus Lim @marcuslim621</div>
   </section>
 
   <!-- MODE SELECT -->
@@ -1107,6 +1172,20 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
     </div>
     <div class="tabs" id="wltabs"></div>
     <div class="posfilters" id="wlposfilters"></div>
+    <div class="addwordcard" id="wladdcard">
+      <div class="awc-head" onclick="toggleWlAddForm()">
+        <span id="wladdchev">＋</span><span>Add a new word to My Words</span>
+      </div>
+      <div class="awc-body" id="wladdbody">
+        <input id="wladd-zh" placeholder="Character(s), e.g. 加油" oninput="previewWlAddPinyin()">
+        <input id="wladd-py" placeholder="Pinyin with tone numbers, e.g. jia1you2" oninput="previewWlAddPinyin()">
+        <div class="awc-preview" id="wladdpreview"></div>
+        <input id="wladd-en" placeholder="English meaning, e.g. go for it / keep going">
+        <div class="awc-poslabel">Part of speech</div>
+        <div class="awc-poschips" id="wladdposchips"></div>
+        <button class="btn primary" style="width:100%" onclick="submitWlAddWord()">Add word</button>
+      </div>
+    </div>
     <input class="searchbox" id="wlsearch" type="text" placeholder="Search characters, pinyin or English" oninput="renderWordlist()">
     <div class="rows" id="wllist"></div>
   </section>
@@ -1174,6 +1253,28 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
       <div class="qpicklist" id="refscopelist" style="padding-top:14px"></div>
       <div style="padding:4px 20px 20px">
         <button class="btn primary" style="width:100%" onclick="saveRefresherScope()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT CUSTOM WORD -->
+  <div class="qpicksheet" id="editwordsheet" onclick="if(event.target===this)closeEditWord()">
+    <div class="qpickpanel">
+      <div class="qpickhead">
+        <h3>Edit word</h3>
+        <button class="helpxbtn" onclick="closeEditWord()">✕</button>
+      </div>
+      <div style="padding:14px 20px 20px">
+        <input id="ewzh" placeholder="Character(s)" oninput="previewEwPinyin()"
+          style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:13.5px;font-family:var(--ui);margin-bottom:8px">
+        <input id="ewpy" placeholder="Pinyin with tone numbers" oninput="previewEwPinyin()"
+          style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:13.5px;font-family:var(--ui);margin-bottom:8px">
+        <div class="awc-preview" id="ewpreview" style="color:var(--seal)"></div>
+        <input id="ewen" placeholder="English meaning"
+          style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:13.5px;font-family:var(--ui);margin-bottom:14px">
+        <div class="awc-poslabel">Part of speech</div>
+        <div class="awc-poschips" id="ewposchips" style="margin-bottom:16px"></div>
+        <button class="btn primary" style="width:100%" onclick="saveEditWord()">Save changes</button>
       </div>
     </div>
   </div>
@@ -2001,6 +2102,13 @@ function saveUserWords(arr){store.set("hsk_userwords",arr)}
 function allWords(){return [...WORDS,...getUserWords()]}
 function getWordlists(){return store.get("hsk_wordlists",{})}
 function saveWordlists(obj){store.set("hsk_wordlists",obj)}
+const MY_WORDS_LIST_ID="mywords";
+function addToMyWordsList(zh){
+  ensureMyWordsList();
+  const lists=getWordlists();
+  if(!lists[MY_WORDS_LIST_ID].words.includes(zh))lists[MY_WORDS_LIST_ID].words.push(zh);
+  saveWordlists(lists);
+}
 // one-time migration from the old single anonymous selection, if present
 (function migrateOldCustomSel(){
   if(store.get("hsk_wordlists",null)!==null)return;
@@ -3255,36 +3363,180 @@ function clearHistory(){
 }
 
 /* ---------- word list + detail ---------- */
-const POS_LABEL={noun:"Noun",verb:"Verb",adj:"Adj.",adv:"Adv.",pronoun:"Pron.",function:"Gram.",idiom:"Idiom"};
+const POS_LABEL={noun:"Noun",verb:"Verb",adj:"Adj.",adv:"Adv.",pronoun:"Pron.",function:"Gram.",idiom:"Idiom",custom:"Custom"};
 let wlTab=1;
 let wlPos="all";
+function wlCurrentWords(){
+  if(typeof wlTab==="string"&&wlTab.startsWith("wl:")){
+    const id=wlTab.slice(3);
+    const lists=getWordlists();
+    const l=lists[id];
+    if(!l)return[];
+    const chars=new Set(l.words);
+    return allWords().filter(w=>chars.has(w[0]));
+  }
+  if(wlTab===6)return getUserWords();
+  return WORDS.filter(w=>w[3]===wlTab);
+}
 function renderPosFilters(){
-  const present=new Set(WORDS.filter(w=>w[3]===wlTab).map(w=>w[4]));
+  const present=new Set(wlCurrentWords().map(w=>w[4]));
   const opts=[["all","All"],...Object.entries(POS_LABEL).filter(([k])=>present.has(k))];
   if(!opts.some(([k])=>k===wlPos))wlPos="all";
   $("wlposfilters").innerHTML=opts.map(([k,label])=>
     `<button class="tab ${wlPos===k?"on":""}" onclick="wlPos='${k}';renderPosFilters();renderWordlist()">${label}</button>`).join("");
 }
+function ensureMyWordsList(){
+  const lists=getWordlists();
+  if(!lists[MY_WORDS_LIST_ID]){
+    lists[MY_WORDS_LIST_ID]={name:"My Words",words:[],created:Date.now(),pinned:true};
+    saveWordlists(lists);
+  }
+}
 function openWordlist(){
-  $("wltabs").innerHTML=TABS.map(([lv,name])=>
+  ensureMyWordsList();
+  const lists=getWordlists();
+  const wlEntries=Object.entries(lists).sort((a,b)=>{
+    if(a[0]===MY_WORDS_LIST_ID)return 1;
+    if(b[0]===MY_WORDS_LIST_ID)return -1;
+    return b[1].created-a[1].created;
+  });
+  const hskTabsHtml=TABS.map(([lv,name])=>
     `<button class="tab ${lv===wlTab?"on":""}" onclick="wlTab=${lv};openWordlist()">${name}</button>`).join("");
+  const wlTabsHtml=wlEntries.map(([id,l])=>
+    `<button class="tab wl ${wlTab===("wl:"+id)?"on":""}" onclick="wlTab='wl:${id}';openWordlist()">${esc(l.name||"Untitled")}</button>`).join("");
+  $("wltabs").innerHTML=hskTabsHtml+wlTabsHtml;
   renderPosFilters();
   renderWordlist();show("wordlist");
 }
 function renderWordlist(){
   const q=$("wlsearch").value.trim().toLowerCase();
-  const list=WORDS.filter(w=>w[3]===wlTab&&(wlPos==="all"||w[4]===wlPos)
+  const list=wlCurrentWords().filter(w=>(wlPos==="all"||w[4]===wlPos)
     &&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
   const pinned=new Set(store.get("hsk_pins",[]));
   list.sort((a,b)=>(pinned.has(b[0])?1:0)-(pinned.has(a[0])?1:0)); // stable: pinned float up, order kept
-  $("wllist").innerHTML=list.map(w=>
-    `<button class="wrow" onclick="openDetail('${w[0]}')">
+  $("wllist").innerHTML=list.map(w=>{
+    const isCustom=w[3]===6;
+    const actions=isCustom?`<span class="wrow-actions">
+        <span class="wrow-edit" title="Edit" onclick="event.stopPropagation();openEditWord('${w[0]}')">✎</span>
+        <span class="wrow-del" title="Delete" onclick="event.stopPropagation();deleteCustomWord('${w[0]}')">✕</span>
+      </span>`:"";
+    return `<button class="wrow" onclick="openDetail('${w[0]}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
       <span class="poschip ${w[4]}">${POS_LABEL[w[4]]}</span>
+      ${actions}
       <span class="pin ${pinned.has(w[0])?"on":""}" title="Pin to top"
-        onclick="event.stopPropagation();togglePin('${w[0]}')">★</span></button>`).join("")
+        onclick="event.stopPropagation();togglePin('${w[0]}')">★</span></button>`;
+  }).join("")
     ||`<div class="empty">No words match your search</div>`;
 }
+/* ---------- inline add-word form on the Word List page ---------- */
+const WLADD_POS_OPTIONS=[["noun","Noun"],["verb","Verb"],["adj","Adj."],["adv","Adv."],["pronoun","Pron."],["function","Gram."],["idiom","Idiom"]];
+let wladdPos="noun";
+function renderWlAddPosChips(){
+  $("wladdposchips").innerHTML=WLADD_POS_OPTIONS.map(([k,label])=>
+    `<button type="button" class="awc-poschip ${wladdPos===k?"on":""}" onclick="wladdPos='${k}';renderWlAddPosChips()">${label}</button>`).join("");
+}
+function toggleWlAddForm(){
+  const card=$("wladdcard");
+  const open=card.classList.contains("open");
+  card.classList.toggle("open",!open);
+  $("wladdchev").textContent=open?"＋":"－";
+  if(!open){renderWlAddPosChips();$("wladd-zh").focus()}
+}
+function previewWlAddPinyin(){
+  const raw=$("wladd-py").value.trim();
+  $("wladdpreview").textContent=raw?("Preview: "+pin(raw)):"";
+}
+function submitWlAddWord(){
+  const zh=$("wladd-zh").value.trim();
+  const py=$("wladd-py").value.trim();
+  const en=$("wladd-en").value.trim();
+  if(!zh||!py||!en){alert("Please fill in the character(s), pinyin, and meaning.");return}
+  if(allWords().some(w=>w[0]===zh)){alert("That word already exists — search for it above instead of adding a duplicate.");return}
+  const words=getUserWords();
+  words.push([zh,py,en,6,wladdPos]);
+  saveUserWords(words);
+  addToMyWordsList(zh);
+  $("wladd-zh").value="";$("wladd-py").value="";$("wladd-en").value="";
+  $("wladdpreview").textContent="";
+  wladdPos="noun";
+  toggleWlAddForm();
+  wlTab="wl:"+MY_WORDS_LIST_ID;
+  openWordlist();
+}
+
+/* ---------- edit / delete custom words from the Word List page ---------- */
+let editingWordChar=null;
+let ewPos="noun";
+function renderEwPosChips(){
+  $("ewposchips").innerHTML=WLADD_POS_OPTIONS.map(([k,label])=>
+    `<button type="button" class="awc-poschip ${ewPos===k?"on":""}" onclick="ewPos='${k}';renderEwPosChips()">${label}</button>`).join("");
+}
+function openEditWord(c){
+  const w=allWords().find(x=>x[0]===c);
+  if(!w||w[3]!==6)return; // only custom words are editable
+  editingWordChar=c;
+  $("ewzh").value=w[0];
+  $("ewpy").value=w[1];
+  $("ewen").value=w[2];
+  $("ewpreview").textContent="Preview: "+pin(w[1]);
+  ewPos=WLADD_POS_OPTIONS.some(([k])=>k===w[4])?w[4]:"noun";
+  renderEwPosChips();
+  $("editwordsheet").classList.add("show");
+}
+function closeEditWord(){
+  $("editwordsheet").classList.remove("show");
+  editingWordChar=null;
+}
+function previewEwPinyin(){
+  const raw=$("ewpy").value.trim();
+  $("ewpreview").textContent=raw?("Preview: "+pin(raw)):"";
+}
+function saveEditWord(){
+  const zh=$("ewzh").value.trim();
+  const py=$("ewpy").value.trim();
+  const en=$("ewen").value.trim();
+  if(!zh||!py||!en){alert("Please fill in the character(s), pinyin, and meaning.");return}
+  if(zh!==editingWordChar&&allWords().some(w=>w[0]===zh)){alert("That word already exists — choose a different character.");return}
+  const words=getUserWords();
+  const idx=words.findIndex(w=>w[0]===editingWordChar);
+  if(idx<0){closeEditWord();return}
+  words[idx]=[zh,py,en,6,ewPos];
+  saveUserWords(words);
+  // keep the word in any personal wordlists / pins it was already part of, following the rename
+  if(zh!==editingWordChar){
+    const lists=getWordlists();
+    let changed=false;
+    Object.values(lists).forEach(l=>{
+      const i=l.words.indexOf(editingWordChar);
+      if(i>=0){l.words[i]=zh;changed=true}
+    });
+    if(changed)saveWordlists(lists);
+    const pins=store.get("hsk_pins",[]);
+    const pi=pins.indexOf(editingWordChar);
+    if(pi>=0){pins[pi]=zh;store.set("hsk_pins",pins)}
+  }
+  closeEditWord();
+  openWordlist();
+}
+function deleteCustomWord(c){
+  const w=allWords().find(x=>x[0]===c);
+  if(!w||w[3]!==6)return;
+  if(!confirm(`Delete "${c}"? This removes it from your custom words and any wordlists it's in.`))return;
+  const words=getUserWords().filter(x=>x[0]!==c);
+  saveUserWords(words);
+  const lists=getWordlists();
+  let changed=false;
+  Object.values(lists).forEach(l=>{
+    const i=l.words.indexOf(c);
+    if(i>=0){l.words.splice(i,1);changed=true}
+  });
+  if(changed)saveWordlists(lists);
+  const pins=store.get("hsk_pins",[]).filter(x=>x!==c);
+  store.set("hsk_pins",pins);
+  openWordlist();
+}
+
 function togglePin(c){
   const pins=store.get("hsk_pins",[]);
   const i=pins.indexOf(c);
@@ -3293,7 +3545,7 @@ function togglePin(c){
   renderWordlist();
 }
 function openDetail(c){
-  const w=WORDS.find(x=>x[0]===c);if(!w)return;
+  const w=allWords().find(x=>x[0]===c);if(!w)return;
   $("dchar").textContent=w[0];$("dpy").textContent=pin(w[1]);$("den").textContent=w[2];
   $("dseal").textContent=levelBadge(w[3]);
   const p=$("dpos");p.textContent=POS_LABEL[w[4]];p.className="poschip "+w[4];

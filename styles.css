@@ -708,9 +708,9 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 .helppage{flex:0 0 100%;overflow:hidden;display:flex;flex-direction:column;padding:12px 22px;box-sizing:border-box;justify-content:space-between}
 .helppage-content{flex:1;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0}
 .helpsub{margin:0;display:flex;flex-direction:column;min-height:0;flex:1}
-.helpsubimg{flex:1;min-height:0;object-fit:contain;margin-bottom:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.08));display:flex;justify-content:center;align-items:center}
+.helpsubimg{flex:1;min-height:0;object-fit:contain;margin-bottom:22px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.08));display:flex;justify-content:center;align-items:center}
 .helpsubimg img{max-height:100%;max-width:100%;width:auto;height:auto;object-fit:contain;border-radius:18px}
-.helpcatrow{display:flex;align-items:center;gap:12px;margin-bottom:0;padding-bottom:0;border-bottom:none;flex-shrink:0}
+.helpcatrow{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:0;border-bottom:none;flex-shrink:0}
 .helpcaticon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;
   justify-content:center;font-family:var(--hanzi);font-size:16px;font-weight:600;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .helpcatlabel{font-size:11px;font-weight:800;letter-spacing:.32em;color:var(--muted);text-transform:uppercase}

@@ -2124,6 +2124,7 @@ function startSwipePractice(){
   $("swipebtns").style.display="";
   $("swipeempty").style.display="none";
   $("swipestage").style.display="";
+  document.documentElement.classList.add("swipe-lock");
   show("swipe");
   renderSwipeCard();
 }
@@ -2138,6 +2139,7 @@ function restartSwipe(){
 }
 function exitSwipe(){
   SW=null;
+  document.documentElement.classList.remove("swipe-lock");
   updateSwipeCardSummary();
   show("home");
 }

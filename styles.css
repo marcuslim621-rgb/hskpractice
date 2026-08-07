@@ -766,9 +766,60 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 @keyframes demoDraw1{0%,6%{stroke-dashoffset:130;opacity:1}20%,88%{stroke-dashoffset:0;opacity:1}96%,100%{stroke-dashoffset:0;opacity:0}}
 @keyframes demoDraw2{0%,20%{stroke-dashoffset:130;opacity:1}34%,88%{stroke-dashoffset:0;opacity:1}96%,100%{stroke-dashoffset:0;opacity:0}}
 @keyframes demoDraw3{0%,34%{stroke-dashoffset:130;opacity:1}48%,88%{stroke-dashoffset:0;opacity:1}96%,100%{stroke-dashoffset:0;opacity:0}}
+/* ---------- animated PRACTICE demos ---------- */
+/* quiz option pills (shared by Meaning + Fill-in-blank) */
+.demoqprompt{padding:14px 12px 8px;text-align:center;flex-shrink:0}
+.demoqzh{font-family:var(--hanzi);font-size:34px;font-weight:600;color:var(--ink);display:block;line-height:1.05}
+.demoqhint{font-size:10.5px;color:var(--muted);display:block;margin-top:4px}
+.demoqopts{display:flex;flex-direction:column;gap:7px;padding:2px 12px 12px}
+.demoopt{position:relative;border:1px solid var(--line);background:var(--card);border-radius:9px;
+  padding:8px 11px;font-size:12px;font-weight:600;color:var(--ink);text-align:center}
+.demoopt.zh{font-family:var(--hanzi);font-size:17px}
+.demoopt.correct{animation:demoOptRight 6s ease-in-out infinite}
+@keyframes demoOptRight{0%,32%{background:var(--card);border-color:var(--line);color:var(--ink)}
+  44%,86%{background:var(--jade);border-color:var(--jade);color:#fff}96%,100%{background:var(--card);border-color:var(--line);color:var(--ink)}}
+.demoqopts .demoopt:not(.correct){animation:demoOptDim 6s ease-in-out infinite}
+@keyframes demoOptDim{0%,32%{opacity:1}44%,86%{opacity:.38}96%,100%{opacity:1}}
+.demotap.center{right:auto;left:50%;top:50%;margin:-13px 0 0 -13px}
+/* split screen: typing (top) + writing (bottom) */
+.demopane{flex:1;min-height:0;padding:9px 12px;display:flex;flex-direction:column;overflow:hidden}
+.demopane-type{border-bottom:1px solid var(--line)}
+.demopanelabel{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.demoqzh.sm{font-size:22px;text-align:left;margin-bottom:9px}
+.demotypebox{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:9px;background:var(--card);
+  padding:7px 10px;animation:demoTypeBox 6s ease-in-out infinite}
+@keyframes demoTypeBox{0%,30%{border-color:var(--line)}40%,86%{border-color:var(--jade)}96%,100%{border-color:var(--line)}}
+.demotyped{font-family:var(--ui);font-size:14px;font-weight:700;color:var(--seal);white-space:nowrap;overflow:hidden;
+  clip-path:inset(0 100% 0 0);animation:demoWipe 6s ease-in-out infinite}
+@keyframes demoWipe{0%,6%{clip-path:inset(0 100% 0 0);animation-timing-function:steps(7,end)}
+  30%,88%{clip-path:inset(0 0 0 0)}96%,100%{clip-path:inset(0 100% 0 0)}}
+.democaret{width:1.5px;height:15px;background:var(--ink);margin-left:2px;flex-shrink:0;animation:demoCaret .9s step-end infinite}
+@keyframes demoCaret{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+.demogridslot{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.demopane-write .demogrid{height:100%;aspect-ratio:1;max-width:100%}
+.demosplit .demogrid .s1{animation-name:demoDrawB1}
+.demosplit .demogrid .s2{animation-name:demoDrawB2}
+.demosplit .demogrid .s3{animation-name:demoDrawB3}
+@keyframes demoDrawB1{0%,42%{stroke-dashoffset:130;opacity:1}54%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes demoDrawB2{0%,54%{stroke-dashoffset:130;opacity:1}64%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes demoDrawB3{0%,64%{stroke-dashoffset:130;opacity:1}74%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+/* fill in the blank */
+.demoblank .demosent{padding:18px 14px 4px;text-align:center;font-family:var(--hanzi);font-size:22px;font-weight:600;color:var(--ink);line-height:1.5;flex-shrink:0}
+.demoblankslot{display:inline-block;min-width:24px;border-bottom:2px solid var(--seal);margin:0 3px;line-height:1;
+  animation:demoBlankLine 6s ease-in-out infinite}
+@keyframes demoBlankLine{0%,44%{border-color:var(--seal)}56%,90%{border-color:var(--jade)}97%,100%{border-color:var(--seal)}}
+.demoblankfill{display:inline-block;color:var(--jade);opacity:0;animation:demoBlankFill 6s ease-in-out infinite}
+@keyframes demoBlankFill{0%,46%{opacity:0;transform:translateY(-5px) scale(.6)}56%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:translateY(-5px) scale(.6)}}
+.demosentgloss{text-align:center;font-size:10.5px;color:var(--muted);margin:3px 12px 10px;flex-shrink:0}
 @media (prefers-reduced-motion:reduce){
-  .demoscroll,.demorow.adding .tk,.demotap,.demotoast,.demogrid .stroke{animation:none}
+  .demoscroll,.demorow.adding .tk,.demotap,.demotoast,.demogrid .stroke,.demoopt.correct,
+  .demoqopts .demoopt:not(.correct),.demotypebox,.demotyped,.democaret,.demoblankslot,.demoblankfill{animation:none!important}
   .demogrid .stroke{stroke-dashoffset:0}
+  .demotyped{clip-path:none}
+  .demoblankfill{opacity:1}
+  .demoopt.correct{background:var(--jade);border-color:var(--jade);color:#fff}
+  .demoblankslot{border-color:var(--jade)}
+  .demotap,.demotoast,.democaret{display:none}
 }
 .help-indicator{text-align:center;font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:-.005em}
 .helpnavrow{display:flex;flex-direction:column;gap:14px;padding:16px 24px 24px;border-top:1px solid var(--line);flex-shrink:0;align-items:center;background:var(--card)}

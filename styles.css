@@ -708,6 +708,68 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 .helpcatlabel{font-size:11px;font-weight:800;letter-spacing:.32em;color:var(--muted);text-transform:uppercase}
 .helpsubhead{font-size:16px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;color:var(--ink);line-height:1.3;flex-shrink:0}
 .helpsubtext{font-size:13.5px;color:var(--muted);line-height:1.55;flex-shrink:0}
+/* ---------- animated LEARN demos (replace static screenshots) ---------- */
+.demoscreen{width:100%;max-width:230px;height:270px;max-height:100%;margin:0 auto;background:var(--bg);
+  border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.demohead{padding:10px 11px 8px;flex-shrink:0}
+.demotabs{display:flex;gap:5px}
+.demotab{font-size:9.5px;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid var(--line);
+  color:var(--muted);background:var(--card)}
+.demotab.on{background:var(--fill);color:var(--on-fill);border-color:var(--fill)}
+.demolistname{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.demolistname::before{content:"词";font-family:var(--hanzi);width:22px;height:22px;border-radius:6px;
+  background:var(--seal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+.demobody{flex:1;min-height:0;position:relative;overflow:hidden}
+.demobody.demopad{padding:2px 0}
+.demorow{position:relative;display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:8px 10px;margin:0 10px 8px}
+.demorow .zh{font-family:var(--hanzi);font-size:17px;font-weight:600;min-width:42px;color:var(--ink)}
+.demorow .py{color:var(--seal);font-size:10.5px;font-weight:600}
+.demorow .en{color:var(--muted);font-size:10.5px;margin-top:1px}
+.demorow .tk{margin-left:auto;width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0}
+.demorow .tk.done{background:var(--jade);border-color:var(--jade);color:#fff}
+/* 1 · scrolling wordlist */
+.demoscroll{position:absolute;left:0;right:0;top:0;animation:demoScroll 8s linear infinite}
+@keyframes demoScroll{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+.demofade{position:absolute;left:0;right:0;height:20px;pointer-events:none;z-index:2}
+.demofade.top{top:0;background:linear-gradient(var(--bg),transparent)}
+.demofade.bot{bottom:0;background:linear-gradient(transparent,var(--bg))}
+/* 2 · add to wordlist */
+.demorow.adding .tk{animation:demoTickFill 6s ease-in-out infinite}
+@keyframes demoTickFill{0%,32%{background:transparent;border-color:var(--line);color:transparent}
+  42%,84%{background:var(--jade);border-color:var(--jade);color:#fff}
+  94%,100%{background:transparent;border-color:var(--line);color:transparent}}
+.demotap{position:absolute;right:1px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%;
+  border:2px solid var(--jade);opacity:0;pointer-events:none;animation:demoTap 6s ease-in-out infinite}
+@keyframes demoTap{0%,28%{opacity:0;transform:scale(.4)}34%{opacity:.85;transform:scale(1)}
+  46%{opacity:0;transform:scale(1.7)}100%{opacity:0;transform:scale(1.7)}}
+.demotoast{position:absolute;left:50%;bottom:9px;background:var(--jade);color:#fff;font-size:10px;font-weight:700;
+  padding:5px 12px;border-radius:999px;white-space:nowrap;opacity:0;animation:demoToast 6s ease-in-out infinite}
+@keyframes demoToast{0%,36%{opacity:0;transform:translate(-50%,8px)}46%,82%{opacity:1;transform:translate(-50%,0)}
+  92%,100%{opacity:0;transform:translate(-50%,8px)}}
+/* 3 · trace a character */
+.demodraw .demohead{text-align:center}
+.ddzh{font-family:var(--hanzi);font-size:22px;font-weight:600;color:var(--ink);line-height:1.1}
+.ddpy{font-size:11px;color:var(--seal);font-weight:600;margin-top:1px}
+.demodraw .demobody{display:flex;align-items:center;justify-content:center;padding:10px}
+.demogrid{height:100%;aspect-ratio:1;max-width:100%;display:block}
+.demogrid .gline{stroke:var(--line);fill:none}
+.demogrid .gbox{stroke-width:1.5}
+.demogrid .gdash{stroke-width:1;stroke-dasharray:3 3;opacity:.7}
+.demogrid .gchar{font-family:var(--hanzi);font-size:64px;font-weight:600;fill:var(--ink);opacity:.1}
+.demogrid .stroke{fill:none;stroke:var(--jade);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:130;stroke-dashoffset:130}
+.demogrid .s1{animation:demoDraw1 6s ease-in-out infinite}
+.demogrid .s2{animation:demoDraw2 6s ease-in-out infinite}
+.demogrid .s3{animation:demoDraw3 6s ease-in-out infinite}
+@keyframes demoDraw1{0%,6%{stroke-dashoffset:130;opacity:1}20%,88%{stroke-dashoffset:0;opacity:1}96%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes demoDraw2{0%,20%{stroke-dashoffset:130;opacity:1}34%,88%{stroke-dashoffset:0;opacity:1}96%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes demoDraw3{0%,34%{stroke-dashoffset:130;opacity:1}48%,88%{stroke-dashoffset:0;opacity:1}96%,100%{stroke-dashoffset:0;opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .demoscroll,.demorow.adding .tk,.demotap,.demotoast,.demogrid .stroke{animation:none}
+  .demogrid .stroke{stroke-dashoffset:0}
+}
 .help-indicator{text-align:center;font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:-.005em}
 .helpnavrow{display:flex;flex-direction:column;gap:14px;padding:16px 24px 24px;border-top:1px solid var(--line);flex-shrink:0;align-items:center;background:var(--card)}
 .helpnavbtn{border-radius:13px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;

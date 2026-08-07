@@ -695,7 +695,15 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
   border:1px solid var(--line);color:var(--muted);font-size:14px;font-weight:300;
   cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .helpxbtn:active{background:var(--line);color:var(--ink)}
-.helpviewport{overflow:hidden;width:100%;flex:1;min-height:0}
+.helpviewport{overflow:hidden;width:100%;flex:1;min-height:0;position:relative}
+.helpchevron{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:22px;font-weight:700;line-height:1;
+  padding:0 0 2px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);transition:opacity .2s,background .15s}
+.helpchevron.left{left:8px}
+.helpchevron.right{right:8px}
+.helpchevron:active{background:var(--line)}
+.helpchevron:disabled{opacity:0;pointer-events:none}
 .helptrack{display:flex;height:100%;transition:transform .35s cubic-bezier(.34,.1,.68,1);will-change:transform}
 .helppage{flex:0 0 100%;overflow:hidden;display:flex;flex-direction:column;padding:12px 22px;box-sizing:border-box;justify-content:space-between}
 .helppage-content{flex:1;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0}

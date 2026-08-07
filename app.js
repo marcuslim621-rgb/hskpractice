@@ -1868,6 +1868,12 @@ function _helpSync(anim){
   
   if(back)back.disabled=cat===0;
   if(fwd)fwd.disabled=cat===2;
+
+  // Page chevrons: single-page steps, disabled at the very first/last page
+  const chevL=document.getElementById("help-chev-left");
+  const chevR=document.getElementById("help-chev-right");
+  if(chevL)chevL.disabled=_hp===0;
+  if(chevR)chevR.disabled=_hp===8;
 }
 function helpTouchStart(e){_htx=e.touches[0].clientX;_hty=e.touches[0].clientY}
 function helpTouchMove(e){if(_htx===null)return;if(Math.abs(e.touches[0].clientX-_htx)>Math.abs(e.touches[0].clientY-_hty)+6)e.preventDefault()}

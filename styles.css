@@ -455,16 +455,30 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
 .swipe-back{transform:rotateY(180deg)}
 .swipe-back .py{font-size:26px;font-weight:700;color:var(--seal);margin-bottom:8px}
 .swipe-back .en{font-size:17px;color:var(--ink)}
-.swipe-hint{position:absolute;top:18px;padding:6px 14px;border-radius:8px;font-weight:800;font-size:13px;
-  border:2.5px solid;opacity:0;pointer-events:none;z-index:5;letter-spacing:.04em}
-.swipe-hint.left{left:18px;color:var(--seal);border-color:var(--seal);transform:rotate(-8deg)}
-.swipe-hint.right{right:18px;color:var(--jade);border-color:var(--jade);transform:rotate(8deg)}
+.swipe-hint{position:absolute;top:22px;padding:10px 20px;border-radius:12px;font-weight:800;font-size:24px;
+  border:4px solid;opacity:0;pointer-events:none;z-index:5;letter-spacing:.04em}
+.swipe-hint.left{left:20px;color:var(--seal);border-color:var(--seal);transform:rotate(-10deg)}
+.swipe-hint.right{right:20px;color:var(--jade);border-color:var(--jade);transform:rotate(10deg)}
 .swipeempty{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center}
 .swipebtns{display:flex;gap:10px}
 .swbtn{flex:1;border-radius:12px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;
   border:1px solid var(--line);background:var(--card);font-family:var(--ui)}
 .swbtn.no{color:var(--seal);border-color:rgba(190,52,37,.3)}
 .swbtn.yes{color:var(--jade);border-color:rgba(31,133,87,.3)}
+/* recent-swipe history: rolling window of the last 5 answered words */
+.swipehistory{display:flex;justify-content:center;flex-wrap:nowrap;gap:8px;margin-top:16px;min-height:46px;
+  max-width:100%;overflow:hidden}
+.swipehist-item .zh{overflow:hidden;text-overflow:ellipsis}
+.swipehist-item{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:11px;
+  background:var(--card);border:1px solid var(--line);font-family:var(--hanzi);font-size:18px;
+  font-weight:600;color:var(--ink);white-space:nowrap}
+.swipehist-item:last-child{animation:swhistpop .22s cubic-bezier(.2,.8,.2,1)}
+.swipehist-item .mk{font-family:var(--ui);font-size:14px;font-weight:800;line-height:1}
+.swipehist-item.know{border-color:rgba(31,133,87,.4)}
+.swipehist-item.know .mk{color:var(--jade)}
+.swipehist-item.dont{border-color:rgba(190,52,37,.4)}
+.swipehist-item.dont .mk{color:var(--seal)}
+@keyframes swhistpop{from{opacity:0;transform:translateY(6px) scale(.9)}to{opacity:1;transform:none}}
 .refresherscope-inline{display:block;margin-top:8px;background:var(--bg);border:1px solid var(--line);
   border-radius:9px;padding:7px 10px;font-size:11.5px;color:var(--muted);font-family:var(--ui);
   cursor:pointer;text-align:left;width:fit-content}

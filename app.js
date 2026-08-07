@@ -2119,7 +2119,7 @@ let SW=null;
 function startSwipePractice(){
   const pool=swipeScopedPool();
   if(!pool.length){alert("This wordlist doesn't have any words yet.");return}
-  SW={deck:buildSwipeDeck(pool),i:0,known:0,unknown:0,flipped:false,dragging:false,startX:0,curX:0};
+  SW={deck:buildSwipeDeck(pool),i:0,known:0,unknown:0,flipped:false,dragging:false,startX:0,curX:0,history:[]};
   $("swipelistlabel").textContent=swipeScopeLabel();
   $("swipebtns").style.display="";
   $("swipeempty").style.display="none";
@@ -2127,15 +2127,17 @@ function startSwipePractice(){
   document.documentElement.classList.add("swipe-lock");
   show("swipe");
   renderSwipeCard();
+  renderSwipeHistory();
 }
 function restartSwipe(){
   const pool=swipeScopedPool();
   if(!pool.length){exitSwipe();return}
-  SW={deck:buildSwipeDeck(pool),i:0,known:0,unknown:0,flipped:false,dragging:false,startX:0,curX:0};
+  SW={deck:buildSwipeDeck(pool),i:0,known:0,unknown:0,flipped:false,dragging:false,startX:0,curX:0,history:[]};
   $("swipeempty").style.display="none";
   $("swipestage").style.display="";
   $("swipebtns").style.display="";
   renderSwipeCard();
+  renderSwipeHistory();
 }
 function exitSwipe(){
   SW=null;
@@ -2190,11 +2192,23 @@ function recordSwipe(c,known){
   }
   saveSwipeFam(fam);
 }
+function renderSwipeHistory(){
+  const el=$("swipehistory");
+  if(!el)return;
+  const hist=(SW&&SW.history)||[];
+  el.innerHTML=hist.map(h=>
+    `<div class="swipehist-item ${h.known?"know":"dont"}">
+      <span class="zh">${esc(h.zh)}</span><span class="mk">${h.known?"✓":"✗"}</span>
+    </div>`).join("");
+}
 function swipeAnswer(known){
   if(!SW||SW.i>=SW.deck.length)return;
   const w=SW.deck[SW.i];
   recordSwipe(w[0],known);
   if(known)SW.known++;else SW.unknown++;
+  SW.history.push({zh:w[0],known});
+  if(SW.history.length>5)SW.history.shift();
+  renderSwipeHistory();
   const card=$("swcard");
   const dir=known?1:-1;
   card.style.transition="transform .3s ease, opacity .3s ease";

@@ -102,7 +102,7 @@ html[data-theme="dark"] .card .sealic{
 .sealic.lg{width:56px;height:56px;font-size:26px;border-radius:12px;margin:0 auto}
 
 /* ---------- header ---------- */
-.hero{text-align:center;padding:64px 0 26px;position:relative;overflow:hidden}
+.hero{text-align:center;padding:76px 0 46px;position:relative;overflow:hidden}
 .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--seal);font-weight:600;margin-bottom:10px}
 .hero h1{font-family:var(--hanzi);font-weight:700;font-size:25px;letter-spacing:.01em}
 .hero .sub{color:var(--muted);font-size:13px;margin-top:7px}

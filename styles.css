@@ -677,6 +677,12 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 }
 .helptoggle.seen .dot{animation:none;box-shadow:none}
 .helptoggle.seen .dot::after{animation:none;display:none}
+/* persistent per-page help icon, shown in each screen's topbar/qbar */
+.helpicon{flex-shrink:0;width:26px;height:26px;border-radius:7px;background:var(--seal);color:#fff;
+  border:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--ui);padding:0}
+.helpicon:hover,.helpicon:focus-visible{opacity:.85}
+.qbar .helpicon{margin-left:0}
 
 /* ---------- help modal ---------- */
 .helpoverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;

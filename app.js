@@ -1809,8 +1809,27 @@ function deleteMySentence(i){
 /* ---------- help modal ---------- */
 let _hp=0,_htx=null,_hty=null;
 const _TOTAL=9;
+const HELP_PAGE_FOR_SCREEN={
+  wordlist:0,
+  mywordlists:1,wordlisteditor:1,swipe:1,
+  worddetail:2,
+  quiz:3,
+  typequiz:4,writequiz:4,
+  sentquiz:5,
+  history:6,
+  stats:7,
+  leaderboard:8
+};
+const HELP_PAGE_FOR_CATEGORY={guessing:3,typing:4,writing:4,sentences:5};
+function helpPageForContext(){
+  const active=document.querySelector(".screen.active");
+  const id=active?active.id.slice(4):"";
+  if(id==="modeselect"||id==="levels"||id==="wordlistlevels")
+    return HELP_PAGE_FOR_CATEGORY[pendingCategory]??0;
+  return HELP_PAGE_FOR_SCREEN[id]??0;
+}
 function openHelp(){
-  _hp=0;
+  _hp=helpPageForContext();
   _helpSync(false);
   document.getElementById("helpoverlay").classList.add("show");
   document.documentElement.style.overflow='hidden';

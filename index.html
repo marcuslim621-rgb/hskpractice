@@ -105,6 +105,7 @@
     <div class="qbar">
       <button class="linkbtn" onclick="exitSwipe()">← Home</button>
       <span class="score"><span id="swipeprog"></span></span>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="track"><div class="fill" id="swipefill"></div></div>
     <div class="swipelabel" id="swipelistlabel"></div>
@@ -163,6 +164,7 @@
     <div class="topbar">
       <button class="linkbtn" onclick="show('home')">← Home</button>
       <h2 id="mstitle">Choose mode</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <p class="hint">Pick how you want to be tested, then choose a level</p>
     <div class="cards">
@@ -198,6 +200,7 @@
     <div class="topbar">
       <button class="linkbtn" onclick="show('modeselect')">← Back</button>
       <h2>Choose level</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="levelhintrow">
       <p class="hint" id="levelhint">Each level tests only the words introduced at that level</p>
@@ -225,6 +228,7 @@
       <button class="linkbtn" onclick="show('mywordlists')">← Back</button>
       <h2>Edit wordlist</h2>
       <button class="linkbtn" onclick="deleteCurrentWordlist()">Delete</button>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <input class="namebox" id="editorname" type="text" placeholder="Name this wordlist…" oninput="renameCurrentWordlist(this.value)">
     <p class="hint">Pick the words that belong in this list. Changes save automatically.</p>
@@ -260,6 +264,7 @@
     <div class="topbar">
       <button class="linkbtn" onclick="show('wordlist')">← Back</button>
       <h2>My wordlists</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <p class="hint">Build your own named wordlists, then test them from any practice category</p>
     <div class="cards">
@@ -279,6 +284,7 @@
     <div class="topbar">
       <button class="linkbtn" onclick="show('levels')">← Back</button>
       <h2>Choose level</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <p class="hint" id="wordlistlevelshint">Only words from your selected wordlist(s) are included</p>
     <div class="rows" id="wordlistlevelrows"></div>
@@ -289,6 +295,7 @@
     <div class="qbar">
       <button class="linkbtn" onclick="endEarly()">End test</button>
       <span class="score"><span class="ok" id="qok">✓ 0</span> &nbsp;<span class="bad" id="qbad">✗ 0</span> &nbsp;<span id="qprog"></span></span>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="track"><div class="fill" id="qfill"></div></div>
     <div class="heartsrow" id="qhearts"></div>
@@ -314,6 +321,7 @@
     <div class="qbar">
       <button class="linkbtn" onclick="typeEndEarly()">End test</button>
       <span class="score"><span class="ok" id="tok">✓ 0</span> &nbsp;<span class="bad" id="tbad">✗ 0</span> &nbsp;<span id="tprog"></span></span>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="track"><div class="fill" id="tfill"></div></div>
     <div class="heartsrow" id="thearts"></div>
@@ -333,6 +341,7 @@
     <div class="qbar">
       <button class="linkbtn" onclick="writeEndEarly()">End test</button>
       <span class="score"><span class="ok" id="wok">✓ 0</span> &nbsp;<span class="bad" id="wbad">✗ 0</span> &nbsp;<span id="wprog"></span></span>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="track"><div class="fill" id="wfill"></div></div>
     <div class="heartsrow" id="whearts"></div>
@@ -370,6 +379,7 @@
     <div class="qbar">
       <button class="linkbtn" onclick="sentEndEarly()">End test</button>
       <span class="score"><span class="ok" id="sok">✓ 0</span> &nbsp;<span class="bad" id="sbad">✗ 0</span> &nbsp;<span id="sprog"></span></span>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="track"><div class="fill" id="sfill"></div></div>
     <div class="heartsrow" id="shearts"></div>
@@ -436,6 +446,7 @@
       <button class="linkbtn" onclick="show('home')">← Home</button>
       <h2>Past scores</h2>
       <button class="linkbtn" onclick="clearHistory()">Clear all</button>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="rows" id="historylist"></div>
   </section>
@@ -446,6 +457,7 @@
       <button class="linkbtn" onclick="show('home')">← Home</button>
       <h2>Leaderboard</h2>
       <button class="linkbtn" onclick="clearBest()">Clear all</button>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <p class="hint">Your highest number of correct answers in a single session, per mode</p>
     <div class="rows" id="lblist"></div>
@@ -464,6 +476,7 @@
       <button class="linkbtn" onclick="show('home')">← Home</button>
       <h2>Statistics</h2>
       <button class="linkbtn" onclick="clearWordStats()">Clear all</button>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="statgrid" id="statoverview"></div>
 
@@ -493,6 +506,7 @@
       <button class="linkbtn" onclick="show('home')">← Home</button>
       <h2>Word list</h2>
       <button class="linkbtn" onclick="renderMyWordlists();show('mywordlists')">My wordlists</button>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="wlsearchrow">
       <input class="searchbox" id="wlsearch" type="text" placeholder="Search characters, pinyin or English" oninput="renderWordlist()">
@@ -523,6 +537,7 @@
     <div class="topbar">
       <button class="linkbtn" onclick="show('wordlist')">← Back</button>
       <h2>Word detail</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
     <div class="detailcard">
       <div class="seal" id="dseal">1级</div>

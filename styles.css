@@ -102,7 +102,7 @@ html[data-theme="dark"] .card .sealic{
 .sealic.lg{width:56px;height:56px;font-size:26px;border-radius:12px;margin:0 auto}
 
 /* ---------- header ---------- */
-.hero{text-align:center;padding:76px 0 46px;position:relative;overflow:hidden}
+.hero{text-align:center;padding:24px 0 46px;position:relative;overflow:hidden}
 .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--seal);font-weight:600;margin-bottom:10px}
 .hero h1{font-family:var(--hanzi);font-weight:700;font-size:25px;letter-spacing:.01em}
 .hero .sub{color:var(--muted);font-size:13px;margin-top:7px}
@@ -169,7 +169,7 @@ html[data-theme="dark"] .cards .card:not(.hero)+.card:not(.hero), html[data-them
 .ghost{position:absolute;font-family:var(--hanzi);font-weight:600;line-height:1;pointer-events:none;
   z-index:0;opacity:.07}
 @media (prefers-reduced-motion:no-preference){.ghost{opacity:.07}}
-.ghost.heroghost{top:22px;left:50%;transform:translateX(-50%);font-size:150px;color:var(--ink);opacity:.05}
+.ghost.heroghost{top:-30px;left:50%;transform:translateX(-50%);font-size:150px;color:var(--ink);opacity:.05}
 .ghost.cardghost{right:-14px;bottom:-26px;font-size:150px;color:var(--seal)}
 .ghost.tileghost{right:-10px;bottom:-20px;font-size:96px;color:var(--ink);transform:rotate(-6deg)}
 .ghost.tileghost.jadeghost{color:var(--jade)}
@@ -455,10 +455,18 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
 .swipe-back{transform:rotateY(180deg)}
 .swipe-back .py{font-size:26px;font-weight:700;color:var(--seal);margin-bottom:8px}
 .swipe-back .en{font-size:17px;color:var(--ink)}
-.swipe-hint{position:absolute;top:22px;padding:10px 20px;border-radius:12px;font-weight:800;font-size:24px;
-  border:4px solid;opacity:0;pointer-events:none;z-index:5;letter-spacing:.04em}
-.swipe-hint.left{left:20px;color:var(--seal);border-color:var(--seal);transform:rotate(-10deg)}
-.swipe-hint.right{right:20px;color:var(--jade);border-color:var(--jade);transform:rotate(10deg)}
+.swipestar{position:absolute;top:13px;left:13px;z-index:6;width:34px;height:34px;border-radius:10px;
+  background:var(--card);border:1px solid var(--line);color:var(--line-strong);font-size:17px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.swipestar.on{color:#D9A62E;border-color:#D9A62E}
+.swipe-hint{position:absolute;top:28px;padding:11px 18px;border-radius:8px;font-weight:800;font-size:25px;
+  border:4px solid;box-shadow:inset 0 0 0 2px currentColor;opacity:0;pointer-events:none;z-index:5;
+  letter-spacing:.06em;text-transform:uppercase;font-family:var(--ui);white-space:nowrap;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='discrete' tableValues='0 1 1 1 1 1 1 1 1 1'/%3E%3CfeFuncG type='discrete' tableValues='0 1 1 1 1 1 1 1 1 1'/%3E%3CfeFuncB type='discrete' tableValues='0 1 1 1 1 1 1 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='220' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='discrete' tableValues='0 1 1 1 1 1 1 1 1 1'/%3E%3CfeFuncG type='discrete' tableValues='0 1 1 1 1 1 1 1 1 1'/%3E%3CfeFuncB type='discrete' tableValues='0 1 1 1 1 1 1 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='220' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-size:220px 140px;mask-size:220px 140px}
+.swipe-hint.left{left:20px;color:var(--seal);border-color:var(--seal);transform:rotate(-14deg)}
+.swipe-hint.right{right:20px;color:var(--jade);border-color:var(--jade);transform:rotate(14deg)}
 .swipeempty{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center}
 .swipebtns{display:flex;gap:10px}
 .swbtn{flex:1;border-radius:12px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;
@@ -466,13 +474,14 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
 .swbtn.no{color:var(--seal);border-color:rgba(190,52,37,.3)}
 .swbtn.yes{color:var(--jade);border-color:rgba(31,133,87,.3)}
 /* recent-swipe history: rolling window of the last 5 answered words */
-.swipehistory{display:flex;justify-content:center;flex-wrap:nowrap;gap:8px;margin-top:16px;min-height:46px;
+.swipehistory{display:flex;flex-direction:column;gap:8px;margin-top:16px;min-height:46px;
   max-width:100%;overflow:hidden}
 .swipehist-item .zh{overflow:hidden;text-overflow:ellipsis}
-.swipehist-item{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:11px;
-  background:var(--card);border:1px solid var(--line);font-family:var(--hanzi);font-size:18px;
-  font-weight:600;color:var(--ink);white-space:nowrap}
+.swipehist-item{display:flex;align-items:center;gap:10px;padding:8px 13px;border-radius:11px;
+  background:var(--card);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
 .swipehist-item:last-child{animation:swhistpop .22s cubic-bezier(.2,.8,.2,1)}
+.swipehist-item .zh{font-family:var(--hanzi);font-size:18px;font-weight:600}
+.swipehist-item .py{font-family:var(--ui);font-size:13px;color:var(--muted);flex:1}
 .swipehist-item .mk{font-family:var(--ui);font-size:14px;font-weight:800;line-height:1}
 .swipehist-item.know{border-color:rgba(31,133,87,.4)}
 .swipehist-item.know .mk{color:var(--jade)}
@@ -646,20 +655,28 @@ html[data-theme="dark"] .lbrow .rank{color:var(--ink)}
 .typeresult{text-align:center;font-size:13px;color:var(--muted);min-height:40px;margin-bottom:6px;line-height:1.5}
 .typeresult .py{color:var(--seal);font-size:16px;font-weight:600;font-family:var(--ui)}
 .typeresult.right .py{color:var(--jade)}
-.themetoggle{position:absolute;top:20px;right:18px;display:flex;align-items:center;gap:7px;
+.homebar{display:flex;align-items:center;justify-content:space-between;gap:6px;position:relative;z-index:70}
+.themetoggle{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:7px;
   background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 13px 7px 9px;
-  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;z-index:70}
+  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
 .themetoggle .dot{width:19px;height:19px;border-radius:6px;background:var(--seal2);color:#fff;
   display:flex;align-items:center;justify-content:center;font-family:var(--hanzi);font-size:11px;
-  transform:rotate(-2deg)}
+  flex-shrink:0;transform:rotate(-2deg)}
+.themetoggle span:last-child,.helptoggle span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
+.streakflame{flex:0 0 auto;display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);
+  border-radius:99px;padding:7px 13px;font-size:13px;font-weight:700;color:var(--muted);
+  font-family:var(--ui)}
+.streakflame .streakicon{font-size:14px;filter:grayscale(1);opacity:.55;transition:filter .2s ease,opacity .2s ease,transform .2s ease}
+.streakflame.active{color:var(--ink);border-color:#f0a63a}
+.streakflame.active .streakicon{filter:none;opacity:1;transform:scale(1.08)}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:26px 12px;line-height:1.6;
   background:var(--card);border:1px dashed var(--line);border-radius:12px}
 
 /* ---------- help button ---------- */
-.helptoggle{position:absolute;top:20px;left:18px;display:flex;align-items:center;gap:7px;
+.helptoggle{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:7px;
   background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 12px 7px 9px;
-  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;z-index:70}
+  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
 .helptoggle:hover{color:var(--ink);border-color:var(--line-strong)}
 .helptoggle .dot{width:19px;height:19px;border-radius:6px;background:var(--seal);color:#fff;
   display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;

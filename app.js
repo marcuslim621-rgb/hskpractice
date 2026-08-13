@@ -6,6 +6,31 @@ const store={
   del(k){try{localStorage.removeItem(k)}catch(e){delete mem[k]}}
 };
 
+/* ---------- daily streak ---------- */
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function bumpStreak(){
+  const today=todayStr();
+  const s=store.get("hsk_streak",{count:0,last:null});
+  if(s.last===today)return;
+  const y=new Date();y.setDate(y.getDate()-1);
+  const yesterday=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
+  s.count=(s.last===yesterday)?s.count+1:1;
+  s.last=today;
+  store.set("hsk_streak",s);
+  updateStreakFlame();
+}
+function updateStreakFlame(){
+  const el=$("streakflame");
+  if(!el)return;
+  const s=store.get("hsk_streak",{count:0,last:null});
+  const activeToday=s.last===todayStr();
+  el.classList.toggle("active",activeToday && s.count>0);
+  $("streakcount").textContent=s.count;
+}
+
 /* ---------- pinyin: tone numbers -> tone marks ---------- */
 const TM={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù",v:"ǖǘǚǜ"};
 function markSyl(sy,t){
@@ -41,7 +66,7 @@ function show(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   $("scr-"+name).classList.add("active");
   window.scrollTo(0,0);
-  if(name==="home"){updateRefresherBadge();updateRefresherScopeLabel();updateSwipeCardSummary()}
+  if(name==="home"){updateRefresherBadge();updateRefresherScopeLabel();updateSwipeCardSummary();updateStreakFlame()}
 }
 function updateRefresherBadge(){
   const badge=$("refresherbadge");
@@ -792,6 +817,7 @@ function refrFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:"Refresher (mixed)",ok,bad,words:results});
   store.set("hsk_history",hist.slice(0,200));
+  bumpStreak();
   lastWasBest=recordBest("Refresher (mixed)",ok,bad);
   REFR=null;
   $("sumbest").classList.toggle("show",lastWasBest);
@@ -807,6 +833,7 @@ function refrEndEarly(){
     const hist=store.get("hsk_history",[]);
     hist.unshift({t:Date.now(),label:"Refresher (mixed)",ok:REFR.ok,bad:REFR.bad,words:REFR.results});
     store.set("hsk_history",hist.slice(0,200));
+    bumpStreak();
     recordBest("Refresher (mixed)",REFR.ok,REFR.bad);
   }
   REFR=null;
@@ -816,6 +843,7 @@ function saveSession(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:S.label,ok:S.ok,bad:S.bad,words:S.results});
   store.set("hsk_history",hist.slice(0,200));
+  bumpStreak();
   recordWordStats(S.results,"guessing");
   lastWasBest=recordBest(S.label,S.ok,S.bad);
 }
@@ -975,6 +1003,7 @@ function typeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
   store.set("hsk_history",hist.slice(0,200));
+  bumpStreak();
   recordWordStats(TS.results,"typing");
   lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
 }
@@ -1125,6 +1154,7 @@ function writeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
   store.set("hsk_history",hist.slice(0,200));
+  bumpStreak();
   recordWordStats(WQ.results,"writing");
   lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
 }
@@ -1321,6 +1351,7 @@ function sentSaveGameOver(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,200));
+  bumpStreak();
   recordWordStats(SS.results,"sentences");
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
   $("gobest").classList.toggle("show",lastWasBest);
@@ -1334,6 +1365,7 @@ function sentFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,200));
+  bumpStreak();
   recordWordStats(SS.results,"sentences");
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
   $("sumbest").classList.toggle("show",lastWasBest);
@@ -2185,6 +2217,7 @@ function renderSwipeCard(){
   $("swpy").textContent=pin(w[1]);
   $("swen").textContent=w[2];
   $("swseal").textContent=levelBadge(w[3]);
+  updateSwipeStar();
   const inner=$("swinner");
   inner.classList.remove("flipped","dragging");
   inner.style.transform="";
@@ -2216,22 +2249,32 @@ function recordSwipe(c,known){
     fam[c]={fam:0,last:now};
   }
   saveSwipeFam(fam);
+  bumpStreak();
 }
 function renderSwipeHistory(){
   const el=$("swipehistory");
   if(!el)return;
   const hist=(SW&&SW.history)||[];
+  const pinned=new Set(store.get("hsk_pins",[]));
   el.innerHTML=hist.map(h=>
     `<div class="swipehist-item ${h.known?"know":"dont"}">
-      <span class="zh">${esc(h.zh)}</span><span class="mk">${h.known?"✓":"✗"}</span>
+      <span class="zh">${esc(h.zh)}</span><span class="py">${esc(pin(h.py))}</span>
+      <span class="pin ${pinned.has(h.zh)?"on":""}" title="Star this word"
+        onclick="toggleSwipeHistoryStar('${h.zh}')">★</span>
+      <span class="mk">${h.known?"✓":"✗"}</span>
     </div>`).join("");
+}
+function toggleSwipeHistoryStar(c){
+  togglePin(c);
+  renderSwipeHistory();
+  updateSwipeStar();
 }
 function swipeAnswer(known){
   if(!SW||SW.i>=SW.deck.length)return;
   const w=SW.deck[SW.i];
   recordSwipe(w[0],known);
   if(known)SW.known++;else SW.unknown++;
-  SW.history.push({zh:w[0],known});
+  SW.history.push({zh:w[0],py:w[1],known});
   if(SW.history.length>5)SW.history.shift();
   renderSwipeHistory();
   const card=$("swcard");
@@ -2244,6 +2287,19 @@ function swipeAnswer(known){
     renderSwipeCard();
   },240);
 }
+function updateSwipeStar(){
+  const el=$("swipestar");
+  if(!el||!SW||SW.i>=SW.deck.length)return;
+  const w=SW.deck[SW.i];
+  const pinned=store.get("hsk_pins",[]).includes(w[0]);
+  el.classList.toggle("on",pinned);
+  el.textContent=pinned?"★":"☆";
+}
+function toggleSwipeStar(){
+  if(!SW||SW.i>=SW.deck.length)return;
+  togglePin(SW.deck[SW.i][0]);
+  updateSwipeStar();
+}
 function swipeFlip(){
   if(!SW||SW.i>=SW.deck.length)return;
   SW.flipped=!SW.flipped;
@@ -2255,6 +2311,7 @@ function swipeFlip(){
   let moved=false;
   card.addEventListener("pointerdown",e=>{
     if(!SW||SW.i>=SW.deck.length)return;
+    if(e.target.closest(".swipestar"))return;
     SW.dragging=true;moved=false;
     SW.startX=e.clientX;SW.curX=e.clientX;
     try{card.setPointerCapture(e.pointerId)}catch(err){}
@@ -2294,4 +2351,5 @@ function swipeFlip(){
 updateSwipeCardSummary();
 updateRefresherBadge();
 updateRefresherScopeLabel();
+updateStreakFlame();
 

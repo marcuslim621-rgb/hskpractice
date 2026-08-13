@@ -17,12 +17,17 @@
 
   <!-- HOME -->
   <section class="screen active" id="scr-home">
-    <button class="helptoggle" onclick="openHelp()" aria-label="How to use">
-      <span class="dot">?</span><span>How to use</span>
-    </button>
-    <button class="themetoggle" onclick="toggleTheme()" aria-label="Switch theme">
-      <span class="dot" id="themedot">暗</span><span id="themelabel">Dark</span>
-    </button>
+    <div class="homebar">
+      <button class="helptoggle" onclick="openHelp()" aria-label="How to use">
+        <span class="dot">?</span><span>How to use</span>
+      </button>
+      <div class="streakflame" id="streakflame" aria-label="Daily streak">
+        <span class="streakicon">🔥</span><span id="streakcount">0</span>
+      </div>
+      <button class="themetoggle" onclick="toggleTheme()" aria-label="Switch theme">
+        <span class="dot" id="themedot">暗</span><span id="themelabel">Dark</span>
+      </button>
+    </div>
     <div class="hero">
       <div class="ghost heroghost">汉</div>
       <div style="position:relative">
@@ -112,6 +117,7 @@
 
     <div class="swipestage" id="swipestage">
       <div class="swipecardface" id="swcard">
+        <button class="swipestar" id="swipestar" onclick="toggleSwipeStar()" aria-label="Star this word">☆</button>
         <div class="swipe-inner" id="swinner">
           <div class="swipe-hint left" id="swhintleft">✗ Don't know</div>
           <div class="swipe-hint right" id="swhintright">✓ Know it</div>

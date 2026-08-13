@@ -2084,6 +2084,11 @@ function openScopeFromTile(e){
 /* ---------- wordlist swipe practice (home widget + full-screen session) ---------- */
 function getSwipeFam(){return store.get("hsk_swipe_fam",{})}
 function saveSwipeFam(o){store.set("hsk_swipe_fam",o)}
+function getMasteredSwipeWords(){return new Set(store.get("hsk_mastered",[]))}
+function markSwipeMastered(c){
+  const m=store.get("hsk_mastered",[]);
+  if(!m.includes(c)){m.push(c);store.set("hsk_mastered",m)}
+}
 function getSwipeScope(){return store.get("hsk_swipe_scope",{mode:"all"})}
 function saveSwipeScopeObj(s){store.set("hsk_swipe_scope",s)}
 function swipeScopedPool(){
@@ -2117,6 +2122,12 @@ function updateSwipeCardSummary(){
   if(!el)return;
   const pool=swipeScopedPool();
   el.textContent=swipeScopeLabel()+" · "+pool.length+" word"+(pool.length===1?"":"s");
+  const mEl=$("swipemastered");
+  if(mEl){
+    const mastered=getMasteredSwipeWords();
+    const count=pool.filter(w=>mastered.has(w[0])).length;
+    mEl.textContent=count+" of "+pool.length+" word"+(pool.length===1?"":"s")+" mastered";
+  }
 }
 function openSwipeListPicker(){
   renderSwipeListPicker();
@@ -2245,6 +2256,7 @@ function recordSwipe(c,known){
   if(known){
     const cur=fam[c]?fam[c].fam:0;
     fam[c]={fam:Math.min(cur+1,5),last:now};
+    markSwipeMastered(c);
   }else{
     fam[c]={fam:0,last:now};
   }

@@ -2208,6 +2208,7 @@ function restartSwipe(){
   renderSwipeHistory();
 }
 function exitSwipe(){
+  closeSwipeWrite();
   SW=null;
   document.documentElement.classList.remove("swipe-lock");
   updateSwipeCardSummary();
@@ -2219,6 +2220,7 @@ function swipeProgressText(){
 }
 function renderSwipeCard(){
   if(!SW)return;
+  closeSwipeWrite();
   if(SW.i>=SW.deck.length){finishSwipeSession();return}
   $("swipeprog").textContent=swipeProgressText();
   $("swipefill").style.width=(SW.deck.length?(SW.i/SW.deck.length*100):0)+"%";
@@ -2283,6 +2285,7 @@ function toggleSwipeHistoryStar(c){
 }
 function swipeAnswer(known){
   if(!SW||SW.i>=SW.deck.length)return;
+  closeSwipeWrite();
   const w=SW.deck[SW.i];
   recordSwipe(w[0],known);
   if(known)SW.known++;else SW.unknown++;
@@ -2317,13 +2320,122 @@ function swipeFlip(){
   SW.flipped=!SW.flipped;
   $("swinner").classList.toggle("flipped",SW.flipped);
 }
+
+/* ---------- writing practice pad, opened from the flipped swipe card ---------- */
+const SWP={chars:[],idx:0,strokes:[],cur:null,guide:true,size:0,open:false};
+function openSwipeWrite(){
+  if(!SW||SW.i>=SW.deck.length)return;
+  const w=SW.deck[SW.i];
+  $("swwzh").textContent=w[0];
+  $("swwpy").textContent=pin(w[1]);
+  $("swwen").textContent=w[2];
+  SWP.chars=[...w[0]];SWP.idx=0;SWP.strokes=[];SWP.cur=null;SWP.open=true;
+  renderSwwChips();
+  $("swwoverlay").classList.add("show");
+  requestAnimationFrame(()=>{sizeSwwCanvas();redrawSwwPad()});
+}
+function closeSwipeWrite(){
+  if(!SWP.open)return;
+  SWP.open=false;SWP.cur=null;
+  $("swwoverlay").classList.remove("show");
+}
+function renderSwwChips(){
+  $("swwchips").innerHTML=SWP.chars.map((c,i)=>
+    `<button class="charchip ${i===SWP.idx?"on":""}" onclick="pickSwwChip(${i})">${esc(c)}</button>`).join("");
+  $("swwchips").style.display=SWP.chars.length>1?"flex":"none";
+}
+function pickSwwChip(i){SWP.idx=i;SWP.strokes=[];SWP.cur=null;renderSwwChips();redrawSwwPad()}
+function sizeSwwCanvas(){
+  const c=$("swwcanvas");
+  const w=Math.min(c.parentElement.clientWidth-20,260);
+  if(w<=0)return;
+  const dpr=window.devicePixelRatio||1;
+  SWP.size=w;
+  c.width=w*dpr;c.height=w*dpr;
+  c.style.width=w+"px";c.style.height=w+"px";
+  c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function redrawSwwPad(){
+  const c=$("swwcanvas"),ctx=c.getContext("2d"),s=SWP.size;
+  if(!s)return;
+  ctx.clearRect(0,0,s,s);
+  // 米字格 practice-paper guides
+  ctx.save();
+  ctx.strokeStyle=cssVar("--line");ctx.lineWidth=1;ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);
+  ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);
+  ctx.moveTo(0,0);ctx.lineTo(s,s);
+  ctx.moveTo(s,0);ctx.lineTo(0,s);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeRect(.5,.5,s-1,s-1);
+  ctx.restore();
+  // faint template character to trace
+  if(SWP.guide&&SWP.chars[SWP.idx]){
+    ctx.save();
+    ctx.globalAlpha=.14;
+    ctx.fillStyle=cssVar("--ink");
+    ctx.font=`600 ${s*.72}px "Noto Serif SC","Songti SC","SimSun",serif`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(SWP.chars[SWP.idx],s/2,s*.54);
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.strokeStyle=cssVar("--ink");
+  ctx.lineWidth=Math.max(5,s/40);
+  ctx.lineCap="round";ctx.lineJoin="round";
+  for(const st of SWP.strokes)drawStroke(ctx,st,s);
+  ctx.restore();
+}
+function swwPoint(e){
+  const r=$("swwcanvas").getBoundingClientRect();
+  return {x:(e.clientX-r.left)/SWP.size,y:(e.clientY-r.top)/SWP.size};
+}
+(function(){
+  const c=$("swwcanvas");
+  if(!c)return;
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    c.setPointerCapture(e.pointerId);
+    SWP.cur=[swwPoint(e)];
+    SWP.strokes.push(SWP.cur);
+  },{passive:false});
+  c.addEventListener("pointermove",e=>{
+    if(!SWP.cur)return;
+    e.preventDefault();
+    SWP.cur.push(swwPoint(e));
+    redrawSwwPad();
+  },{passive:false});
+  const end=()=>{SWP.cur=null};
+  c.addEventListener("pointerup",end);
+  c.addEventListener("pointercancel",end);
+  c.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+  window.addEventListener("resize",()=>{
+    if(SWP.open){sizeSwwCanvas();redrawSwwPad()}
+  });
+})();
+function swwClear(){SWP.strokes=[];SWP.cur=null;redrawSwwPad()}
+function swwUndo(){
+  if(!SWP.strokes.length)return;
+  SWP.strokes.pop();SWP.cur=null;
+  redrawSwwPad();
+}
+function swwGuideToggle(){
+  SWP.guide=!SWP.guide;
+  $("swwguidebtn").textContent="Guide: "+(SWP.guide?"on":"off");
+  redrawSwwPad();
+}
+document.addEventListener("keydown",e=>{
+  if(SWP.open&&e.key==="Escape")closeSwipeWrite();
+});
 (function(){
   const card=$("swcard");
   if(!card)return;
   let moved=false;
   card.addEventListener("pointerdown",e=>{
     if(!SW||SW.i>=SW.deck.length)return;
-    if(e.target.closest(".swipestar"))return;
+    if(e.target.closest(".swipestar")||e.target.closest(".swipewritebtn"))return;
     SW.dragging=true;moved=false;
     SW.startX=e.clientX;SW.curX=e.clientX;
     try{card.setPointerCapture(e.pointerId)}catch(err){}

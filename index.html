@@ -130,6 +130,7 @@
           <div class="swipe-back">
             <div class="py" id="swpy">–</div>
             <div class="en" id="swen">–</div>
+            <button class="swipewritebtn" onclick="openSwipeWrite()">✍ Practice writing</button>
           </div>
         </div>
       </div>
@@ -164,6 +165,30 @@
         <button class="helpxbtn" onclick="closeSwipeListPicker()">✕</button>
       </div>
       <div class="qpicklist" id="swipescopelist" style="padding-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- SWIPE WRITING PRACTICE -->
+  <div class="swwoverlay" id="swwoverlay" onclick="if(event.target===this)closeSwipeWrite()">
+    <div class="swwpanel">
+      <div class="swwhead">
+        <div class="swwword">
+          <span class="zh" id="swwzh">–</span>
+          <span class="py" id="swwpy">–</span>
+        </div>
+        <button class="helpxbtn" onclick="closeSwipeWrite()" aria-label="Close writing practice">✕</button>
+      </div>
+      <div class="swwen" id="swwen">–</div>
+      <div class="charchips" id="swwchips"></div>
+      <div class="drawwrap">
+        <canvas id="swwcanvas"></canvas>
+        <div class="drawtools">
+          <button class="minibtn" onclick="swwClear()">Clear</button>
+          <button class="minibtn" onclick="swwUndo()">Undo</button>
+          <button class="minibtn" id="swwguidebtn" onclick="swwGuideToggle()">Guide: on</button>
+        </div>
+      </div>
+      <button class="btn primary" style="width:100%;margin-top:14px" onclick="closeSwipeWrite()">Done</button>
     </div>
   </div>
 

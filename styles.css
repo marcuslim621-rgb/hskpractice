@@ -479,6 +479,22 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
   border:1px solid var(--line);background:var(--card);font-family:var(--ui)}
 .swbtn.no{color:var(--seal);border-color:rgba(190,52,37,.3)}
 .swbtn.yes{color:var(--jade);border-color:rgba(31,133,87,.3)}
+/* writing practice, opened from the translation side of the swipe card */
+.swipewritebtn{margin-top:20px;border:1px solid var(--jade);background:var(--card);color:var(--jade);
+  border-radius:11px;padding:9px 16px;font-family:var(--ui);font-size:12.5px;font-weight:700;cursor:pointer}
+.swipewritebtn:active{background:rgba(31,133,87,.1)}
+.swwoverlay{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;padding:20px}
+.swwoverlay.show{display:flex}
+.swwpanel{background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:18px;
+  width:100%;max-width:400px;max-height:92vh;overflow-y:auto;touch-action:pan-y;
+  box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.swwhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.swwword{display:flex;align-items:baseline;gap:10px;min-width:0}
+.swwword .zh{font-family:var(--hanzi);font-size:30px;font-weight:600;color:var(--ink)}
+.swwword .py{font-size:14px;font-weight:700;color:var(--seal)}
+.swwen{font-size:13px;color:var(--muted);margin:2px 0 14px}
+#swwcanvas{display:block;margin:0 auto;border-radius:10px;touch-action:none;cursor:crosshair}
 /* recent-swipe history: rolling window of the last 5 answered words */
 .swipehistory{display:flex;flex-direction:column;gap:8px;margin-top:16px;min-height:46px;
   max-width:100%;overflow:hidden}

@@ -446,6 +446,7 @@ function addUserWord(){
   const words=getUserWords();
   words.push([zh,py,en,6,"custom",key]);
   saveUserWords(words);
+  syncCustomWord(key);
   editorSel.add(key);
   persistEditorSel();
   editorTab=6;
@@ -1735,6 +1736,7 @@ function submitWlAddWord(){
   const words=getUserWords();
   words.push([zh,py,en,6,wladdPos,key]);
   saveUserWords(words);
+  syncCustomWord(key);
   addToMyWordsList(key);
   $("wladd-zh").value="";$("wladd-py").value="";$("wladd-en").value="";
   $("wladdpreview").textContent="";
@@ -1742,6 +1744,65 @@ function submitWlAddWord(){
   toggleWlAddForm();
   wlTab="wl:"+MY_WORDS_LIST_ID;
   openWordlist();
+}
+
+/* ---------- Supabase mirror of the custom words ---------- */
+/* Words you add by hand are pushed to a Supabase table so they exist somewhere
+   other than this browser's localStorage. Built-in HSK words are never sent.
+   localStorage stays the source of truth: every call here is fire-and-forget,
+   so the app keeps working unchanged when offline or when the request fails.
+   The key below is the project's publishable key — it is meant to ship in
+   client code, and the table's policies let anyone holding it read and write. */
+const SUPABASE_URL="https://amwralfgyxwnzzsoyfki.supabase.co";
+const SUPABASE_KEY="sb_publishable_M40Z1-Ay-tUzsJT8npnPSA_qWR3TtRT";
+const SUPABASE_TABLE="hsk_words";
+function supabaseHeaders(extra){
+  return Object.assign({
+    "apikey":SUPABASE_KEY,
+    "Authorization":"Bearer "+SUPABASE_KEY,
+    "Content-Type":"application/json"
+  },extra||{});
+}
+function supabaseRowFor(w){
+  const key=wordKey(w);
+  const sentences=store.get("hsk_mysentences",{})[key]||[];
+  return {
+    entry_key:key,
+    word:w[0],
+    pinyin:w[1],
+    translation:w[2],
+    category:w[4],
+    example_sentences:sentences.map(s=>({zh:s.zh,py:s.py||"",en:s.en||""}))
+  };
+}
+function pushCustomWords(rows){
+  if(!rows.length)return Promise.resolve();
+  // on_conflict on the entry key turns this into an upsert, so re-pushing a
+  // word updates its row instead of creating a second one
+  return fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=entry_key`,{
+    method:"POST",
+    headers:supabaseHeaders({"Prefer":"resolution=merge-duplicates,return=minimal"}),
+    body:JSON.stringify(rows)
+  }).then(r=>{if(!r.ok)return r.text().then(t=>Promise.reject(new Error(r.status+" "+t)))});
+}
+// pushes one entry, but only if it is a custom word — built-ins stay out of the table
+function syncCustomWord(key){
+  const w=findWord(key);
+  if(!w||w[3]!==6)return;
+  pushCustomWords([supabaseRowFor(w)]).catch(e=>console.warn("Supabase sync failed for "+key,e));
+}
+function unsyncCustomWord(key){
+  fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?entry_key=eq.${encodeURIComponent(key)}`,{
+    method:"DELETE",
+    headers:supabaseHeaders({"Prefer":"return=minimal"})
+  }).then(r=>{if(!r.ok)return r.text().then(t=>Promise.reject(new Error(r.status+" "+t)))})
+    .catch(e=>console.warn("Supabase delete failed for "+key,e));
+}
+// one catch-up push per load, so words added before this existed (or while
+// offline) reach the table without needing to be edited again
+function syncAllCustomWords(){
+  const rows=getUserWords().filter(w=>w[3]===6).map(supabaseRowFor);
+  pushCustomWords(rows).catch(e=>console.warn("Supabase backfill failed",e));
 }
 
 /* ---------- edit / delete custom words from the Word List page ---------- */
@@ -1783,6 +1844,7 @@ function saveEditWord(){
   // the key survives the edit, so wordlists, pins and progress follow it
   words[idx]=[zh,py,en,6,ewPos,editingWordKey];
   saveUserWords(words);
+  syncCustomWord(editingWordKey);
   closeEditWord();
   openWordlist();
 }
@@ -1793,6 +1855,7 @@ function deleteCustomWord(k){
   if(!confirm(`Delete "${w[0]}" (${pin(w[1])} — ${w[2]})? This removes it from your custom words and any wordlists it's in.`))return;
   const words=getUserWords().filter(x=>wordKey(x)!==k);
   saveUserWords(words);
+  unsyncCustomWord(k);
   const lists=getWordlists();
   let changed=false;
   Object.values(lists).forEach(l=>{
@@ -1853,6 +1916,7 @@ function addMySentence(){
   all[mySentChar].push({zh,py,en});
   store.set("hsk_mysentences",all);
   $("msinput").value="";$("mspyinput").value="";$("msenginput").value="";
+  syncCustomWord(mySentChar);
   renderMySentences(mySentChar);
 }
 function deleteMySentence(i){
@@ -1860,6 +1924,7 @@ function deleteMySentence(i){
   if(!all[mySentChar])return;
   all[mySentChar].splice(i,1);
   store.set("hsk_mysentences",all);
+  syncCustomWord(mySentChar);
   renderMySentences(mySentChar);
 }
 
@@ -2501,4 +2566,5 @@ updateSwipeCardSummary();
 updateRefresherBadge();
 updateRefresherScopeLabel();
 updateStreakFlame();
+syncAllCustomWords();
 

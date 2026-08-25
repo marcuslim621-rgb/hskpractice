@@ -72,9 +72,9 @@ function updateRefresherBadge(){
   const badge=$("refresherbadge");
   if(!badge)return;
   const dueSet=new Set(wordsDueToday());
-  const scopedChars=new Set(refresherScopedDict().map(w=>w[0]));
+  const scopedKeys=new Set(refresherScopedDict().map(wordKey));
   let n=0;
-  dueSet.forEach(c=>{if(scopedChars.has(c))n++});
+  dueSet.forEach(c=>{if(scopedKeys.has(c))n++});
   if(n>0){
     badge.textContent=n+" due";
     badge.style.display="";
@@ -233,12 +233,12 @@ function refresherScopedDict(){
   if(scope.mode==="wordlists"){
     if(!scope.wordlistIds.length)return dict;
     const lists=getWordlists();
-    const chars=new Set();
+    const keys=new Set();
     scope.wordlistIds.forEach(id=>{
       const l=lists[id];
-      if(l)l.words.forEach(c=>chars.add(c));
+      if(l)l.words.forEach(k=>keys.add(k));
     });
-    return dict.filter(w=>chars.has(w[0]));
+    return dict.filter(w=>keys.has(wordKey(w)));
   }
   return dict;
 }
@@ -328,13 +328,41 @@ function startRefresher(){
 function getUserWords(){return store.get("hsk_userwords",[])}
 function saveUserWords(arr){store.set("hsk_userwords",arr)}
 function allWords(){return [...WORDS,...getUserWords()]}
+/* Words are identified by a stable key rather than by their characters, so the
+   same character can be entered more than once — 了 as a grammar particle and
+   了 as a verb are separate entries with their own pinyin, meaning, pin and
+   progress. Built-in words, and every custom word saved before this existed,
+   key on their own characters, so previously stored progress stays attached. */
+function wordKey(w){return w[5]||w[0]}
+function findWord(k){return allWords().find(w=>wordKey(w)===k)}
+function newWordKey(zh,taken){
+  taken=taken||new Set(allWords().map(wordKey));
+  if(!taken.has(zh))return zh;
+  let n=2;
+  while(taken.has(zh+"~"+n))n++;
+  return zh+"~"+n;
+}
+// stamp older custom words with an explicit key matching their character, so a
+// later rename can't detach them from the wordlists and stats they belong to
+(function migrateUserWordKeys(){
+  const words=getUserWords();
+  const taken=new Set(WORDS.map(w=>w[0]));
+  let changed=false;
+  words.forEach(w=>{
+    if(w[5]){taken.add(w[5]);return}
+    w[5]=newWordKey(w[0],taken);
+    taken.add(w[5]);
+    changed=true;
+  });
+  if(changed)saveUserWords(words);
+})();
 function getWordlists(){return store.get("hsk_wordlists",{})}
 function saveWordlists(obj){store.set("hsk_wordlists",obj)}
 const MY_WORDS_LIST_ID="mywords";
-function addToMyWordsList(zh){
+function addToMyWordsList(key){
   ensureMyWordsList();
   const lists=getWordlists();
-  if(!lists[MY_WORDS_LIST_ID].words.includes(zh))lists[MY_WORDS_LIST_ID].words.push(zh);
+  if(!lists[MY_WORDS_LIST_ID].words.includes(key))lists[MY_WORDS_LIST_ID].words.push(key);
   saveWordlists(lists);
 }
 // one-time migration from the old single anonymous selection, if present
@@ -381,9 +409,10 @@ function editorVisible(){
 }
 function renderEditorList(){
   $("editorlist").innerHTML=editorVisible().map(w=>{
-    const on=editorSel.has(w[0]);
+    const key=wordKey(w);
+    const on=editorSel.has(key);
     const badge=w[3]===6?`<span class="poschip custom">Custom</span>`:"";
-    return `<button class="wrow ${on?"sel":""}" onclick="toggleEditorWord('${w[0]}')">
+    return `<button class="wrow ${on?"sel":""}" onclick="toggleEditorWord('${key}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
       ${badge}
       <span class="tick">✓</span></button>`;
@@ -412,11 +441,12 @@ function addUserWord(){
   const py=$("neword-py").value.trim();
   const en=$("neword-en").value.trim();
   if(!zh||!py||!en){alert("Please fill in the character(s), pinyin, and meaning.");return}
-  if(allWords().some(w=>w[0]===zh)){alert("That word already exists — search for it above instead of adding a duplicate.");return}
+  if(allWords().some(w=>w[0]===zh&&w[1]===py&&w[2]===en)){alert("You've already added that exact entry — give this one a different pinyin or meaning if it's a separate usage.");return}
+  const key=newWordKey(zh);
   const words=getUserWords();
-  words.push([zh,py,en,6,"custom"]);
+  words.push([zh,py,en,6,"custom",key]);
   saveUserWords(words);
-  editorSel.add(zh);
+  editorSel.add(key);
   persistEditorSel();
   editorTab=6;
   $("neword-zh").value="";$("neword-py").value="";$("neword-en").value="";
@@ -431,7 +461,7 @@ function toggleEditorWord(c){
   renderEditorList();
 }
 function editorBulk(on){
-  editorVisible().forEach(w=>on?editorSel.add(w[0]):editorSel.delete(w[0]));
+  editorVisible().forEach(w=>{const k=wordKey(w);on?editorSel.add(k):editorSel.delete(k)});
   persistEditorSel();renderEditorList();
 }
 function editorClearAll(){editorSel.clear();persistEditorSel();renderEditorList()}
@@ -464,21 +494,23 @@ function renderMyWordlists(){
 let pendingWordlistIds=new Set();
 let pendingWordlistPool=[];
 let pendingWordlistLabel="";
+// looks up by character, not by entry key: its only caller matches sentence
+// questions, which target a character rather than one particular entry
 function wordLevelOf(c){
   const w=allWords().find(x=>x[0]===c);
   return w?w[3]:null;
 }
 function confirmWordlistSelection(){
   const lists=getWordlists();
-  const chars=new Set();
+  const keys=new Set();
   const names=[];
   [...pendingWordlistIds].forEach(id=>{
     const l=lists[id];
     if(!l)return;
     names.push(l.name||"Untitled list");
-    l.words.forEach(c=>chars.add(c));
+    l.words.forEach(k=>keys.add(k));
   });
-  pendingWordlistPool=[...chars];
+  pendingWordlistPool=[...keys];
   pendingWordlistLabel=names.length===1?names[0]:`${names.length} wordlists`;
   renderWordlistLevels();
   show("wordlistlevels");
@@ -486,7 +518,7 @@ function confirmWordlistSelection(){
 const WL_LEVEL_META={5:["宗","Master 宗师"],7:["文","Master II 文哲"],6:["＋","My Words"]};
 function renderWordlistLevels(){
   const wset=new Set(pendingWordlistPool);
-  const matched=allWords().filter(w=>wset.has(w[0]));
+  const matched=allWords().filter(w=>wset.has(wordKey(w)));
   if(!matched.length){
     $("wordlistlevelrows").innerHTML=`<div class="empty">Your selected wordlist(s) don't have any words in them yet.</div>`;
     return;
@@ -519,16 +551,18 @@ function renderWordlistLevels(){
 }
 function startWordlistFiltered(level){
   const wset=new Set(pendingWordlistPool);
+  const selected=allWords().filter(w=>wset.has(wordKey(w)));
+  const cset=new Set(selected.map(w=>w[0])); // sentence questions target characters, not entries
   const cat=pendingCategory,variant=pendingVariant;
   const levelName=level===null?"All words":level===5?"Master":level===7?"Master II":level===6?"My Words":`HSK ${level}`;
   const label=`${pendingWordlistLabel} · ${levelName} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
   if(cat==="sentences"){
-    const pool=SENTQ.filter(s=>wset.has(s[2])&&(level===null||wordLevelOf(s[2])===level));
+    const pool=SENTQ.filter(s=>cset.has(s[2])&&(level===null||wordLevelOf(s[2])===level));
     if(!pool.length){alert("None of the sentence questions in this app target matching words yet — try a different level or practice category.");return}
     startSentQuiz(pool,label,variant);
     return;
   }
-  const pool=allWords().filter(w=>wset.has(w[0])&&(level===null||w[3]===level));
+  const pool=selected.filter(w=>level===null||w[3]===level);
   if(!pool.length)return;
   if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
   if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
@@ -565,7 +599,7 @@ let S=null;
 function buildQueue(pool){
   const q=shuffle([...pool]);
   const seen=store.get("hsk_seen",{});
-  return q.sort((a,b)=>(seen[a[0]]||0)-(seen[b[0]]||0)); // stable sort keeps ties shuffled
+  return q.sort((a,b)=>(seen[wordKey(a)]||0)-(seen[wordKey(b)]||0)); // stable sort keeps ties shuffled
 }
 let againFn=null;
 let quizTimer=null;
@@ -659,9 +693,9 @@ function answerPy(btn,right){
 }
 function finishWord(){
   const w=S.queue[S.i];
-  S.results.push({c:w[0],ok:!S.phase.wrong});
+  S.results.push({c:wordKey(w),ok:!S.phase.wrong});
   const seen=store.get("hsk_seen",{});
-  seen[w[0]]=(seen[w[0]]||0)+1;
+  seen[wordKey(w)]=(seen[wordKey(w)]||0)+1;
   store.set("hsk_seen",seen);
   if(S.phase.wrong){S.bad++;S.streak=0;if((S.variant==="arcade"||S.variant==="competition"))S.lives--}else{S.ok++;S.streak++}
   setFire("qcard",S.streak);
@@ -742,13 +776,13 @@ function wordsDueToday(){
   });
   return [...out];
 }
-function dueQueueForScope(scopedChars){
-  // returns [{c, mode}] for every word×mode combo that's due, restricted to scopedChars (Set or null=all)
+function dueQueueForScope(scopedKeys){
+  // returns [{c, mode}] for every word×mode combo that's due, restricted to scopedKeys (Set or null=all)
   const stats=store.get("hsk_word_stats",{});
   const now=Date.now();
   const out=[];
   Object.entries(stats).forEach(([c,s])=>{
-    if(scopedChars&&!scopedChars.has(c))return;
+    if(scopedKeys&&!scopedKeys.has(c))return;
     if(!s.byMode)return;
     SRS_MODES.forEach(mode=>{
       const m=s.byMode[mode];
@@ -766,16 +800,16 @@ let REFR=null;
 function refrBuildQueue(){
   const dict=allWords();
   const dueChars=new Set(wordsDueToday());
-  const scopedChars=new Set(refresherScopedDict().map(w=>w[0]));
-  let items=dueQueueForScope(scopedChars).filter(it=>dueChars.has(it.c));
+  const scopedKeys=new Set(refresherScopedDict().map(wordKey));
+  let items=dueQueueForScope(scopedKeys).filter(it=>dueChars.has(it.c));
 
   // mix in a few brand-new (never-practiced) words, Duolingo-style — default to Recognition
   const stats=store.get("hsk_word_stats",{});
   const NEW_WORD_COUNT=3;
   const scopedDict=refresherScopedDict();
-  const unseen=scopedDict.filter(w=>!stats[w[0]]);
+  const unseen=scopedDict.filter(w=>!stats[wordKey(w)]);
   if(unseen.length){
-    shuffle([...unseen]).slice(0,NEW_WORD_COUNT).forEach(w=>items.push({c:w[0],mode:"guessing"}));
+    shuffle([...unseen]).slice(0,NEW_WORD_COUNT).forEach(w=>items.push({c:wordKey(w),mode:"guessing"}));
   }
   return shuffle(items);
 }
@@ -789,14 +823,14 @@ function refrRunCurrent(){
   if(!REFR||REFR.i>=REFR.queue.length){refrFinish();return}
   const {c,mode}=REFR.queue[REFR.i];
   const dict=allWords();
-  const w=dict.find(x=>x[0]===c);
+  const w=dict.find(x=>wordKey(x)===c);
   if(!w){REFR.i++;refrRunCurrent();return} // word no longer exists (e.g. deleted custom word)
   const label="Refresher · "+CATEGORY_TITLE[mode];
   if(mode==="guessing")startQuiz([w],label,"unlimited");
   else if(mode==="typing")startTypeQuiz([w],label,"unlimited");
   else if(mode==="writing")startWriteQuiz([w],label,"unlimited");
   else if(mode==="sentences"){
-    const sentMatches=SENTQ.filter(s=>s[2]===c);
+    const sentMatches=SENTQ.filter(s=>s[2]===w[0]); // sentence questions target characters
     if(!sentMatches.length){REFR.i++;refrRunCurrent();return} // no sentence exists for this word
     startSentQuiz(sentMatches.slice(0,1),label,"unlimited");
   }
@@ -849,7 +883,7 @@ function saveSession(){
 }
 function breakdownHTML(results){
   return results.map(r=>{
-    const w=allWords().find(x=>x[0]===r.c)||[r.c,"",""];
+    const w=findWord(r.c)||[r.c,"",""];
     const thumb=r.drawing?`<img class="drawthumb" src="${r.drawing}" onclick="event.stopPropagation();showDrawingLightbox(this.src)" alt="Your drawing of ${w[0]}">`:"";
     return `<div class="bitem ${r.ok?"ok":"bad"}"><span class="zh">${w[0]}</span>
       <span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
@@ -985,12 +1019,12 @@ function typeCheck(){
   res.className="typeresult "+(right?"right":"wrong");
   res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
   inp.focus();
-  TS.results.push({c:w[0],ok:right});
+  TS.results.push({c:wordKey(w),ok:right});
   if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(TS.variant==="arcade")TS.lives--}
   setFire("tcard",TS.streak);
   if(right&&TS.streak>=5)inp.classList.add("rainbow");
   const seen=store.get("hsk_seen",{});
-  seen[w[0]]=(seen[w[0]]||0)+1;
+  seen[wordKey(w)]=(seen[wordKey(w)]||0)+1;
   store.set("hsk_seen",seen);
   $("tok").textContent="✓ "+TS.ok;$("tbad").textContent="✗ "+TS.bad;
   if(!TS.timed){
@@ -1118,11 +1152,11 @@ function writeGrade(right){
   const w=WQ.queue[WQ.i];
   let drawing=null;
   try{ drawing=$("wcanvas").toDataURL("image/png"); }catch(e){}
-  WQ.results.push({c:w[0],ok:right,drawing});
+  WQ.results.push({c:wordKey(w),ok:right,drawing});
   if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0;if(WQ.variant==="arcade")WQ.lives--}
   setFire("wcard",WQ.streak);
   const seen=store.get("hsk_seen",{});
-  seen[w[0]]=(seen[w[0]]||0)+1;
+  seen[wordKey(w)]=(seen[wordKey(w)]||0)+1;
   store.set("hsk_seen",seen);
   $("wok").textContent="✓ "+WQ.ok;$("wbad").textContent="✗ "+WQ.bad;
   if(!WQ.timed){
@@ -1548,13 +1582,13 @@ function renderStatWords(){
   const q=($("statsearch").value||"").trim().toLowerCase();
   const dict=allWords();
   let rows=Object.entries(wstats).map(([c,s])=>{
-    const w=dict.find(x=>x[0]===c)||[c,"",""];
+    const w=dict.find(x=>wordKey(x)===c)||[c,"",""];
     const t=s.ok+s.bad;
     const acc=t?Math.round(s.ok/t*100):0;
-    return {c,py:w[1],en:w[2],ok:s.ok,bad:s.bad,acc,total:t,lastSeen:s.lastSeen||0};
+    return {c,zh:w[0],py:w[1],en:w[2],ok:s.ok,bad:s.bad,acc,total:t,lastSeen:s.lastSeen||0};
   });
   if(q){
-    rows=rows.filter(r=>r.c.includes(q)||pin(r.py).toLowerCase().includes(q)||r.en.toLowerCase().includes(q));
+    rows=rows.filter(r=>r.zh.includes(q)||pin(r.py).toLowerCase().includes(q)||r.en.toLowerCase().includes(q));
   }
   switch(statSort){
     case "worst": rows.sort((a,b)=>a.acc-b.acc||b.total-a.total); break;
@@ -1565,7 +1599,7 @@ function renderStatWords(){
   $("statwordlist").innerHTML=rows.length?rows.map(r=>{
     const accClass=r.acc>=80?"high":r.acc>=50?"mid":"low";
     return `<div class="wordstat-row">
-      <div class="zh">${r.c}</div>
+      <div class="zh">${r.zh}</div>
       <div class="info"><div class="py">${pin(r.py)}</div><div class="en">${esc(r.en)}</div></div>
       <div class="stat-nums">
         <div class="stat-acc ${accClass}">${r.acc}%</div>
@@ -1607,8 +1641,8 @@ function wlCurrentWords(){
     const lists=getWordlists();
     const l=lists[id];
     if(!l)return[];
-    const chars=new Set(l.words);
-    return allWords().filter(w=>chars.has(w[0]));
+    const keys=new Set(l.words);
+    return allWords().filter(w=>keys.has(wordKey(w)));
   }
   if(wlTab===6)return getUserWords();
   return WORDS.filter(w=>w[3]===wlTab);
@@ -1655,20 +1689,21 @@ function renderWordlist(){
   const list=wlCurrentWords().filter(w=>(wlPos==="all"||w[4]===wlPos)
     &&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
   const pinned=new Set(store.get("hsk_pins",[]));
-  list.sort((a,b)=>(pinned.has(b[0])?1:0)-(pinned.has(a[0])?1:0)); // stable: pinned float up, order kept
+  list.sort((a,b)=>(pinned.has(wordKey(b))?1:0)-(pinned.has(wordKey(a))?1:0)); // stable: pinned float up, order kept
   $("wlcount").textContent=list.length+" word"+(list.length===1?"":"s");
   $("wllist").innerHTML=list.map(w=>{
+    const key=wordKey(w);
     const isCustom=w[3]===6;
     const actions=isCustom?`<span class="wrow-actions">
-        <span class="wrow-edit" title="Edit" onclick="event.stopPropagation();openEditWord('${w[0]}')">✎</span>
-        <span class="wrow-del" title="Delete" onclick="event.stopPropagation();deleteCustomWord('${w[0]}')">✕</span>
+        <span class="wrow-edit" title="Edit" onclick="event.stopPropagation();openEditWord('${key}')">✎</span>
+        <span class="wrow-del" title="Delete" onclick="event.stopPropagation();deleteCustomWord('${key}')">✕</span>
       </span>`:"";
-    return `<button class="wrow" onclick="openDetail('${w[0]}')">
+    return `<button class="wrow" onclick="openDetail('${key}')">
       <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
       <span class="poschip ${w[4]}">${POS_LABEL[w[4]]}</span>
       ${actions}
-      <span class="pin ${pinned.has(w[0])?"on":""}" title="Pin to top"
-        onclick="event.stopPropagation();togglePin('${w[0]}')">★</span></button>`;
+      <span class="pin ${pinned.has(key)?"on":""}" title="Pin to top"
+        onclick="event.stopPropagation();togglePin('${key}')">★</span></button>`;
   }).join("")
     ||`<div class="empty">No words match your search</div>`;
 }
@@ -1695,11 +1730,12 @@ function submitWlAddWord(){
   const py=$("wladd-py").value.trim();
   const en=$("wladd-en").value.trim();
   if(!zh||!py||!en){alert("Please fill in the character(s), pinyin, and meaning.");return}
-  if(allWords().some(w=>w[0]===zh)){alert("That word already exists — search for it above instead of adding a duplicate.");return}
+  if(allWords().some(w=>w[0]===zh&&w[1]===py&&w[2]===en)){alert("You've already added that exact entry — give this one a different pinyin or meaning if it's a separate usage.");return}
+  const key=newWordKey(zh);
   const words=getUserWords();
-  words.push([zh,py,en,6,wladdPos]);
+  words.push([zh,py,en,6,wladdPos,key]);
   saveUserWords(words);
-  addToMyWordsList(zh);
+  addToMyWordsList(key);
   $("wladd-zh").value="";$("wladd-py").value="";$("wladd-en").value="";
   $("wladdpreview").textContent="";
   wladdPos="noun";
@@ -1709,16 +1745,16 @@ function submitWlAddWord(){
 }
 
 /* ---------- edit / delete custom words from the Word List page ---------- */
-let editingWordChar=null;
+let editingWordKey=null;
 let ewPos="noun";
 function renderEwPosChips(){
   $("ewposchips").innerHTML=WLADD_POS_OPTIONS.map(([k,label])=>
     `<button type="button" class="awc-poschip ${ewPos===k?"on":""}" onclick="ewPos='${k}';renderEwPosChips()">${label}</button>`).join("");
 }
-function openEditWord(c){
-  const w=allWords().find(x=>x[0]===c);
+function openEditWord(k){
+  const w=findWord(k);
   if(!w||w[3]!==6)return; // only custom words are editable
-  editingWordChar=c;
+  editingWordKey=k;
   $("ewzh").value=w[0];
   $("ewpy").value=w[1];
   $("ewen").value=w[2];
@@ -1729,7 +1765,7 @@ function openEditWord(c){
 }
 function closeEditWord(){
   $("editwordsheet").classList.remove("show");
-  editingWordChar=null;
+  editingWordKey=null;
 }
 function previewEwPinyin(){
   const raw=$("ewpy").value.trim();
@@ -1740,42 +1776,31 @@ function saveEditWord(){
   const py=$("ewpy").value.trim();
   const en=$("ewen").value.trim();
   if(!zh||!py||!en){alert("Please fill in the character(s), pinyin, and meaning.");return}
-  if(zh!==editingWordChar&&allWords().some(w=>w[0]===zh)){alert("That word already exists — choose a different character.");return}
+  if(allWords().some(w=>wordKey(w)!==editingWordKey&&w[0]===zh&&w[1]===py&&w[2]===en)){alert("Another entry already has that exact character, pinyin and meaning.");return}
   const words=getUserWords();
-  const idx=words.findIndex(w=>w[0]===editingWordChar);
+  const idx=words.findIndex(w=>wordKey(w)===editingWordKey);
   if(idx<0){closeEditWord();return}
-  words[idx]=[zh,py,en,6,ewPos];
+  // the key survives the edit, so wordlists, pins and progress follow it
+  words[idx]=[zh,py,en,6,ewPos,editingWordKey];
   saveUserWords(words);
-  // keep the word in any personal wordlists / pins it was already part of, following the rename
-  if(zh!==editingWordChar){
-    const lists=getWordlists();
-    let changed=false;
-    Object.values(lists).forEach(l=>{
-      const i=l.words.indexOf(editingWordChar);
-      if(i>=0){l.words[i]=zh;changed=true}
-    });
-    if(changed)saveWordlists(lists);
-    const pins=store.get("hsk_pins",[]);
-    const pi=pins.indexOf(editingWordChar);
-    if(pi>=0){pins[pi]=zh;store.set("hsk_pins",pins)}
-  }
   closeEditWord();
   openWordlist();
 }
-function deleteCustomWord(c){
-  const w=allWords().find(x=>x[0]===c);
+function deleteCustomWord(k){
+  const w=findWord(k);
   if(!w||w[3]!==6)return;
-  if(!confirm(`Delete "${c}"? This removes it from your custom words and any wordlists it's in.`))return;
-  const words=getUserWords().filter(x=>x[0]!==c);
+  // name the reading and meaning too — the same character can have several entries
+  if(!confirm(`Delete "${w[0]}" (${pin(w[1])} — ${w[2]})? This removes it from your custom words and any wordlists it's in.`))return;
+  const words=getUserWords().filter(x=>wordKey(x)!==k);
   saveUserWords(words);
   const lists=getWordlists();
   let changed=false;
   Object.values(lists).forEach(l=>{
-    const i=l.words.indexOf(c);
+    const i=l.words.indexOf(k);
     if(i>=0){l.words.splice(i,1);changed=true}
   });
   if(changed)saveWordlists(lists);
-  const pins=store.get("hsk_pins",[]).filter(x=>x!==c);
+  const pins=store.get("hsk_pins",[]).filter(x=>x!==k);
   store.set("hsk_pins",pins);
   openWordlist();
 }
@@ -1787,15 +1812,15 @@ function togglePin(c){
   store.set("hsk_pins",pins);
   renderWordlist();
 }
-function openDetail(c){
-  const w=allWords().find(x=>x[0]===c);if(!w)return;
+function openDetail(k){
+  const w=findWord(k);if(!w)return;
   $("dchar").textContent=w[0];$("dpy").textContent=pin(w[1]);$("den").textContent=w[2];
   $("dseal").textContent=levelBadge(w[3]);
   const p=$("dpos");p.textContent=POS_LABEL[w[4]];p.className="poschip "+w[4];
   detailTab("write");
   show("worddetail");
-  setupPractice(w[0]);
-  renderMySentences(w[0]);
+  setupPractice(w[0]);           // writing practice is per character
+  renderMySentences(wordKey(w)); // sentences belong to this entry
 }
 function detailTab(which){
   $("dtabs").children[0].classList.toggle("on",which==="write");
@@ -2099,8 +2124,8 @@ function swipeScopedPool(){
     const lists=getWordlists();
     const l=lists[scope.id];
     if(!l)return dict;
-    const chars=new Set(l.words);
-    return dict.filter(w=>chars.has(w[0]));
+    const keys=new Set(l.words);
+    return dict.filter(w=>keys.has(wordKey(w)));
   }
   return dict;
 }
@@ -2125,7 +2150,7 @@ function updateSwipeCardSummary(){
   const mEl=$("swipemastered");
   if(mEl){
     const mastered=getMasteredSwipeWords();
-    const count=pool.filter(w=>mastered.has(w[0])).length;
+    const count=pool.filter(w=>mastered.has(wordKey(w))).length;
     mEl.textContent=count+" of "+pool.length+" word"+(pool.length===1?"":"s")+" mastered";
   }
 }
@@ -2176,7 +2201,7 @@ function renderSwipeListPicker(){
 function buildSwipeDeck(pool){
   const fam=getSwipeFam();
   const withMeta=pool.map(w=>{
-    const f=fam[w[0]];
+    const f=fam[wordKey(w)];
     return {w,fam:f?f.fam:0,last:f?f.last:0,r:Math.random()};
   });
   withMeta.sort((a,b)=>(a.fam-b.fam)||(a.last-b.last)||(a.r-b.r));
@@ -2273,8 +2298,8 @@ function renderSwipeHistory(){
   el.innerHTML=hist.map(h=>
     `<div class="swipehist-item ${h.known?"know":"dont"}">
       <span class="zh">${esc(h.zh)}</span><span class="py">${esc(pin(h.py))}</span>
-      <span class="pin ${pinned.has(h.zh)?"on":""}" title="Star this word"
-        onclick="toggleSwipeHistoryStar('${h.zh}')">★</span>
+      <span class="pin ${pinned.has(h.k)?"on":""}" title="Star this word"
+        onclick="toggleSwipeHistoryStar('${h.k}')">★</span>
       <span class="mk">${h.known?"✓":"✗"}</span>
     </div>`).join("");
 }
@@ -2287,9 +2312,9 @@ function swipeAnswer(known){
   if(!SW||SW.i>=SW.deck.length)return;
   closeSwipeWrite();
   const w=SW.deck[SW.i];
-  recordSwipe(w[0],known);
+  recordSwipe(wordKey(w),known);
   if(known)SW.known++;else SW.unknown++;
-  SW.history.push({zh:w[0],py:w[1],known});
+  SW.history.push({k:wordKey(w),zh:w[0],py:w[1],known});
   if(SW.history.length>5)SW.history.shift();
   renderSwipeHistory();
   const card=$("swcard");
@@ -2306,13 +2331,13 @@ function updateSwipeStar(){
   const el=$("swipestar");
   if(!el||!SW||SW.i>=SW.deck.length)return;
   const w=SW.deck[SW.i];
-  const pinned=store.get("hsk_pins",[]).includes(w[0]);
+  const pinned=store.get("hsk_pins",[]).includes(wordKey(w));
   el.classList.toggle("on",pinned);
   el.textContent=pinned?"★":"☆";
 }
 function toggleSwipeStar(){
   if(!SW||SW.i>=SW.deck.length)return;
-  togglePin(SW.deck[SW.i][0]);
+  togglePin(wordKey(SW.deck[SW.i]));
   updateSwipeStar();
 }
 function swipeFlip(){

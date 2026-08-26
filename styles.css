@@ -38,7 +38,7 @@
   --tile-jade-border:rgba(0,107,62,.18);
   --tile-jade-border-hover:rgba(0,107,62,.3);
   --hanzi:"Noto Serif SC","Songti SC","SimSun",serif;
-  --ui:"Noto Serif",Georgia,"Times New Roman",serif;
+  --ui:"Manrope",ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
 }
 html[data-theme="dark"]{
   /* the same tiles carved from dark stone rather than bone */
@@ -132,14 +132,14 @@ html[data-theme="dark"] .card .sealic{
 
 /* ---------- header ---------- */
 .hero{text-align:center;padding:24px 0 46px;position:relative;overflow:hidden}
-.eyebrow{font-size:11px;letter-spacing:.22em;color:var(--seal);font-weight:600;margin-bottom:10px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--seal);font-weight:700;margin-bottom:10px}
 .hero h1{font-family:var(--hanzi);font-weight:700;font-size:25px;letter-spacing:.01em}
 .hero .sub{color:var(--muted);font-size:13px;margin-top:7px}
 .topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .topbar h2{font-size:18px;font-weight:700;flex:1;letter-spacing:-.01em;text-align:center}
 .linkbtn{background:none;border:none;color:var(--muted);font-size:13.5px;font-weight:500;cursor:pointer;padding:6px 2px}
 .linkbtn:hover,.linkbtn:focus-visible{color:var(--seal)}
-.sechead{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin:20px 0 10px}
+.sechead{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:20px 0 10px}
 .versionfooter{text-align:center;font-size:11px;color:var(--muted);opacity:0.55;margin:28px 0 8px;letter-spacing:.02em}
 .hint{color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.55}
 
@@ -274,11 +274,21 @@ html[data-theme="dark"] .cards .card:not(.hero)+.card:not(.hero), html[data-them
   font-size:38px;line-height:1;margin:6px 0 18px;min-height:42px}
 .qbar .score{margin-left:auto;font-variant-numeric:tabular-nums}
 .qbar .score .ok{color:var(--jade);font-weight:600} .qbar .score .bad{color:var(--seal);font-weight:600}
-.track{height:3px;background:var(--line);border-radius:99px;margin-bottom:16px;overflow:hidden}
-.track .fill{height:100%;width:0;background:var(--fill);border-radius:99px;transition:width .25s ease}
+/* Engraved progress track: recessed into the ivory with the sharp 4px radius the
+   Ink & Ivory "Engraved Elements" rule calls for, filled jade-to-cinnabar. */
+.track{height:7px;background:var(--tile-ink-bg);border-radius:4px;margin-bottom:16px;overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(26,28,26,.16),inset 0 -1px 0 rgba(255,255,255,.55)}
+.track .fill{height:100%;width:0;border-radius:3px;transition:width .25s ease;
+  background:linear-gradient(90deg,var(--jade),var(--seal))}
 .charcard{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;
   padding:38px 20px 32px;text-align:center;margin-bottom:18px;box-shadow:0 1px 3px rgba(33,36,44,.05)}
-.charcard .zh{font-family:var(--hanzi);font-size:62px;line-height:1.15;font-weight:600}
+.charcard .zh{font-family:var(--hanzi);font-size:62px;line-height:1.15;font-weight:600;
+  /* engraved: a light bevel above the stroke, ink settling into the cut below */
+  text-shadow:0 1px 0 rgba(255,255,255,.85),0 -1px 1px rgba(26,28,26,.18)}
+/* register marks at the card corners, like the cut edge of a printing block */
+.charcard::before,.charcard::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none}
+.charcard::before{top:12px;left:12px;border-top:1.5px solid var(--tile-lo);border-left:1.5px solid var(--tile-lo)}
+.charcard::after{bottom:12px;right:12px;border-bottom:1.5px solid var(--tile-lo);border-right:1.5px solid var(--tile-lo)}
 .charcard .prompt{color:var(--muted);font-size:11.5px;margin-top:10px;letter-spacing:.12em;text-transform:uppercase}
 .seal{position:absolute;top:13px;right:13px;width:34px;height:34px;background:var(--seal);color:#fff;
   border-radius:8px;transform:rotate(-2deg);display:flex;align-items:center;justify-content:center;
@@ -496,7 +506,8 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
 .swipe-front,.swipe-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   border-radius:20px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;
   align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(33,36,44,.05);padding:20px;text-align:center}
-.swipe-front .zh{font-family:var(--hanzi);font-size:76px;font-weight:600;line-height:1.1}
+.swipe-front .zh{font-family:var(--hanzi);font-size:76px;font-weight:600;line-height:1.1;
+  text-shadow:0 1px 0 rgba(255,255,255,.85),0 -1px 1px rgba(26,28,26,.18)}
 .swipe-front .prompt{color:var(--muted);font-size:11.5px;margin-top:16px;letter-spacing:.1em;text-transform:uppercase}
 .swipe-back{transform:rotateY(180deg)}
 .swipe-back .py{font-size:26px;font-weight:700;color:var(--seal);margin-bottom:8px}
@@ -1051,7 +1062,7 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
   margin-bottom:22px;box-shadow:inset 0 0 0 1px rgba(31,133,87,.16),0 4px 0 rgba(18,88,55,.42),0 6px 14px rgba(0,0,0,.08)}
 html[data-theme="dark"] .rowcard{background:rgba(31,133,87,.07);
   box-shadow:inset 0 0 0 1px rgba(65,179,131,.22),0 4px 0 rgba(8,55,30,.85),0 6px 16px rgba(0,0,0,.32)}
-.rowsechead{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+.rowsechead{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   padding:14px 4px 10px}
 .listrow{display:flex;align-items:center;gap:13px;width:100%;background:none;border:none;
   border-top:1px solid rgba(31,133,87,.15);padding:13px 4px;cursor:pointer;text-align:left;
@@ -1175,7 +1186,7 @@ html.no-tabs .app{padding-bottom:calc(44px + env(safe-area-inset-bottom))}
 .rowcard,html[data-theme="dark"] .rowcard{
   background:none;border:none;box-shadow:none;padding:0;margin-bottom:24px;
   display:flex;flex-direction:column;gap:12px}
-.rowsechead{font-size:11px;color:var(--quiet);font-weight:700;letter-spacing:.14em;
+.rowsechead{font-size:12px;color:var(--quiet);font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;padding:4px 8px 0}
 .listrow,html[data-theme="dark"] .listrow{
   display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;
@@ -1407,4 +1418,8 @@ html.no-tabs .rigtap{pointer-events:none}
 }
 /* right/wrong reaction: swing harder for a moment (JS winds --sp up to match) */
 .rig.react{--amp:2.1}
-}
+
+/* On the dark ground the engraving inverts: the bevel goes below the stroke. */
+html[data-theme="dark"] .charcard .zh,
+html[data-theme="dark"] .swipe-front .zh{
+  text-shadow:0 -1px 0 rgba(0,0,0,.5),0 1px 1px rgba(255,255,255,.10)}

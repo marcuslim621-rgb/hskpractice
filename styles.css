@@ -1288,8 +1288,8 @@ html[data-theme="dark"] .swipe-front .zh{text-shadow:1px 1px 0 rgba(255,255,255,
   width:calc(400px * var(--rigscale));height:calc(640px * var(--rigscale));
   right:-14px;bottom:calc(68px + env(safe-area-inset-bottom))}
 @media (min-width:520px){.rigdock{--rigscale:.44;right:2px}}
-html.no-tabs .rigdock{bottom:calc(2px + env(safe-area-inset-bottom))}
-html.no-rig .rigdock,html.rig-hidden .rigdock{display:none}
+/* one seat on every screen — she doesn't move or disappear between them */
+html.rig-hidden .rigdock{display:none}
 .rigscale{position:absolute;left:0;top:0;width:400px;height:640px;
   transform:scale(var(--rigscale));transform-origin:0 0}
 .rigbounce{width:400px;height:640px;transform-origin:50% 100%}
@@ -1298,6 +1298,9 @@ html.no-rig .rigdock,html.rig-hidden .rigdock{display:none}
    than the whole box, so the transparent corners stay click-through */
 .rigtap{position:absolute;left:9.5%;top:4.2%;width:81.8%;height:93.8%;z-index:2;
   padding:0;border:none;background:none;cursor:pointer;pointer-events:auto}
+/* mid-drill and on the result screens she's scenery: still in the same seat,
+   but click-through, so she can't swallow a star or a button underneath her */
+html.no-tabs .rigtap{pointer-events:none}
 .rigdock.moving{pointer-events:auto;cursor:grab;touch-action:none}
 .rigdock.moving:active{cursor:grabbing}
 .rigdock.moving .rigscale{filter:drop-shadow(0 6px 14px rgba(0,0,0,.28))}

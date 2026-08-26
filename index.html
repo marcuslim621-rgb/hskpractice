@@ -15,33 +15,31 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
 
   <!-- HOME -->
-  <section class="screen active" id="scr-home">
-    <div class="homebar">
-      <button class="helptoggle" onclick="openHelp()" aria-label="How to use">
-        <span class="dot">?</span><span>How to use</span>
-      </button>
+  <!-- Persistent app bar, shown on the four tab roots -->
+  <header class="appbar" id="appbar">
+    <div class="appbar-brand">
+      <div class="appbar-mark">汉</div>
+      <div class="appbar-titles">
+        <div class="appbar-title" id="appbartitle">Hanzi Daily</div>
+        <div class="appbar-sub" id="appbarsub">HSK 1-4 preparation | Hi Momo!</div>
+      </div>
+    </div>
+    <div class="appbar-actions">
       <div class="streakflame" id="streakflame" aria-label="Daily streak">
         <span class="streakicon">🔥</span><span id="streakcount">0</span>
       </div>
-      <button class="themetoggle" onclick="toggleTheme()" aria-label="Switch theme">
-        <span class="dot" id="themedot">暗</span><span id="themelabel">Dark</span>
-      </button>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>
-    <div class="hero">
-      <div class="ghost heroghost">汉</div>
-      <div style="position:relative">
-        <div class="eyebrow">汉语水平考试</div>
-        <h1>Hanzi Daily</h1>
-        <div class="sub">HSK 1-4 preparation | Hi Momo!</div>
-      </div>
-    </div>
+  </header>
+
+  <section class="screen active" id="scr-home">
     <div class="swipecard" id="swipecard">
       <div class="swipe-head">
         <div class="swipe-title">
@@ -61,11 +59,6 @@
 
     <div class="rowcard">
       <div class="rowsechead">Learn &amp; Practice</div>
-      <button class="listrow" onclick="openWordlist()">
-        <div class="sealic">词</div>
-        <div class="tt">Word list</div>
-        <div class="chev">›</div>
-      </button>
       <button class="listrow" onclick="goCategory('guessing')">
         <div class="sealic quiet">认</div>
         <div class="tt">Recognition</div>
@@ -92,8 +85,35 @@
         <button class="chev listrow-maintap" onclick="startRefresher()">›</button>
       </div>
       <button class="refresherscope-row" onclick="openRefresherScope()">Scope: <b id="refresherscopelabel">All HSK levels</b> ›</button>
+    </div>
+  </section>
 
-      <div class="rowsechead" style="margin-top:20px">Review</div>
+  <!-- REVIEW TAB -->
+  <section class="screen" id="scr-review">
+    <div class="rowcard">
+      <div class="rowsechead">Your words</div>
+      <button class="listrow" onclick="openWordlist()">
+        <div class="sealic">词</div>
+        <div class="tt">Word list</div>
+        <div class="chev">›</div>
+      </button>
+      <button class="listrow" onclick="renderMyWordlists();show('mywordlists')">
+        <div class="sealic quiet">册</div>
+        <div class="tt">My wordlists</div>
+        <div class="chev">›</div>
+      </button>
+      <button class="listrow listrow-last" onclick="openMastery()">
+        <div class="sealic jade">熟</div>
+        <div class="tt">Mastery</div>
+        <div class="chev">›</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- PROGRESS TAB -->
+  <section class="screen" id="scr-progress">
+    <div class="rowcard">
+      <div class="rowsechead">Progress</div>
       <button class="listrow" onclick="renderHistory();show('history')">
         <div class="sealic jade">录</div>
         <div class="tt">Past scores</div>
@@ -107,6 +127,26 @@
       <button class="listrow listrow-last" onclick="renderStats();show('stats')">
         <div class="sealic jade">统</div>
         <div class="tt">Statistics</div>
+        <div class="chev">›</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- SETTINGS TAB -->
+  <section class="screen" id="scr-settings">
+    <div class="rowcard">
+      <div class="rowsechead">Appearance</div>
+      <div class="listrow listrow-static listrow-last">
+        <div class="sealic quiet" id="themedot">暗</div>
+        <div class="tt">Theme</div>
+        <button class="settingbtn" onclick="toggleTheme()"><span id="themelabel">Dark</span></button>
+      </div>
+    </div>
+    <div class="rowcard">
+      <div class="rowsechead">Help</div>
+      <button class="listrow listrow-last" onclick="openHelp()">
+        <div class="sealic quiet">问</div>
+        <div class="tt">How to use</div>
         <div class="chev">›</div>
       </button>
     </div>
@@ -447,12 +487,18 @@
 
   <!-- SUMMARY -->
   <section class="screen" id="scr-summary">
-    <div class="centerpiece"><div class="sealic lg">成</div><h2>Session summary</h2><p id="sumlabel"></p>
-      <p class="bestflag" id="sumbest">★ New personal best</p></div>
+    <div class="donehead">
+      <h1>All Done!</h1>
+      <p id="sumlabel"></p>
+      <p class="bestflag" id="sumbest">★ New personal best</p>
+    </div>
+    <div class="herotile">
+      <span class="l">Accuracy</span>
+      <span class="v" id="sumacc">0%</span>
+    </div>
     <div class="bigstats">
       <div class="stat ok"><div class="v" id="sumok">0</div><div class="l">Correct</div></div>
       <div class="stat bad"><div class="v" id="sumbad">0</div><div class="l">Wrong</div></div>
-      <div class="stat acc"><div class="v" id="sumacc">0%</div><div class="l">Accuracy</div></div>
     </div>
     <div class="sechead">Word breakdown</div>
     <div class="breakdown" id="sumwords"></div>
@@ -997,6 +1043,23 @@
 
 
 </div>
+
+<!-- Bottom tab bar. Hidden during a practice session and on the result screens. -->
+<nav class="tabbar" id="tabbar">
+  <button class="tabitem" id="tab-learn" onclick="goTab('learn')">
+    <span class="tabic">学</span><span class="tablabel">Learn</span>
+  </button>
+  <button class="tabitem" id="tab-review" onclick="goTab('review')">
+    <span class="tabic">复</span><span class="tablabel">Review</span>
+  </button>
+  <button class="tabitem" id="tab-progress" onclick="goTab('progress')">
+    <span class="tabic">进</span><span class="tablabel">Progress</span>
+  </button>
+  <button class="tabitem" id="tab-settings" onclick="goTab('settings')">
+    <span class="tabic">设</span><span class="tablabel">Settings</span>
+  </button>
+</nav>
+
 <script src="data.js"></script>
 <script src="app.js"></script>
 

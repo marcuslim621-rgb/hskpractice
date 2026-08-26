@@ -1,48 +1,77 @@
+/* ============================================================
+   Ink & Ivory — the palette is a traditional triad (cinnabar,
+   ink, jade) on a bone-white ivory substrate. Depth comes from
+   "tile" construction: a light top-left edge, a bone-shadow
+   bottom-right recede, and a stacked shadow underneath, so
+   cards read as physical pieces rather than flat panels.
+   ============================================================ */
 :root{
-  --bg:#F0F1EE;        /* page surface, sits behind cards */
-  --card:#FFFFFF;
-  --ink:#1B1D24;
-  --muted:#6B6E6A;
-  --line:#E1E3DE;
-  --line-strong:#CBCEC6;
-  --seal:#DB3A1B;      /* cinnabar, more saturated */
-  --seal-tint:#FCEBE5;
-  --jade:#0E8F55;
-  --jade-tint:#E4F3EA;
-  --gold:#B87D0C;      /* new accent for the quiet seals */
-  --fill:#1B1D24;      /* filled controls */
-  --on-fill:#FFFFFF;
-  --seal2:#DB3A1B;     /* quiet seal stamps — aligned to seal color */
-  --tile-ink-bg:rgba(33,36,44,.05);
-  --tile-ink-border:rgba(33,36,44,.15);
-  --tile-ink-border-hover:rgba(33,36,44,.25);
-  --tile-jade-bg:rgba(31,133,87,.05);
-  --tile-jade-border:rgba(31,133,87,.15);
-  --tile-jade-border-hover:rgba(31,133,87,.25);
+  --bg:#F5F3EF;        /* page surface, sits behind the ivory tiles */
+  --card:#FDFBF7;      /* ivory */
+  --ink:#1A1C1A;
+  --muted:#5A413D;     /* warm on-surface-variant */
+  --quiet:#8E706C;     /* outline — quieter still, for uppercase labels */
+  --line:#E5E2D9;      /* bone-shadow, the tile's receding edge */
+  --line-strong:#D6D2C6;
+  --seal:#BE3425;      /* cinnabar */
+  --seal-deep:#9C1A0F;
+  --seal-tint:#FFDFDA;
+  --jade:#006B3E;
+  --jade-tint:#DCEFE4;
+  --gold:#B87D0C;
+  --fill:#1A1C1A;      /* filled controls */
+  --on-fill:#FDFBF7;
+  --seal2:#BE3425;
+  --btn-edge:#1A1C1A;   /* engraved bottom edge on cinnabar buttons */
+  --on-jade:#FFFFFF;
+  /* tile construction */
+  --tile-face:#FDFBF7;
+  --tile-hi:#FFFFFF;                    /* top-left highlight */
+  --tile-lo:#E5E2D9;                    /* bottom-right recede */
+  --tile-inset:inset 0 1px 2px rgba(255,255,255,.8);
+  --tile-lift:0 1px 0 0 var(--tile-lo),0 4px 12px rgba(0,0,0,.05);
+  --tile-lift-hi:0 2px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.08);
+  --tile-ink-bg:rgba(26,28,26,.05);
+  --tile-ink-border:rgba(26,28,26,.15);
+  --tile-ink-border-hover:rgba(26,28,26,.25);
+  --tile-jade-bg:rgba(0,107,62,.05);
+  --tile-jade-border:rgba(0,107,62,.18);
+  --tile-jade-border-hover:rgba(0,107,62,.3);
   --hanzi:"Noto Serif SC","Songti SC","SimSun",serif;
-  --ui:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ui:"Noto Serif",Georgia,"Times New Roman",serif;
 }
 html[data-theme="dark"]{
-  --bg:#14161C;        /* page surface, deeper than card in dark mode too */
-  --card:#1E2028;
-  --ink:#ECEBE6;
-  --muted:#8B8F99;
-  --line:#2D3039;
-  --line-strong:#3B3F4A;
-  --seal:#EE5A38;
-  --seal-tint:rgba(238,90,56,.15);
-  --jade:#41B383;
-  --jade-tint:rgba(65,179,131,.13);
+  /* the same tiles carved from dark stone rather than bone */
+  --bg:#141513;
+  --card:#212220;
+  --ink:#F2F0ED;
+  --muted:#A99691;
+  --quiet:#8E7B77;
+  --line:#33342F;
+  --line-strong:#454745;
+  --seal:#E5604E;
+  --seal-deep:#BE3425;
+  --seal-tint:rgba(229,96,78,.16);
+  --jade:#4FBF88;
+  --jade-tint:rgba(79,191,136,.14);
   --gold:#E0A83C;
-  --fill:#ECEBE6;
+  --fill:#F2F0ED;
   --on-fill:#17181C;
-  --seal2:#EE5A38;
-  --tile-ink-bg:rgba(236,235,230,.11);
-  --tile-ink-border:rgba(236,235,230,.23);
-  --tile-ink-border-hover:rgba(236,235,230,.33);
-  --tile-jade-bg:rgba(65,179,131,.11);
-  --tile-jade-border:rgba(65,179,131,.23);
-  --tile-jade-border-hover:rgba(65,179,131,.33);
+  --seal2:#E5604E;
+  --btn-edge:#7A2317;
+  --on-jade:#0E120F;
+  --tile-face:#212220;
+  --tile-hi:rgba(255,255,255,.07);
+  --tile-lo:#0D0E0C;
+  --tile-inset:inset 0 1px 2px rgba(255,255,255,.05);
+  --tile-lift:0 1px 0 0 var(--tile-lo),0 4px 12px rgba(0,0,0,.4);
+  --tile-lift-hi:0 2px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.5);
+  --tile-ink-bg:rgba(242,240,237,.11);
+  --tile-ink-border:rgba(242,240,237,.23);
+  --tile-ink-border-hover:rgba(242,240,237,.33);
+  --tile-jade-bg:rgba(79,191,136,.11);
+  --tile-jade-border:rgba(79,191,136,.23);
+  --tile-jade-border-hover:rgba(79,191,136,.33);
 }
 html[data-theme="dark"] body{-webkit-font-smoothing:auto}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1089,3 +1118,157 @@ html[data-theme="dark"] #wllist .wrow{border-top-color:rgba(65,179,131,.18)}
 .awc-poschip{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:99px;
   padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--ui)}
 .awc-poschip.on{background:var(--seal);border-color:var(--seal);color:#fff}
+
+/* ============================================================
+   INK & IVORY — shell and tile treatment.
+   Layered after the original rules so the redesign reads as one
+   block while it rolls out screen by screen. Anything the old
+   sheet themed per-mode is re-stated with matching specificity.
+   ============================================================ */
+
+/* ---------- shared tile construction ---------- */
+.tile-face{
+  background:var(--tile-face);
+  border-top:1.5px solid var(--tile-hi);border-left:1.5px solid var(--tile-hi);
+  border-bottom:1.5px solid var(--tile-lo);border-right:1.5px solid var(--tile-lo);
+  box-shadow:var(--tile-lift);
+}
+.tile-press{transition:transform .16s ease,box-shadow .16s ease}
+.tile-press:active{box-shadow:none;transform:translateY(2px)}
+
+/* ---------- app bar (the four tab roots) ---------- */
+.appbar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.appbar-brand{flex:1;min-width:0;display:flex;align-items:center;gap:12px}
+.appbar-mark{width:42px;height:48px;flex-shrink:0;border-radius:12px;
+  background:var(--tile-face);color:var(--seal);
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:var(--tile-inset),0 2px 4px rgba(0,0,0,.05);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--hanzi);font-size:22px;font-weight:700}
+.appbar-titles{min-width:0}
+.appbar-title{font-size:21px;font-weight:700;line-height:1.2;color:var(--seal);letter-spacing:-.01em}
+.appbar-sub{font-size:11.5px;color:var(--muted);margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.appbar-actions{flex-shrink:0;display:flex;align-items:center;gap:8px}
+
+/* ---------- bottom tab bar ---------- */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:60;max-width:440px;margin:0 auto;
+  display:flex;align-items:stretch;gap:6px;
+  padding:8px 12px calc(10px + env(safe-area-inset-bottom));
+  background:var(--card);border-top:1px solid var(--line);
+  border-radius:16px 16px 0 0;box-shadow:0 -4px 14px rgba(0,0,0,.07)}
+html.no-tabs .tabbar{display:none}
+.tabitem{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:7px 4px;border:none;background:none;cursor:pointer;color:var(--quiet);
+  font-family:var(--ui);border-radius:12px;
+  transition:transform .2s ease,background-color .2s ease,color .2s ease}
+.tabitem .tabic{font-family:var(--hanzi);font-size:19px;line-height:1;font-weight:600}
+.tabitem .tablabel{font-size:10.5px;font-weight:700;letter-spacing:.05em}
+.tabitem.on{background:var(--jade);color:var(--on-jade);
+  border-top:2px solid rgba(255,255,255,.2);border-left:2px solid rgba(255,255,255,.2)}
+.tabitem:active{transform:translateY(1px) scale(.96)}
+/* room for the bar, reclaimed when a session takes the viewport */
+.app{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+html.no-tabs .app{padding-bottom:calc(44px + env(safe-area-inset-bottom))}
+
+/* ---------- row groups become stacks of tiles ---------- */
+.rowcard,html[data-theme="dark"] .rowcard{
+  background:none;border:none;box-shadow:none;padding:0;margin-bottom:24px;
+  display:flex;flex-direction:column;gap:12px}
+.rowsechead{font-size:11px;color:var(--quiet);font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:4px 8px 0}
+.listrow,html[data-theme="dark"] .listrow{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;
+  color:var(--ink);font-family:var(--ui);padding:12px 14px;border-radius:12px;
+  background:var(--tile-face);
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:0 2px 0 0 var(--tile-lo);
+  transition:transform .16s ease,box-shadow .16s ease}
+.listrow:not(.listrow-static):hover,html[data-theme="dark"] .listrow:not(.listrow-static):hover{
+  background:var(--tile-face);box-shadow:var(--tile-lift-hi)}
+.listrow:not(.listrow-static):active,html[data-theme="dark"] .listrow:not(.listrow-static):active{
+  background:var(--tile-face);transform:translateY(2px);box-shadow:none}
+.listrow .tt{font-size:15px;font-weight:600;letter-spacing:0}
+.listrow .chev{color:var(--quiet);font-size:18px}
+/* row icons are engraved ivory tiles rather than filled seals */
+.listrow .sealic,
+.listrow .sealic.quiet,
+.listrow .sealic.jade,
+html[data-theme="dark"] .listrow .sealic.quiet{
+  width:42px;height:48px;border-radius:8px;transform:none;flex-shrink:0;
+  background:var(--tile-face);color:var(--seal);
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:var(--tile-inset);
+  font-family:var(--hanzi);font-size:20px;font-weight:600;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.listrow .sealic.jade{color:var(--jade)}
+.listrow:not(.listrow-static):hover .sealic,
+.listrow:not(.listrow-static):active .sealic{transform:rotate(-4deg) scale(1.04)}
+.refresherscope-row{margin:0;background:var(--bg);border:1.5px solid var(--tile-lo);border-radius:8px;
+  padding:10px 12px;color:var(--muted)}
+.settingbtn{flex-shrink:0;border:1.5px solid var(--tile-lo);background:var(--bg);color:var(--ink);
+  border-radius:99px;padding:7px 15px;font-family:var(--ui);font-size:12px;font-weight:700;cursor:pointer}
+.settingbtn:active{transform:translateY(1px)}
+
+/* ---------- hero: wordlist practice card ---------- */
+.swipecard,html[data-theme="dark"] .swipecard{
+  background:var(--tile-face);border-radius:16px;padding:20px;margin-bottom:24px;
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:0 4px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.06)}
+.swipe-ic{width:50px;height:58px;border-radius:12px;background:var(--tile-face);color:var(--seal);
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:var(--tile-inset),0 2px 4px rgba(0,0,0,.05);font-size:22px;font-weight:700}
+.swipe-heading{font-size:16px;font-weight:600}
+.swipe-sub{font-size:12px}
+.qwrite-pick{border:1.5px solid var(--tile-lo);background:var(--tile-face);color:var(--ink);
+  border-radius:99px;padding:6px 11px;font-size:10.5px;font-weight:700;letter-spacing:.04em}
+html[data-theme="dark"] .qwrite-pick{background:var(--tile-face)}
+.swipe-mastered{background:var(--bg);border:1.5px solid var(--tile-lo);color:var(--ink);
+  border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px}
+.swipe-mastered .chev{color:var(--quiet)}
+/* cinnabar action button with the signature engraved bottom edge */
+.swipe-start,.swipe-start.primary{width:100%;min-height:56px;border-radius:12px;
+  background:var(--seal);color:#fff;border:none;border-bottom:4px solid var(--btn-edge);
+  font-family:var(--ui);font-size:17px;font-weight:600;cursor:pointer;
+  transition:transform .12s ease,border-width .12s ease}
+.swipe-start:active{border-bottom-width:0;transform:translateY(4px)}
+
+/* ---------- the flashcard reads as a mahjong tile ---------- */
+.swipe-front,.swipe-back{
+  background:var(--tile-face);border-radius:16px;
+  border-top:1px solid var(--tile-hi);border-left:1px solid var(--tile-hi);
+  border-bottom:2px solid var(--tile-lo);border-right:2px solid var(--tile-lo);
+  box-shadow:0 4px 15px rgba(0,0,0,.07)}
+.swipe-front .zh{color:var(--jade);text-shadow:1px 1px 0 rgba(255,255,255,.8)}
+html[data-theme="dark"] .swipe-front .zh{text-shadow:1px 1px 0 rgba(255,255,255,.08)}
+.swipe-front .prompt{color:var(--seal)}
+.swipe-back .py{color:var(--seal)}
+.swbtn{border:1.5px solid var(--tile-lo);background:var(--tile-face);border-radius:12px;
+  box-shadow:0 2px 0 0 var(--tile-lo);transition:transform .16s ease,box-shadow .16s ease}
+.swbtn:active{transform:translateY(2px);box-shadow:none}
+.swipehist-item{background:var(--tile-face);border:1.5px solid var(--tile-lo);
+  border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);border-radius:11px}
+
+/* ---------- result screens ---------- */
+.donehead{text-align:center;padding:22px 0 18px}
+.donehead h1{font-size:30px;font-weight:700;color:var(--seal);letter-spacing:-.01em;line-height:1.15}
+.donehead p{color:var(--muted);font-size:13px;margin-top:6px}
+.herotile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:30px 20px;border-radius:16px;background:var(--tile-face);
+  border-top:1px solid var(--tile-hi);border-left:1px solid var(--tile-hi);
+  border-bottom:1.5px solid var(--tile-lo);border-right:1.5px solid var(--tile-lo);
+  box-shadow:var(--tile-lift)}
+.herotile .l{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--quiet)}
+.herotile .v{font-size:46px;font-weight:700;line-height:1.1;color:var(--jade);
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat{background:var(--tile-face);border-radius:16px;padding:20px 10px;
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:var(--tile-lift)}
+.stat .l{color:var(--quiet);letter-spacing:.14em}
+.btn{border-radius:12px;font-family:var(--ui);font-weight:600;border:1.5px solid var(--tile-lo);
+  transition:transform .12s ease,box-shadow .12s ease}
+.btn.outline{background:var(--tile-face);box-shadow:0 2px 0 0 var(--tile-lo)}
+.btn.outline:active{transform:translateY(2px);box-shadow:none}
+.btn.primary{background:var(--seal);border-color:var(--seal);color:#fff;
+  border-bottom:4px solid var(--btn-edge)}
+.btn.primary:active{border-bottom-width:0;transform:translateY(4px)}

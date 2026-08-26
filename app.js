@@ -63,10 +63,41 @@ function levelBadge(lv){
 /* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+/* ---------- tab shell ----------
+   Four roots (Learn / Review / Progress / Settings). Every other screen is
+   filed under whichever tab it was reached from, so the bar keeps showing
+   where you are. A practice session or a result screen takes the whole
+   viewport instead — the bar and the app bar step out of the way. */
+const TAB_ROOT={learn:"home",review:"review",progress:"progress",settings:"settings"};
+const TAB_ORDER=["learn","review","progress","settings"];
+const TAB_FOR_SCREEN={
+  home:"learn",modeselect:"learn",levels:"learn",wordlistlevels:"learn",
+  review:"review",wordlist:"review",worddetail:"review",
+  mywordlists:"review",wordlisteditor:"review",mastery:"review",
+  progress:"progress",history:"progress",leaderboard:"progress",stats:"progress",
+  settings:"settings"
+};
+const NO_TABS=new Set(["swipe","quiz","typequiz","writequiz","sentquiz","summary","gameover"]);
+const APPBAR_TEXT={
+  home:["Hanzi Daily","HSK 1-4 preparation | Hi Momo!"],
+  review:["Review","Your words, and how well you know them"],
+  progress:["Progress","Scores, streaks and statistics"],
+  settings:["Settings","Appearance and help"]
+};
+function goTab(tab){show(TAB_ROOT[tab])}
+function updateShell(name){
+  document.documentElement.classList.toggle("no-tabs",NO_TABS.has(name));
+  const text=APPBAR_TEXT[name];
+  $("appbar").style.display=text?"":"none";
+  if(text){$("appbartitle").textContent=text[0];$("appbarsub").textContent=text[1]}
+  const active=TAB_FOR_SCREEN[name]||null;
+  TAB_ORDER.forEach(t=>$("tab-"+t).classList.toggle("on",t===active));
+}
 function show(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   $("scr-"+name).classList.add("active");
   window.scrollTo(0,0);
+  updateShell(name);
   if(name==="home"){updateRefresherBadge();updateRefresherScopeLabel();updateSwipeCardSummary();updateStreakFlame()}
   if(name==="summary")fireConfetti();
 }
@@ -2018,7 +2049,7 @@ let _hp=0,_htx=null,_hty=null;
 const _TOTAL=9;
 const HELP_PAGE_FOR_SCREEN={
   wordlist:0,
-  mywordlists:1,wordlisteditor:1,swipe:1,mastery:1,
+  mywordlists:1,wordlisteditor:1,swipe:1,mastery:1,review:0,progress:7,settings:0,
   worddetail:2,
   quiz:3,
   typequiz:4,writequiz:4,
@@ -2739,4 +2770,6 @@ updateRefresherBadge();
 updateRefresherScopeLabel();
 updateStreakFlame();
 syncAllCustomWords();
+// the first screen is marked active in the markup, so show() never ran for it
+updateShell((document.querySelector(".screen.active")||{id:"scr-home"}).id.slice(4));
 

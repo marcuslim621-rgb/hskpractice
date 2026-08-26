@@ -29,6 +29,10 @@
   --tile-hi:#FFFFFF;                    /* top-left highlight */
   --tile-lo:#E5E2D9;                    /* bottom-right recede */
   --tile-inset:inset 0 1px 2px rgba(255,255,255,.8);
+  --tile-back:#0E7A48;        /* mahjong tile backing, seen at the bottom lip */
+  --tile-back-deep:#06542F;   /* its shaded underside */
+  --tile-stack:var(--tile-inset),0 3px 0 0 var(--tile-back),0 4px 0 0 var(--tile-back-deep),0 6px 7px -3px rgba(0,0,0,.22);
+  --tile-stack-press:var(--tile-inset),0 1px 0 0 var(--tile-back),0 2px 0 0 var(--tile-back-deep);
   --tile-lift:0 1px 0 0 var(--tile-lo),0 4px 12px rgba(0,0,0,.05);
   --tile-lift-hi:0 2px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.08);
   --tile-ink-bg:rgba(26,28,26,.05);
@@ -1154,7 +1158,7 @@ html[data-theme="dark"] #wllist .wrow{border-top-color:rgba(65,179,131,.18)}
 .appbar-mark{width:42px;height:48px;flex-shrink:0;border-radius:12px;
   background:var(--tile-face);color:var(--seal);
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
-  box-shadow:var(--tile-inset),0 2px 4px rgba(0,0,0,.05);
+  box-shadow:var(--tile-stack);
   display:flex;align-items:center;justify-content:center;
   font-family:var(--hanzi);font-size:22px;font-weight:700}
 .appbar-titles{min-width:0}
@@ -1215,12 +1219,13 @@ html[data-theme="dark"] .listrow .sealic.quiet{
   width:42px;height:48px;border-radius:8px;transform:none;flex-shrink:0;
   background:var(--tile-face);color:var(--seal);
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
-  box-shadow:var(--tile-inset);
+  box-shadow:var(--tile-stack);
   font-family:var(--hanzi);font-size:20px;font-weight:600;
   transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
 .listrow .sealic.jade{color:var(--jade)}
-.listrow:not(.listrow-static):hover .sealic,
-.listrow:not(.listrow-static):active .sealic{transform:rotate(-4deg) scale(1.04)}
+.listrow:not(.listrow-static):hover .sealic{transform:rotate(-4deg) scale(1.04)}
+.listrow:not(.listrow-static):active .sealic{transform:rotate(-4deg) scale(1.02);
+  box-shadow:var(--tile-stack-press)}
 .refresherscope-row{margin:0;background:var(--bg);border:1.5px solid var(--tile-lo);border-radius:8px;
   padding:10px 12px;color:var(--muted)}
 .settingbtn{flex-shrink:0;border:1.5px solid var(--tile-lo);background:var(--bg);color:var(--ink);
@@ -1234,7 +1239,7 @@ html[data-theme="dark"] .listrow .sealic.quiet{
   box-shadow:0 4px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.06)}
 .swipe-ic{width:50px;height:58px;border-radius:12px;background:var(--tile-face);color:var(--seal);
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
-  box-shadow:var(--tile-inset),0 2px 4px rgba(0,0,0,.05);font-size:22px;font-weight:700}
+  box-shadow:var(--tile-stack);font-size:22px;font-weight:700}
 .swipe-heading{font-size:16px;font-weight:600}
 .swipe-sub{font-size:12px}
 .qwrite-pick{border:1.5px solid var(--tile-lo);background:var(--tile-face);color:var(--ink);

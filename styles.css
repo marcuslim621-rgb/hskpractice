@@ -1282,10 +1282,10 @@ html[data-theme="dark"] .swipe-front .zh{text-shadow:1px 1px 0 rgba(255,255,255,
    To show it smaller, scale the whole rig (.rigdock below).
    ============================================================ */
 .rigdock{position:fixed;right:-14px;z-index:40;pointer-events:none;
-  bottom:calc(60px + env(safe-area-inset-bottom));  /* feet clear the tab bar */
+  bottom:calc(68px + env(safe-area-inset-bottom));  /* feet clear the tab bar */
   transform-origin:100% 100%;transform:scale(.33)}
 @media (min-width:520px){.rigdock{right:2px;transform:scale(.44)}}
-html.no-tabs .rigdock{bottom:calc(-7px + env(safe-area-inset-bottom))}
+html.no-tabs .rigdock{bottom:calc(2px + env(safe-area-inset-bottom))}
 html.no-rig .rigdock{display:none}
 
 .rig{--sp:1;position:relative;width:400px;height:640px}
@@ -1303,6 +1303,17 @@ html.no-rig .rigdock{display:none}
 .s-arm-r{transform-origin:146px 348px;z-index:5}
 .s-prop{transform-origin:90px 197px}
 .s-head{transform-origin:200px 232px;z-index:6}
+
+/* Pose offsets, applied on top of the baked alignment. The parts already stack
+   correctly at 0,0; these push the pose further — longer legs, heavier sleeves,
+   torso lifted — and are Marcus's chosen look, not a correction. Pivots and
+   layer order above stay as the handoff defines them. */
+.s-leg-l > .art{transform:translate(-96px,-413px) scale(1.73)}
+.s-leg-r > .art{transform:translate(-189px,-418px) scale(1.73)}
+.s-body  > .art{transform:translate(-9px,-51px) scale(1)}
+.s-arm-l > .art{transform:translate(-59px,-79px) scale(1.2)}
+.s-arm-r > .art{transform:translate(-18px,-52px) scale(1.2)}
+.s-prop  > .art{transform:translate(-22px,-21px) scale(1)}
 
 /* motion — the rig export left hairBackSway and propBob with empty
    animation-name longhands, so both are written out here in full */

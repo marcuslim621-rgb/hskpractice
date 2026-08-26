@@ -10,6 +10,14 @@ reposition them. Do not size an `<img class="art">` to anything but
 `object-fit:cover`, or a flex/grid stretch, the layers scale by different
 amounts and the character comes apart.
 
+**One exception, deliberate:** `styles.css` applies a block of `transform` pose
+offsets to six of the `.art` layers — longer legs, heavier sleeves, torso
+lifted. That is a chosen look layered on top of the baked alignment, not a
+correction to it. The baked stack is still the zero position; if you ever need
+the neutral figure back, delete that block and everything lines up at 0,0.
+Changing those offsets changes the pose, so re-measure where the feet land
+before adjusting `.rigdock`'s `bottom`.
+
 To show the rig smaller, scale the **whole rig** — `.rigdock` in `styles.css`
 does this with a `transform:scale()` on the wrapper. Never resize the images
 individually.

@@ -774,9 +774,10 @@ html[data-theme="dark"] .themetoggle .dot{color:var(--ink)}
 .streakflame{flex:0 0 auto;display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);
   border-radius:99px;padding:7px 13px;font-size:13px;font-weight:700;color:var(--muted);
   font-family:var(--ui)}
-.streakflame .streakicon{font-size:14px;filter:grayscale(1);opacity:.55;transition:filter .2s ease,opacity .2s ease,transform .2s ease}
+.streakflame .streakicon{width:16px;height:16px;flex:0 0 auto;fill:currentColor;color:var(--quiet);
+  opacity:.7;transition:color .2s ease,opacity .2s ease,transform .2s ease}
 .streakflame.active{color:var(--ink);border-color:#f0a63a}
-.streakflame.active .streakicon{filter:none;opacity:1;transform:scale(1.08)}
+.streakflame.active .streakicon{color:var(--seal);opacity:1;transform:scale(1.08)}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:26px 12px;line-height:1.6;
   background:var(--card);border:1px dashed var(--line);border-radius:12px}
 
@@ -1173,7 +1174,12 @@ html.no-tabs .tabbar{display:none}
   padding:7px 4px;border:none;background:none;cursor:pointer;color:var(--quiet);
   font-family:var(--ui);border-radius:12px;
   transition:transform .2s ease,background-color .2s ease,color .2s ease}
-.tabitem .tabic{font-family:var(--hanzi);font-size:19px;line-height:1;font-weight:600}
+/* icons carry the tab; the filled cut is swapped in for the active one, as the
+   Ink & Ivory screens do with Material Symbols' FILL axis */
+.tabitem .tabic{width:22px;height:22px;display:block;fill:currentColor}
+.tabitem .tabic-f{display:none}
+.tabitem.on .tabic-o{display:none}
+.tabitem.on .tabic-f{display:block}
 .tabitem .tablabel{font-size:10.5px;font-weight:700;letter-spacing:.05em}
 .tabitem.on{background:var(--jade);color:var(--on-jade);
   border-top:2px solid rgba(255,255,255,.2);border-left:2px solid rgba(255,255,255,.2)}
@@ -1423,3 +1429,6 @@ html.no-tabs .rigtap{pointer-events:none}
 html[data-theme="dark"] .charcard .zh,
 html[data-theme="dark"] .swipe-front .zh{
   text-shadow:0 -1px 0 rgba(0,0,0,.5),0 1px 1px rgba(255,255,255,.10)}
+
+/* the symbol sprite itself never renders */
+.icsprite{position:absolute;width:0;height:0;overflow:hidden}

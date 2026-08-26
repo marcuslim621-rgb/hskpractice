@@ -78,6 +78,8 @@ const TAB_FOR_SCREEN={
   settings:"settings"
 };
 const NO_TABS=new Set(["swipe","quiz","typequiz","writequiz","sentquiz","summary","gameover"]);
+// the mascot steps out during a live session, but stays for the result screens
+const NO_RIG=new Set(["swipe","quiz","typequiz","writequiz","sentquiz"]);
 const APPBAR_TEXT={
   home:["Hanzi Daily","HSK 1-4 preparation | Hi Momo!"],
   review:["Review","Your words, and how well you know them"],
@@ -87,6 +89,7 @@ const APPBAR_TEXT={
 function goTab(tab){show(TAB_ROOT[tab])}
 function updateShell(name){
   document.documentElement.classList.toggle("no-tabs",NO_TABS.has(name));
+  document.documentElement.classList.toggle("no-rig",NO_RIG.has(name));
   const text=APPBAR_TEXT[name];
   $("appbar").style.display=text?"":"none";
   if(text){$("appbartitle").textContent=text[0];$("appbarsub").textContent=text[1]}

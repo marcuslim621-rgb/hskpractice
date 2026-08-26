@@ -68,6 +68,62 @@ function show(name){
   $("scr-"+name).classList.add("active");
   window.scrollTo(0,0);
   if(name==="home"){updateRefresherBadge();updateRefresherScopeLabel();updateSwipeCardSummary();updateStreakFlame()}
+  if(name==="summary")fireConfetti();
+}
+
+/* ---------- confetti: a finished session gets a burst, drawn on a throwaway
+   canvas so nothing external is needed and nothing is left behind ---------- */
+const CONFETTI_COLORS=["#BE3425","#D14A37","#E08A6B","#1F8557","#41B383","#D9A62E","#F0D07A"];
+let confettiRAF=0;
+function fireConfetti(){
+  if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  cancelAnimationFrame(confettiRAF);
+  const old=$("confetti");
+  if(old)old.remove();
+  const cv=document.createElement("canvas");
+  cv.id="confetti";
+  document.body.appendChild(cv);
+  const ctx=cv.getContext("2d");
+  if(!ctx){cv.remove();return}
+  const W=window.innerWidth,H=window.innerHeight;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  cv.width=W*dpr;cv.height=H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  // fire from inside the app column, not the far edges of a wide desktop window
+  const col=document.querySelector(".app");
+  const box=col?col.getBoundingClientRect():{left:0,width:W};
+  const bits=[];
+  [[.12,.66],[.5,.58],[.88,.66]].forEach(([fx,fy])=>{
+    for(let i=0;i<60;i++){
+      const ang=-Math.PI/2+(Math.random()-.5)*1.7;
+      const sp=6+Math.random()*11;
+      bits.push({x:box.left+box.width*fx,y:H*fy,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,
+        w:5+Math.random()*5,h:8+Math.random()*7,
+        rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.35,
+        c:CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)]});
+    }
+  });
+  const start=performance.now();
+  const step=now=>{
+    const t=now-start;
+    const fade=Math.max(0,1-Math.max(0,t-1500)/900);
+    ctx.clearRect(0,0,W,H);
+    let alive=0;
+    for(const p of bits){
+      p.vy+=.28;p.vx*=.995;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+      if(p.y>H+30)continue;
+      alive++;
+      ctx.save();
+      ctx.globalAlpha=fade;
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+      ctx.fillStyle=p.c;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    }
+    if(alive&&fade>0)confettiRAF=requestAnimationFrame(step);
+    else cv.remove();
+  };
+  confettiRAF=requestAnimationFrame(step);
 }
 function updateRefresherBadge(){
   const badge=$("refresherbadge");
@@ -1896,8 +1952,16 @@ function togglePin(c){
   store.set("hsk_pins",pins);
   renderWordlist();
 }
-function openDetail(k){
+// word detail is reachable from the word list and from the mastery breakdown —
+// remember which, so Back doesn't dump you on the wrong screen
+let detailReturn="wordlist";
+function backFromDetail(){
+  if(detailReturn==="mastery"){renderMastery();show("mastery");return}
+  show("wordlist");
+}
+function openDetail(k,from){
   const w=findWord(k);if(!w)return;
+  detailReturn=from||"wordlist";
   $("dchar").textContent=w[0];$("dpy").textContent=pin(w[1]);$("den").textContent=w[2];
   $("dseal").textContent=levelBadge(w[3]);
   const p=$("dpos");p.textContent=POS_LABEL[w[4]];p.className="poschip "+w[4];
@@ -1954,7 +2018,7 @@ let _hp=0,_htx=null,_hty=null;
 const _TOTAL=9;
 const HELP_PAGE_FOR_SCREEN={
   wordlist:0,
-  mywordlists:1,wordlisteditor:1,swipe:1,
+  mywordlists:1,wordlisteditor:1,swipe:1,mastery:1,
   worddetail:2,
   quiz:3,
   typequiz:4,writequiz:4,
@@ -2233,12 +2297,51 @@ function updateSwipeCardSummary(){
   if(!el)return;
   const pool=swipeScopedPool();
   el.textContent=swipeScopeLabel()+" · "+pool.length+" word"+(pool.length===1?"":"s");
-  const mEl=$("swipemastered");
+  const mEl=$("swipemasteredtext");
   if(mEl){
     const mastered=getMasteredSwipeWords();
     const count=pool.filter(w=>mastered.has(wordKey(w))).length;
     mEl.textContent=count+" of "+pool.length+" word"+(pool.length===1?"":"s")+" mastered";
   }
+}
+
+/* ---------- mastery breakdown: the current practice list split into words you've
+   marked "know it" and words you haven't ---------- */
+let masteryTab="mastered";
+function openMastery(){
+  masteryTab="mastered";
+  renderMastery();
+  show("mastery");
+}
+function masteryRow(w,fam,done){
+  const key=wordKey(w);
+  const f=(fam[key]&&fam[key].fam)||0;
+  const dots=`<span class="famdots" title="${f} of 5 correct swipes in a row">${"●".repeat(f)}<span class="off">${"○".repeat(5-f)}</span></span>`;
+  // a word stays mastered once known, but a later "don't know" resets its streak —
+  // surface that rather than showing a silent contradiction
+  const slip=(done&&f===0)?`<span class="masteryslip">slipped</span>`:"";
+  return `<button class="wrow" onclick="openDetail('${key}','mastery')">
+    <span class="zh">${w[0]}</span><span><div class="py">${pin(w[1])}</div><div class="en">${esc(w[2])}</div></span>
+    <span class="masteryend">${slip}${dots}${done?`<span class="masterytick">✓</span>`:""}</span></button>`;
+}
+function renderMastery(){
+  const pool=swipeScopedPool();
+  const mastered=getMasteredSwipeWords();
+  const fam=getSwipeFam();
+  const done=pool.filter(w=>mastered.has(wordKey(w)));
+  const todo=pool.filter(w=>!mastered.has(wordKey(w)));
+  const pct=pool.length?Math.round(done.length/pool.length*100):0;
+  $("masteryscope").textContent=swipeScopeLabel();
+  $("masteryfill").style.width=pct+"%";
+  $("masterysub").textContent=done.length+" of "+pool.length+" word"+(pool.length===1?"":"s")+" mastered · "+pct+"%";
+  $("masterytabs").innerHTML=
+    `<button class="tab ${masteryTab==="mastered"?"on":""}" onclick="masteryTab='mastered';renderMastery()">Mastered · ${done.length}</button>`+
+    `<button class="tab ${masteryTab==="todo"?"on":""}" onclick="masteryTab='todo';renderMastery()">Not yet · ${todo.length}</button>`;
+  const showing=masteryTab==="mastered"?done:todo;
+  $("masterylist").innerHTML=showing.map(w=>masteryRow(w,fam,masteryTab==="mastered")).join("")
+    ||`<div class="empty">${masteryTab==="mastered"
+        ?"Nothing mastered in this list yet — swipe “Know it” on a word to master it."
+        :"Every word in this list is mastered. 恭喜!"}</div>`;
 }
 function openSwipeListPicker(){
   renderSwipeListPicker();
@@ -2303,6 +2406,7 @@ function startSwipePractice(){
   $("swipebtns").style.display="";
   $("swipeempty").style.display="none";
   $("swipestage").style.display="";
+  $("swipehistory").style.display="";
   document.documentElement.classList.add("swipe-lock");
   show("swipe");
   renderSwipeCard();
@@ -2314,6 +2418,7 @@ function restartSwipe(){
   SW={deck:buildSwipeDeck(pool),i:0,known:0,unknown:0,flipped:false,dragging:false,startX:0,curX:0,history:[]};
   $("swipeempty").style.display="none";
   $("swipestage").style.display="";
+  $("swipehistory").style.display="";
   $("swipebtns").style.display="";
   renderSwipeCard();
   renderSwipeHistory();
@@ -2357,11 +2462,35 @@ function finishSwipeSession(){
   $("swipeprog").textContent="";
   $("swipefill").style.width="100%";
   $("swipebtns").style.display="none";
-  $("swcard").style.display="none";
+  $("swipestage").style.display="none";
+  $("swipehistory").style.display="none";
   $("swipeempty").style.display="flex";
   $("swknowcount").textContent=SW.known;
   $("swunkcount").textContent=SW.unknown;
   $("swipesummary").textContent="You reviewed "+SW.deck.length+" word"+(SW.deck.length===1?"":"s")+" from "+esc(swipeScopeLabel())+".";
+  renderSwipeMissed();
+  fireConfetti();
+}
+/* the end-of-session list is only the words that were swiped "don't know" */
+function renderSwipeMissed(){
+  const el=$("swipemissed");
+  if(!el)return;
+  const missed=((SW&&SW.history)||[]).filter(h=>!h.known);
+  const head=$("swipemissedhead");
+  if(!missed.length){
+    if(head)head.textContent="Words to review";
+    el.innerHTML=`<div class="allclear">Nothing missed — you knew every word.</div>`;
+    return;
+  }
+  if(head)head.textContent="Words to review · "+missed.length;
+  const pinned=new Set(store.get("hsk_pins",[]));
+  el.innerHTML=missed.map(h=>
+    `<div class="swipehist-item dont">
+      <span class="zh">${esc(h.zh)}</span><span class="py">${esc(pin(h.py))}</span>
+      <span class="pin ${pinned.has(h.k)?"on":""}" title="Star this word"
+        onclick="toggleSwipeHistoryStar('${h.k}')">★</span>
+      <span class="mk">✗</span>
+    </div>`).join("");
 }
 function recordSwipe(c,known){
   const fam=getSwipeFam();
@@ -2379,7 +2508,8 @@ function recordSwipe(c,known){
 function renderSwipeHistory(){
   const el=$("swipehistory");
   if(!el)return;
-  const hist=(SW&&SW.history)||[];
+  // newest first, so the word just answered is always at the top of the scroll area
+  const hist=((SW&&SW.history)||[]).slice().reverse();
   const pinned=new Set(store.get("hsk_pins",[]));
   el.innerHTML=hist.map(h=>
     `<div class="swipehist-item ${h.known?"know":"dont"}">
@@ -2388,10 +2518,12 @@ function renderSwipeHistory(){
         onclick="toggleSwipeHistoryStar('${h.k}')">★</span>
       <span class="mk">${h.known?"✓":"✗"}</span>
     </div>`).join("");
+  el.scrollTop=0;
 }
 function toggleSwipeHistoryStar(c){
   togglePin(c);
   renderSwipeHistory();
+  renderSwipeMissed();
   updateSwipeStar();
 }
 function swipeAnswer(known){
@@ -2401,7 +2533,6 @@ function swipeAnswer(known){
   recordSwipe(wordKey(w),known);
   if(known)SW.known++;else SW.unknown++;
   SW.history.push({k:wordKey(w),zh:w[0],py:w[1],known});
-  if(SW.history.length>5)SW.history.shift();
   renderSwipeHistory();
   const card=$("swcard");
   const dir=known?1:-1;

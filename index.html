@@ -53,7 +53,9 @@
         </div>
         <button class="qwrite-pick" onclick="openSwipeListPicker()">Change ›</button>
       </div>
-      <div class="swipe-mastered" id="swipemastered">0 words mastered</div>
+      <button class="swipe-mastered" id="swipemastered" onclick="openMastery()">
+        <span id="swipemasteredtext">0 words mastered</span><span class="chev">›</span>
+      </button>
       <button class="btn primary swipe-start" onclick="startSwipePractice()">Start swiping →</button>
     </div>
 
@@ -140,9 +142,12 @@
           </div>
         </div>
       </div>
-      <div class="swipeempty" id="swipeempty" style="display:none">
+    </div>
+
+    <div class="swipeempty" id="swipeempty" style="display:none">
+      <div class="swipedone-scroll">
         <div class="centerpiece">
-          <div class="ghost heroghost" style="position:static;font-size:48px;opacity:1">👍</div>
+          <div class="heroghost-static">👍</div>
           <h2>All done!</h2>
           <p id="swipesummary"></p>
         </div>
@@ -150,7 +155,11 @@
           <div class="stat ok"><div class="v" id="swknowcount">0</div><div class="l">Know it</div></div>
           <div class="stat bad"><div class="v" id="swunkcount">0</div><div class="l">Don't know</div></div>
         </div>
-        <button class="btn primary" style="width:100%;margin-top:16px" onclick="restartSwipe()">Practice again</button>
+        <div class="sechead" id="swipemissedhead">Words to review</div>
+        <div class="swipemissed" id="swipemissed"></div>
+      </div>
+      <div class="swipedone-actions">
+        <button class="btn primary" style="width:100%" onclick="restartSwipe()">Practice again</button>
         <button class="btn" style="width:100%;margin-top:10px" onclick="exitSwipe()">Done</button>
       </div>
     </div>
@@ -538,6 +547,22 @@
     <div class="rows" id="statwordlist"></div>
   </section>
 
+  <!-- MASTERY BREAKDOWN (opened from the Wordlist Practice card on the home page) -->
+  <section class="screen" id="scr-mastery">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('home')">← Home</button>
+      <h2>Mastery</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
+    </div>
+    <div class="masterycard">
+      <div class="masteryscope" id="masteryscope">All words</div>
+      <div class="masterytrack"><div class="fill" id="masteryfill"></div></div>
+      <div class="masterysub" id="masterysub">0 of 0 mastered</div>
+    </div>
+    <div class="tabs" id="masterytabs"></div>
+    <div class="rows" id="masterylist"></div>
+  </section>
+
   <!-- WORD LIST -->
   <section class="screen" id="scr-wordlist">
     <div class="topbar">
@@ -574,7 +599,7 @@
   <!-- WORD DETAIL -->
   <section class="screen" id="scr-worddetail">
     <div class="topbar">
-      <button class="linkbtn" onclick="show('wordlist')">← Back</button>
+      <button class="linkbtn" onclick="backFromDetail()">← Back</button>
       <h2>Word detail</h2>
       <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
     </div>

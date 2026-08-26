@@ -436,15 +436,26 @@ html[data-theme="dark"] .swipecard{background:rgba(31,133,87,.07);
   box-shadow:inset 0 0 0 1px var(--jade)}
 .swipe-heading{font-weight:700;font-size:14.5px;color:var(--ink)}
 .swipe-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+/* doubles as the progress readout and the way into the mastery breakdown */
 .swipe-mastered{font-size:12px;font-weight:700;color:var(--jade);margin-bottom:10px;
-  display:flex;align-items:center;gap:6px}
+  display:flex;align-items:center;gap:6px;width:100%;padding:8px 10px;text-align:left;
+  font-family:var(--ui);cursor:pointer;border-radius:10px;
+  background:rgba(31,133,87,.07);border:1px solid rgba(31,133,87,.28)}
+.swipe-mastered:active{background:rgba(31,133,87,.15)}
+.swipe-mastered .chev{margin-left:auto;font-size:15px;line-height:1}
 .swipe-mastered::before{content:"✓";flex-shrink:0;width:15px;height:15px;border-radius:50%;
   background:var(--jade);color:#fff;font-size:9px;font-weight:800;
   display:flex;align-items:center;justify-content:center}
 .swipe-start{width:100%}
 .swipelabel{font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px;font-weight:700;
   letter-spacing:.06em;text-transform:uppercase}
-.swipestage{position:relative;height:340px;margin-bottom:18px}
+/* the swipe session locks page scrolling, so the screen is laid out as a column that
+   fits the viewport and the history list below it scrolls on its own */
+#scr-swipe.active{display:flex;flex-direction:column;
+  height:calc(100vh - 66px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height:calc(100dvh - 66px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+#scr-swipe .qbar,#scr-swipe .track,#scr-swipe .swipelabel,#scr-swipe .swipebtns{flex:0 0 auto}
+.swipestage{position:relative;flex:0 1 340px;min-height:220px;margin-bottom:18px}
 .swipecardface{position:absolute;inset:0;perspective:1200px;cursor:grab;user-select:none;touch-action:none}
 .swipecardface:active{cursor:grabbing}
 /* while the swipe session is open, lock the page so a swipe can't scroll the window */
@@ -473,7 +484,15 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
   -webkit-mask-size:220px 140px;mask-size:220px 140px}
 .swipe-hint.left{left:20px;color:var(--seal);border-color:var(--seal);transform:rotate(-14deg)}
 .swipe-hint.right{right:20px;color:var(--jade);border-color:var(--jade);transform:rotate(14deg)}
-.swipeempty{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center}
+/* end-of-session panel: the summary scrolls, the buttons stay pinned to the bottom */
+.swipeempty{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.swipedone-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.swipedone-actions{flex:0 0 auto;padding-top:14px}
+.heroghost-static{font-size:48px;line-height:1}
+.swipemissed{display:flex;flex-direction:column;gap:8px;padding-bottom:4px}
+.swipemissed .allclear{text-align:center;color:var(--jade);font-size:13px;font-weight:600;
+  border:1px dashed rgba(31,133,87,.4);border-radius:11px;padding:14px}
 .swipebtns{display:flex;gap:10px}
 .swbtn{flex:1;border-radius:12px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;
   border:1px solid var(--line);background:var(--card);font-family:var(--ui)}
@@ -495,13 +514,17 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
 .swwword .py{font-size:14px;font-weight:700;color:var(--seal)}
 .swwen{font-size:13px;color:var(--muted);margin:2px 0 14px}
 #swwcanvas{display:block;margin:0 auto;border-radius:10px;touch-action:none;cursor:crosshair}
-/* recent-swipe history: rolling window of the last 5 answered words */
-.swipehistory{display:flex;flex-direction:column;gap:8px;margin-top:16px;min-height:46px;
-  max-width:100%;overflow:hidden}
+/* swipe history: every word answered this session, newest first, scrolled on its own
+   (the page itself is scroll-locked so a swipe can't drag the window) */
+.swipehistory{display:flex;flex-direction:column;gap:8px;margin-top:16px;
+  flex:1 1 auto;min-height:46px;max-width:100%;
+  overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch}
+.swipehist-item{flex:0 0 auto}
 .swipehist-item .zh{overflow:hidden;text-overflow:ellipsis}
 .swipehist-item{display:flex;align-items:center;gap:10px;padding:8px 13px;border-radius:11px;
   background:var(--card);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
-.swipehist-item:last-child{animation:swhistpop .22s cubic-bezier(.2,.8,.2,1)}
+.swipehist-item:first-child{animation:swhistpop .22s cubic-bezier(.2,.8,.2,1)}
 .swipehist-item .zh{font-family:var(--hanzi);font-size:18px;font-weight:600}
 .swipehist-item .py{font-family:var(--ui);font-size:13px;color:var(--muted);flex:1}
 .swipehist-item .mk{font-family:var(--ui);font-size:14px;font-weight:800;line-height:1}
@@ -510,6 +533,23 @@ html.swipe-lock,html.swipe-lock body{overflow:hidden;overscroll-behavior:none;to
 .swipehist-item.dont{border-color:rgba(190,52,37,.4)}
 .swipehist-item.dont .mk{color:var(--seal)}
 @keyframes swhistpop{from{opacity:0;transform:translateY(6px) scale(.9)}to{opacity:1;transform:none}}
+/* confetti burst on a finished session — drawn to a throwaway canvas over everything */
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:90}
+/* ---------- mastery breakdown for the current practice wordlist ---------- */
+.masterycard{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:15px 16px;margin-bottom:14px}
+.masteryscope{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px}
+.masterytrack{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.masterytrack .fill{height:100%;background:var(--jade);border-radius:99px;
+  transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.masterysub{font-size:12.5px;color:var(--ink);font-weight:600;margin-top:9px}
+.masteryend{margin-left:auto;display:flex;align-items:center;gap:9px;flex-shrink:0}
+.famdots{flex-shrink:0;font-size:9px;letter-spacing:1.5px;color:var(--jade);line-height:1;white-space:nowrap}
+.famdots .off{color:var(--line-strong)}
+.masterytick{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--jade);color:#fff;
+  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.masteryslip{flex-shrink:0;font-size:10px;font-weight:700;color:var(--seal);white-space:nowrap}
 .refresherscope-inline{display:block;margin-top:8px;background:var(--bg);border:1px solid var(--line);
   border-radius:9px;padding:7px 10px;font-size:11.5px;color:var(--muted);font-family:var(--ui);
   cursor:pointer;text-align:left;width:fit-content}

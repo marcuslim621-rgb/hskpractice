@@ -104,6 +104,33 @@ function pokeRig(){
   dock.classList.toggle("open");
   if(!dock.classList.contains("open")&&rigMoveMode)toggleRigMove();
 }
+/* Right/wrong reaction: a random face from the matching set, and the idle loop
+   swings harder (--amp) and faster (--sp) for a beat before settling back. */
+const RIG_FACES={
+  correct:["head-correct1","head-correct2","head-correct3"],
+  wrong:["head-wrong1","head-wrong2","head-wrong3","head-wrong4"]
+};
+let rigFaceTimer=0;
+// warm the cache, or the first reaction of a session shows a headless girl
+[].concat(RIG_FACES.correct,RIG_FACES.wrong).forEach(n=>{
+  const im=new Image();im.src="parts/"+n+".png";
+});
+function reactRig(ok){
+  const fig=$("rigfigure"),head=$("righead");
+  if(!fig||!head)return;
+  const pool=ok?RIG_FACES.correct:RIG_FACES.wrong;
+  head.src="parts/"+pool[Math.floor(Math.random()*pool.length)]+".png";
+  fig.classList.add("react");
+  rigSpeedTimers.forEach(clearTimeout);   // don't let a poke's decay cut this short
+  rigSpeedTimers=[];
+  fig.style.setProperty("--sp","2.2");
+  clearTimeout(rigFaceTimer);
+  rigFaceTimer=setTimeout(()=>{
+    head.src="parts/head.png";
+    fig.classList.remove("react");
+    fig.style.removeProperty("--sp");
+  },1200);
+}
 function closeRigMenu(){
   const dock=rigDock();
   if(!dock)return;
@@ -891,6 +918,7 @@ function answerPy(btn,right){
 function finishWord(){
   const w=S.queue[S.i];
   S.results.push({c:wordKey(w),ok:!S.phase.wrong});
+  reactRig(!S.phase.wrong);
   const seen=store.get("hsk_seen",{});
   seen[wordKey(w)]=(seen[wordKey(w)]||0)+1;
   store.set("hsk_seen",seen);
@@ -1217,6 +1245,7 @@ function typeCheck(){
   res.innerHTML=`<span class="py">${pin(w[1])}</span><br>${esc(w[2])}`;
   inp.focus();
   TS.results.push({c:wordKey(w),ok:right});
+  reactRig(right);
   if(right){TS.ok++;TS.streak++}else{TS.bad++;TS.streak=0;if(TS.variant==="arcade")TS.lives--}
   setFire("tcard",TS.streak);
   if(right&&TS.streak>=5)inp.classList.add("rainbow");
@@ -1350,6 +1379,7 @@ function writeGrade(right){
   let drawing=null;
   try{ drawing=$("wcanvas").toDataURL("image/png"); }catch(e){}
   WQ.results.push({c:wordKey(w),ok:right,drawing});
+  reactRig(right);
   if(right){WQ.ok++;WQ.streak++}else{WQ.bad++;WQ.streak=0;if(WQ.variant==="arcade")WQ.lives--}
   setFire("wcard",WQ.streak);
   const seen=store.get("hsk_seen",{});
@@ -1549,6 +1579,7 @@ function answerSent(btn,right){
   setFire("scard",SS.streak);
   if(right&&SS.streak>=5)btn.classList.add("rainbow");
   SS.results.push({c:q[2],ok:right});
+  reactRig(right);
   $("ssent").innerHTML=esc(q[1]).replace("___",`<span class="filled ${right?"ok":""}">${q[2]}</span>`);
   $("srevealpy").textContent=pin(q[4]);
   $("srevealen").textContent=q[5];
@@ -2674,6 +2705,7 @@ function swipeAnswer(known){
   recordSwipe(wordKey(w),known);
   if(known)SW.known++;else SW.unknown++;
   SW.history.push({k:wordKey(w),zh:w[0],py:w[1],known});
+  reactRig(known);
   renderSwipeHistory();
   const card=$("swcard");
   const dir=known?1:-1;
@@ -2681,6 +2713,7 @@ function swipeAnswer(known){
   card.style.transform="translateX("+(dir*520)+"px) rotate("+(dir*20)+"deg)";
   card.style.opacity=0;
   setTimeout(()=>{
+    if(!SW)return;      // left the session inside the card's 240ms flick-out
     SW.i++;
     renderSwipeCard();
   },240);

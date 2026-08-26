@@ -43,3 +43,25 @@ To change a placement, edit `chibi-rig/tools/spec.json` and re-run
 hand-edit these PNGs. `chibi-rig/HANDOFF.md` has the full record.
 
 `hair-front.png` is deliberately absent — `head.png` already contains the bangs.
+
+## Expression heads
+
+`head-correct1..3` and `head-wrong1..4` are alternate faces swapped into the
+`.s-head` slot by `reactRig()` when an answer is graded, then swapped back.
+
+They are **not** baked the way `build-parts.py` bakes a part. That script crops
+each source to its own alpha bounding box, and these differ per expression —
+hearts, sparkles and swirls push the bbox around, and one of them is inset 15px
+on the left. Normalising each to its own bbox would scale and shift the head
+slightly per face, so it would visibly jump on every swap.
+
+Instead all seven are cropped to the **base head's** box `(0, 21, 1239, 1254)`,
+scaled by `280/1239` and pasted at `(60, 20)` — identical to `head.png`, so the
+head lands on exactly the same pixels every time. Re-deriving that transform
+reproduces `head.png` byte-for-byte, which is how it was checked. Two faces lose
+a couple of pixels off a sparkle at the very top; that is the price of alignment
+and it is not visible.
+
+These seven are also colour-quantised to 256 colours (773KB -> 151KB, no visible
+change on pixel art). `head.png` is left exactly as `build-parts.py` wrote it, so
+a re-bake still matches it.

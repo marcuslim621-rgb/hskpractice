@@ -1327,7 +1327,7 @@ html.no-tabs .rigtap{pointer-events:none}
 .rigbounce.jump{animation:rigJump .62s cubic-bezier(.3,.9,.4,1)}
 @media (prefers-reduced-motion:reduce){.rigbounce.jump{animation:none}}
 
-.rig{--sp:1;position:relative;width:400px;height:640px}
+.rig{--sp:1;--amp:1;position:relative;width:400px;height:640px}
 .rig .slot{position:absolute;left:0;top:0;width:400px;height:640px;will-change:transform}
 .rig .art{position:absolute;left:0;top:0;display:block;width:400px;height:640px;
   object-fit:contain;object-position:left top;transform-origin:0 0}
@@ -1369,35 +1369,42 @@ html.no-tabs .rigtap{pointer-events:none}
 [data-anim="legIdleL"]    {animation:legIdleL     calc(3.4s/var(--sp)) ease-in-out infinite}
 [data-anim="legIdleR"]    {animation:legIdleR     calc(3.4s/var(--sp)) ease-in-out infinite}
 
+/* --amp scales every idle motion from one place, so a reaction can make the
+   whole figure swing harder without a second set of keyframes; --sp does the
+   same for tempo through the duration table above. */
 @keyframes breathe{
   0%,100%{transform:translateY(0px) scaleY(1) scaleX(1)}
-  50%{transform:translateY(-2px) scaleY(1.014) scaleX(.996)}
+  50%{transform:translateY(calc(-2px * var(--amp)))
+      scaleY(calc(1 + .014 * var(--amp))) scaleX(calc(1 - .004 * var(--amp)))}
 }
 @keyframes headBob{
-  0%,100%{transform:translateY(0px) rotate(-.9deg)}
-  50%{transform:translateY(-3px) rotate(.9deg)}
+  0%,100%{transform:translateY(0px) rotate(calc(-.9deg * var(--amp)))}
+  50%{transform:translateY(calc(-3px * var(--amp))) rotate(calc(.9deg * var(--amp)))}
 }
 @keyframes hairBackSway{
-  0%,100%{transform:translateY(0px) rotate(-2.1deg)}
-  50%{transform:translateY(-2px) rotate(2.1deg)}
+  0%,100%{transform:translateY(0px) rotate(calc(-2.1deg * var(--amp)))}
+  50%{transform:translateY(calc(-2px * var(--amp))) rotate(calc(2.1deg * var(--amp)))}
 }
 @keyframes armSwayL{
-  0%,100%{transform:rotate(1.6deg)}
-  50%{transform:rotate(-1.6deg)}
+  0%,100%{transform:rotate(calc(1.6deg * var(--amp)))}
+  50%{transform:rotate(calc(-1.6deg * var(--amp)))}
 }
 @keyframes armSwayR{
-  0%,100%{transform:rotate(-2deg)}
-  50%{transform:rotate(2deg)}
+  0%,100%{transform:rotate(calc(-2deg * var(--amp)))}
+  50%{transform:rotate(calc(2deg * var(--amp)))}
 }
 @keyframes propBob{
-  0%,100%{transform:translateY(0px) rotate(-2.6deg)}
-  50%{transform:translateY(-4px) rotate(2.6deg)}
+  0%,100%{transform:translateY(0px) rotate(calc(-2.6deg * var(--amp)))}
+  50%{transform:translateY(calc(-4px * var(--amp))) rotate(calc(2.6deg * var(--amp)))}
 }
 @keyframes legIdleL{
-  0%,100%{transform:rotate(-.5deg)}
-  50%{transform:rotate(.5deg)}
+  0%,100%{transform:rotate(calc(-.5deg * var(--amp)))}
+  50%{transform:rotate(calc(.5deg * var(--amp)))}
 }
 @keyframes legIdleR{
-  0%,100%{transform:rotate(.6deg)}
-  50%{transform:rotate(-.6deg)}
+  0%,100%{transform:rotate(calc(.6deg * var(--amp)))}
+  50%{transform:rotate(calc(-.6deg * var(--amp)))}
+}
+/* right/wrong reaction: swing harder for a moment (JS winds --sp up to match) */
+.rig.react{--amp:2.1}
 }

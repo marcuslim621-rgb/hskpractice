@@ -25,6 +25,11 @@ individually.
 Pivots live on the `.slot` (in 400x640 canvas coordinates), never on the
 `.art`. They are in `styles.css` under "MASCOT RIG".
 
+`arm-r` sits at `z-index:2`, behind the body, which is a deliberate departure
+from the handoff table's `5`. The raised arm reads wrong in front of the dress.
+Note that `prop` is nested inside `arm-r`, so it rides that slot's stacking
+context and moves with it.
+
 ## Source
 
 Baked from the 1254x1254 source art by `chibi-rig/tools/build-parts.py`, which

@@ -1339,14 +1339,16 @@ html.no-tabs .rigtap{pointer-events:none}
 .s-leg-r{transform-origin:229px 480px;z-index:2}
 .s-body{transform-origin:200px 470px;z-index:3}
 .s-arm-l{transform-origin:247px 267px;z-index:4}
-.s-arm-r{transform-origin:146px 348px;z-index:5}
+.s-arm-r{transform-origin:146px 348px;z-index:2}  /* raised arm tucks behind the dress */
 .s-prop{transform-origin:90px 197px}
 .s-head{transform-origin:200px 232px;z-index:6}
 
 /* Pose offsets, applied on top of the baked alignment. The parts already stack
    correctly at 0,0; these push the pose further — longer legs, heavier sleeves,
-   torso lifted — and are Marcus's chosen look, not a correction. Pivots and
-   layer order above stay as the handoff defines them. */
+   torso lifted — and are Marcus's chosen look, not a correction. Pivots stay
+   as the handoff defines them; arm-r's z-index deliberately does not — the
+   handoff puts it at 5, in front of the dress, and the raised arm belongs
+   behind it. */
 .s-leg-l > .art{transform:translate(-96px,-413px) scale(1.73)}
 .s-leg-r > .art{transform:translate(-189px,-418px) scale(1.73)}
 .s-body  > .art{transform:translate(-9px,-51px) scale(1)}

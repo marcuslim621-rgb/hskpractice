@@ -29,6 +29,7 @@
   --tile-hi:#FFFFFF;                    /* top-left highlight */
   --tile-lo:#E5E2D9;                    /* bottom-right recede */
   --tile-inset:inset 0 1px 2px rgba(255,255,255,.8);
+  --well:#EFEEEA;              /* recessed surface a glyph is engraved into */
   --tile-back:#0E7A48;        /* mahjong tile backing, seen at the bottom lip */
   --tile-back-deep:#06542F;   /* its shaded underside */
   --tile-stack:var(--tile-inset),0 3px 0 0 var(--tile-back),0 4px 0 0 var(--tile-back-deep),0 6px 7px -3px rgba(0,0,0,.22);
@@ -64,6 +65,7 @@ html[data-theme="dark"]{
   --seal2:#E5604E;
   --btn-edge:#7A2317;
   --on-jade:#0E120F;
+  --well:#191A18;
   --tile-face:#212220;
   --tile-hi:rgba(255,255,255,.07);
   --tile-lo:#0D0E0C;
@@ -1437,3 +1439,52 @@ html[data-theme="dark"] .swipe-front .zh{
 
 /* the symbol sprite itself never renders */
 .icsprite{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ============================================================
+   MODE SELECT — "Pick how you want to be tested"
+   Each mode is a tile carrying an engraved glyph well. The accent and the
+   corner wash are per-mode custom properties so one rule serves all four.
+   ============================================================ */
+.modehead{margin:2px 0 20px}
+.modeh1{font-size:26px;line-height:32px;font-weight:700;letter-spacing:-.01em;color:var(--ink);margin:0 0 3px}
+.modesub{font-size:16px;line-height:24px;color:var(--muted);margin:0}
+
+.modegrid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:700px){.modegrid{grid-template-columns:1fr 1fr;gap:20px}}
+
+.modecard{--mode-accent:var(--ink);--mode-wash:rgba(26,28,26,.05);
+  position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;width:100%;
+  padding:20px;text-align:left;cursor:pointer;color:var(--ink);
+  background:var(--tile-face);border:1px solid var(--tile-lo);border-radius:12px;
+  box-shadow:0 2px 0 0 var(--tile-lo),0 4px 12px rgba(26,28,26,.05);
+  transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,.2,1)}
+.modecard:hover{transform:translateY(-2px);
+  box-shadow:0 4px 0 0 var(--tile-lo),0 8px 16px rgba(26,28,26,.08)}
+.modecard:active{transform:translateY(2px);
+  box-shadow:0 0 0 0 var(--tile-lo),0 2px 4px rgba(26,28,26,.02)}
+/* the mode's colour bleeding out of the top corner */
+.modecard::after{content:"";position:absolute;top:0;right:0;width:96px;height:96px;pointer-events:none;
+  border-bottom-left-radius:100%;background:linear-gradient(to bottom right,var(--mode-wash),transparent)}
+
+.modeglyph{flex:0 0 auto;width:64px;height:64px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--well);color:var(--mode-accent);
+  font-family:var(--hanzi);font-size:30px;font-weight:700;line-height:1;
+  box-shadow:inset 2px 2px 4px rgba(26,28,26,.1),inset -1px -1px 2px rgba(255,255,255,.8)}
+html[data-theme="dark"] .modeglyph{
+  box-shadow:inset 2px 2px 4px rgba(0,0,0,.5),inset -1px -1px 2px rgba(255,255,255,.05)}
+
+.modetext{flex:1;min-width:0}
+.modett{display:block;font-size:18px;line-height:24px;font-weight:700;margin-bottom:3px;
+  transition:color .2s}
+.modecard:hover .modett{color:var(--mode-accent)}
+.modedd{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
+.modechev{flex:0 0 auto;color:var(--quiet);font-size:20px;line-height:1;
+  opacity:0;transition:opacity .2s}
+.modecard:hover .modechev{opacity:1}
+
+.m-arcade{--mode-accent:var(--seal);--mode-wash:rgba(190,52,37,.07)}
+.m-comp{--mode-accent:var(--jade);--mode-wash:rgba(0,107,62,.07)}
+.m-unlim{--mode-accent:var(--ink);--mode-wash:rgba(26,28,26,.06)}
+.m-timer{--mode-accent:#004224;--mode-wash:rgba(0,66,36,.07)}
+html[data-theme="dark"] .m-timer{--mode-accent:#7FD8A6}

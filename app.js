@@ -100,6 +100,12 @@ function pokeRig(){
     setTimeout(()=>fig.style.setProperty("--sp","1.6"),650),
     setTimeout(()=>fig.style.removeProperty("--sp"),1400)
   ];
+  // she enjoys the first few pokes and then stops enjoying them; the count
+  // decays so she recovers once you leave her alone
+  rigPokes++;
+  clearTimeout(rigCalmTimer);
+  rigCalmTimer=setTimeout(()=>{rigPokes=0},6000);
+  setRigFace(rigPokes<=RIG_PATIENCE,1200);
   updateRigMenuSide();
   dock.classList.toggle("open");
   if(!dock.classList.contains("open")&&rigMoveMode)toggleRigMove();
@@ -110,23 +116,39 @@ const RIG_FACES={
   correct:["head-correct1","head-correct2","head-correct3"],
   wrong:["head-wrong1","head-wrong2","head-wrong3","head-wrong4"]
 };
-let rigFaceTimer=0;
+let rigFaceTimer=0,rigReactTimer=0,rigLastFace="";
+// how many pokes she takes in good humour before the face turns
+const RIG_PATIENCE=5;
+let rigPokes=0,rigCalmTimer=0;
 // warm the cache, or the first reaction of a session shows a headless girl
 [].concat(RIG_FACES.correct,RIG_FACES.wrong).forEach(n=>{
   const im=new Image();im.src="parts/"+n+".png";
 });
-function reactRig(ok){
-  const fig=$("rigfigure"),head=$("righead");
-  if(!fig||!head)return;
+// swap in a face from the matching set, then settle back to the neutral head
+function setRigFace(ok,hold){
+  const head=$("righead");
+  if(!head)return;
   const pool=ok?RIG_FACES.correct:RIG_FACES.wrong;
-  head.src="parts/"+pool[Math.floor(Math.random()*pool.length)]+".png";
+  let pick=pool[Math.floor(Math.random()*pool.length)];
+  // never repeat the face just shown — with three happy ones a repeat reads
+  // as nothing having happened at all
+  if(pool.length>1&&pick===rigLastFace)
+    pick=pool[(pool.indexOf(pick)+1+Math.floor(Math.random()*(pool.length-1)))%pool.length];
+  rigLastFace=pick;
+  head.src="parts/"+pick+".png";
+  clearTimeout(rigFaceTimer);
+  rigFaceTimer=setTimeout(()=>{head.src="parts/head.png"},hold);
+}
+function reactRig(ok){
+  const fig=$("rigfigure");
+  if(!fig)return;
+  setRigFace(ok,1200);
   fig.classList.add("react");
+  fig.style.setProperty("--sp","2.2");
   rigSpeedTimers.forEach(clearTimeout);   // don't let a poke's decay cut this short
   rigSpeedTimers=[];
-  fig.style.setProperty("--sp","2.2");
-  clearTimeout(rigFaceTimer);
-  rigFaceTimer=setTimeout(()=>{
-    head.src="parts/head.png";
+  clearTimeout(rigReactTimer);
+  rigReactTimer=setTimeout(()=>{
     fig.classList.remove("react");
     fig.style.removeProperty("--sp");
   },1200);

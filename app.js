@@ -2362,23 +2362,43 @@ function renderSwipeListPicker(){
   const scope=getSwipeScope();
   const lists=getWordlists();
   const entries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
+  const dict=allWords();
+  const mastered=getMasteredSwipeWords();
+  // one pass over the dictionary gives every level's mastered/total for the row tallies
+  const byLevel={};
+  let allDone=0;
+  dict.forEach(w=>{
+    const done=mastered.has(wordKey(w));
+    if(done)allDone++;
+    const b=byLevel[w[3]]||(byLevel[w[3]]={done:0,total:0});
+    b.total++;
+    if(done)b.done++;
+  });
+  const dictKeys=new Set(dict.map(wordKey));
+  const tally=(done,total)=>`<span class="scopeend">
+      <span class="scopecount${total&&done===total?" full":""}">${done}/${total}</span>
+      <span class="tick">✓</span></span>`;
   let html=`<button class="wrow ${scope.mode==="all"?"sel":""}" onclick="pickSwipeScopeAll()">
     <span><div class="py">All words</div><div class="en">Every HSK level combined</div></span>
-    <span class="tick">✓</span></button>`;
+    ${tally(allDone,dict.length)}</button>`;
   html+=`<div class="sechead" style="margin-top:14px">By level</div>`;
   LEVELS.forEach(([lv,name])=>{
     const on=scope.mode==="level"&&scope.level===lv;
+    const b=byLevel[lv]||{done:0,total:0};
     html+=`<button class="wrow ${on?"sel":""}" onclick="pickSwipeScopeLevel(${lv})">
       <span><div class="py">${esc(name)}</div></span>
-      <span class="tick">✓</span></button>`;
+      ${tally(b.done,b.total)}</button>`;
   });
   if(entries.length){
     html+=`<div class="sechead" style="margin-top:14px">My wordlists</div>`;
     entries.forEach(([id,l])=>{
       const on=scope.mode==="wordlist"&&scope.id===id;
+      // count against the dictionary, so a word deleted since can't inflate the total
+      const valid=l.words.filter(k=>dictKeys.has(k));
+      const done=valid.filter(k=>mastered.has(k)).length;
       html+=`<button class="wrow ${on?"sel":""}" onclick="pickSwipeScopeWordlist('${id}')">
-        <span><div class="py">${esc(l.name||"Untitled list")}</div><div class="en">${l.words.length} word${l.words.length===1?"":"s"}</div></span>
-        <span class="tick">✓</span></button>`;
+        <span><div class="py">${esc(l.name||"Untitled list")}</div><div class="en">${valid.length} word${valid.length===1?"":"s"}</div></span>
+        ${tally(done,valid.length)}</button>`;
     });
   }
   $("swipescopelist").innerHTML=html;

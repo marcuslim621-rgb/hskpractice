@@ -1281,12 +1281,48 @@ html[data-theme="dark"] .swipe-front .zh{text-shadow:1px 1px 0 rgba(255,255,255,
    re-scale the images, and never size an .art to anything but 400x640.
    To show it smaller, scale the whole rig (.rigdock below).
    ============================================================ */
-.rigdock{position:fixed;right:-14px;z-index:40;pointer-events:none;
-  bottom:calc(68px + env(safe-area-inset-bottom));  /* feet clear the tab bar */
-  transform-origin:100% 100%;transform:scale(.33)}
-@media (min-width:520px){.rigdock{right:2px;transform:scale(.44)}}
+/* The dock is the figure's on-screen box, so it can be dragged and hit-tested;
+   .rigscale holds the 400x640 canvas and does the shrinking. The menu sits
+   outside that wrapper — inside it the buttons would render at a third size. */
+.rigdock{--rigscale:.33;position:fixed;z-index:40;pointer-events:none;
+  width:calc(400px * var(--rigscale));height:calc(640px * var(--rigscale));
+  right:-14px;bottom:calc(68px + env(safe-area-inset-bottom))}
+@media (min-width:520px){.rigdock{--rigscale:.44;right:2px}}
 html.no-tabs .rigdock{bottom:calc(2px + env(safe-area-inset-bottom))}
-html.no-rig .rigdock{display:none}
+html.no-rig .rigdock,html.rig-hidden .rigdock{display:none}
+.rigscale{position:absolute;left:0;top:0;width:400px;height:640px;
+  transform:scale(var(--rigscale));transform-origin:0 0}
+.rigbounce{width:400px;height:640px;transform-origin:50% 100%}
+
+/* hit area tracks her silhouette (x 38-365, y 27-627 of the canvas) rather
+   than the whole box, so the transparent corners stay click-through */
+.rigtap{position:absolute;left:9.5%;top:4.2%;width:81.8%;height:93.8%;z-index:2;
+  padding:0;border:none;background:none;cursor:pointer;pointer-events:auto}
+.rigdock.moving{pointer-events:auto;cursor:grab;touch-action:none}
+.rigdock.moving:active{cursor:grabbing}
+.rigdock.moving .rigscale{filter:drop-shadow(0 6px 14px rgba(0,0,0,.28))}
+
+.rigmenu{position:absolute;right:100%;bottom:14%;margin-right:6px;z-index:3;
+  display:none;flex-direction:column;gap:6px;pointer-events:auto}
+.rigdock.open .rigmenu{display:flex}
+/* if she's parked near the left edge there's no room beside her, so the
+   menu swaps to her other side */
+.rigdock.flip .rigmenu{right:auto;left:100%;margin-right:0;margin-left:6px}
+.rigbtn{white-space:nowrap;border:1.5px solid var(--tile-lo);background:var(--tile-face);
+  color:var(--ink);border-radius:99px;padding:7px 12px;font-family:var(--ui);
+  font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:var(--tile-lift)}
+.rigbtn:active{transform:translateY(1px);box-shadow:none}
+
+/* poke reaction: crouch, hop, land */
+@keyframes rigJump{
+  0%{transform:translateY(0) scaleY(1) scaleX(1)}
+  16%{transform:translateY(0) scaleY(.9) scaleX(1.05)}
+  46%{transform:translateY(-46px) scaleY(1.06) scaleX(.97)}
+  74%{transform:translateY(0) scaleY(.94) scaleX(1.03)}
+  100%{transform:translateY(0) scaleY(1) scaleX(1)}
+}
+.rigbounce.jump{animation:rigJump .62s cubic-bezier(.3,.9,.4,1)}
+@media (prefers-reduced-motion:reduce){.rigbounce.jump{animation:none}}
 
 .rig{--sp:1;position:relative;width:400px;height:640px}
 .rig .slot{position:absolute;left:0;top:0;width:400px;height:640px;will-change:transform}

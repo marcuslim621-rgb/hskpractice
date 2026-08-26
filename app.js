@@ -80,6 +80,95 @@ const TAB_FOR_SCREEN={
 const NO_TABS=new Set(["swipe","quiz","typequiz","writequiz","sentquiz","summary","gameover"]);
 // the mascot steps out during a live session, but stays for the result screens
 const NO_RIG=new Set(["swipe","quiz","typequiz","writequiz","sentquiz"]);
+
+/* ---------- mascot: poke, move, dismiss ----------
+   Poking makes her hop and briefly winds the idle loop up; --sp divides every
+   animation duration, so raising it speeds the whole rig at once. Position is
+   remembered across refreshes; hiding is not — she's back on the next load. */
+let rigMoveMode=false;
+let rigSpeedTimers=[];
+function rigDock(){return $("rigdock")}
+function pokeRig(){
+  const dock=rigDock();
+  if(!dock)return;
+  const bounce=$("rigbounce");
+  bounce.classList.remove("jump");
+  void bounce.offsetWidth;          // reflow, so a second poke replays the hop
+  bounce.classList.add("jump");
+  const fig=$("rigfigure");
+  rigSpeedTimers.forEach(clearTimeout);
+  fig.style.setProperty("--sp","2.4");
+  rigSpeedTimers=[
+    setTimeout(()=>fig.style.setProperty("--sp","1.6"),650),
+    setTimeout(()=>fig.style.removeProperty("--sp"),1400)
+  ];
+  updateRigMenuSide();
+  dock.classList.toggle("open");
+  if(!dock.classList.contains("open")&&rigMoveMode)toggleRigMove();
+}
+function closeRigMenu(){
+  const dock=rigDock();
+  if(!dock)return;
+  dock.classList.remove("open");
+  if(rigMoveMode)toggleRigMove();
+}
+function toggleRigMove(){
+  rigMoveMode=!rigMoveMode;
+  rigDock().classList.toggle("moving",rigMoveMode);
+  $("rigmovebtn").textContent=rigMoveMode?"✓ Done":"✥ Move";
+}
+function hideRigForSession(){
+  closeRigMenu();
+  document.documentElement.classList.add("rig-hidden");
+}
+function placeRig(x,y){
+  const dock=rigDock();
+  const r=dock.getBoundingClientRect();
+  x=Math.max(0,Math.min(x,window.innerWidth-r.width));
+  y=Math.max(0,Math.min(y,window.innerHeight-r.height));
+  dock.style.left=x+"px";dock.style.top=y+"px";
+  dock.style.right="auto";dock.style.bottom="auto";
+  updateRigMenuSide();
+}
+// the menu needs ~96px beside her; near the left edge it flips to her right
+function updateRigMenuSide(){
+  const dock=rigDock();
+  if(!dock)return;
+  dock.classList.toggle("flip",dock.getBoundingClientRect().left<96);
+}
+function restoreRigPos(){
+  const p=store.get("hsk_rig_pos",null);
+  if(p&&typeof p.x==="number")placeRig(p.x,p.y);
+}
+(function rigDrag(){
+  const dock=document.getElementById("rigdock");
+  if(!dock)return;
+  let on=false,sx=0,sy=0,ox=0,oy=0;
+  dock.addEventListener("pointerdown",e=>{
+    if(!rigMoveMode)return;
+    const r=dock.getBoundingClientRect();
+    on=true;sx=e.clientX;sy=e.clientY;ox=r.left;oy=r.top;
+    dock.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  dock.addEventListener("pointermove",e=>{
+    if(on)placeRig(ox+(e.clientX-sx),oy+(e.clientY-sy));
+  });
+  const drop=()=>{
+    if(!on)return;
+    on=false;
+    store.set("hsk_rig_pos",{x:parseFloat(dock.style.left)||0,y:parseFloat(dock.style.top)||0});
+  };
+  dock.addEventListener("pointerup",drop);
+  dock.addEventListener("pointercancel",drop);
+  // a tap anywhere else puts the menu away
+  document.addEventListener("pointerdown",e=>{
+    if(!dock.contains(e.target)&&dock.classList.contains("open"))closeRigMenu();
+  },true);
+  window.addEventListener("resize",()=>{
+    if(dock.style.left)placeRig(parseFloat(dock.style.left),parseFloat(dock.style.top));
+  });
+})();
 const APPBAR_TEXT={
   home:["Hanzi Daily","HSK 1-4 preparation | Hi Momo!"],
   review:["Review","Your words, and how well you know them"],
@@ -90,6 +179,7 @@ function goTab(tab){show(TAB_ROOT[tab])}
 function updateShell(name){
   document.documentElement.classList.toggle("no-tabs",NO_TABS.has(name));
   document.documentElement.classList.toggle("no-rig",NO_RIG.has(name));
+  closeRigMenu();
   const text=APPBAR_TEXT[name];
   $("appbar").style.display=text?"":"none";
   if(text){$("appbartitle").textContent=text[0];$("appbarsub").textContent=text[1]}
@@ -2775,4 +2865,5 @@ updateStreakFlame();
 syncAllCustomWords();
 // the first screen is marked active in the markup, so show() never ran for it
 updateShell((document.querySelector(".screen.active")||{id:"scr-home"}).id.slice(4));
+restoreRigPos();
 

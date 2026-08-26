@@ -1044,9 +1044,17 @@
 
 </div>
 
-<!-- Mascot: layered 2D rig docked bottom-right. Decorative — never takes a tap. -->
-<div class="rigdock" id="rigdock" aria-hidden="true">
-  <div class="rig">
+<!-- Mascot: layered 2D rig docked bottom-right. Only her silhouette and her
+     menu take pointer events; the rest of the dock stays click-through. -->
+<div class="rigdock" id="rigdock">
+  <button class="rigtap" id="rigtap" onclick="pokeRig()" aria-label="Poke the mascot"></button>
+  <div class="rigmenu" id="rigmenu">
+    <button class="rigbtn" id="rigmovebtn" onclick="toggleRigMove()">✥ Move</button>
+    <button class="rigbtn" onclick="hideRigForSession()">✕ Hide</button>
+  </div>
+  <div class="rigscale">
+   <div class="rigbounce" id="rigbounce">
+    <div class="rig" id="rigfigure">
     <div class="slot s-hair-back" data-anim="hairBackSway">
       <img class="art" src="parts/hair-back.png" alt="">
     </div>
@@ -1071,6 +1079,8 @@
     <div class="slot s-head" data-anim="headBob">
       <img class="art" src="parts/head.png" alt="">
     </div>
+    </div>
+   </div>
   </div>
 </div>
 

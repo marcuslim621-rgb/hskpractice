@@ -1275,54 +1275,44 @@ html[data-theme="dark"] .swipe-front .zh{text-shadow:1px 1px 0 rgba(255,255,255,
 
 /* ============================================================
    MASCOT RIG — layered 2D character docked bottom-right.
-   Canvas is 400x640; .slot is a bone (transform-origin = pivot,
-   nesting = parent/child chain), .art is that bone's sprite.
+   Every PNG in parts/ is a full 400x640 canvas with its part already in
+   final position: they stack at 0,0 and that IS the alignment. The
+   transparent margin is the positioning data — never crop, trim or
+   re-scale the images, and never size an .art to anything but 400x640.
+   To show it smaller, scale the whole rig (.rigdock below).
    ============================================================ */
 .rigdock{position:fixed;right:-14px;z-index:40;pointer-events:none;
-  bottom:calc(58px + env(safe-area-inset-bottom));
+  bottom:calc(60px + env(safe-area-inset-bottom));  /* feet clear the tab bar */
   transform-origin:100% 100%;transform:scale(.33)}
 @media (min-width:520px){.rigdock{right:2px;transform:scale(.44)}}
-html.no-tabs .rigdock{bottom:calc(6px + env(safe-area-inset-bottom))}
+html.no-tabs .rigdock{bottom:calc(-7px + env(safe-area-inset-bottom))}
 html.no-rig .rigdock{display:none}
 
 .rig{--sp:1;position:relative;width:400px;height:640px}
-.rig .slot{position:absolute;inset:0;will-change:transform}
-.rig .art{position:absolute;left:0;top:0;width:400px;height:400px;transform-origin:0 0;
-  image-rendering:pixelated}
+.rig .slot{position:absolute;left:0;top:0;width:400px;height:640px;will-change:transform}
+.rig .art{position:absolute;left:0;top:0;display:block;width:400px;height:640px;
+  object-fit:contain;object-position:left top;transform-origin:0 0}
 @media (prefers-reduced-motion:reduce){.rig .slot{animation:none}}
 
-/* pivots + layer order */
+/* pivots (canvas coordinates, on the slot not the art) + layer order */
 .s-hair-back{transform-origin:200px 150px;z-index:1}
 .s-leg-l{transform-origin:157px 481px;z-index:2}
 .s-leg-r{transform-origin:229px 480px;z-index:2}
-.s-body{transform-origin:200px 279px;z-index:3}
+.s-body{transform-origin:200px 470px;z-index:3}
 .s-arm-l{transform-origin:247px 267px;z-index:4}
-.s-arm-r{transform-origin:146px 348px;z-index:2}
-.s-prop{transform-origin:90px 197px;z-index:29}
-.s-head{transform-origin:200px 232px;z-index:3}
+.s-arm-r{transform-origin:146px 348px;z-index:5}
+.s-prop{transform-origin:90px 197px}
+.s-head{transform-origin:200px 232px;z-index:6}
 
-/* Art offsets. The parts ship framed and zoomed differently rather than on one
-   shared canvas, so the offsets the rig exported don't place them. These are
-   re-derived as  pivot - scale x joint,  measured per part against the pivots
-   above, which do describe a coherent skeleton. */
-.s-hair-back > .art{transform:translate(76px,125px) scale(.62)}
-.s-head      > .art{transform:translate(90px,71px) scale(.55)}
-.s-body      > .art{transform:translate(50px,189px) scale(.75)}
-.s-arm-l     > .art{transform:translate(207px,243px) scale(.5)}
-.s-arm-r     > .art{transform:translate(2px,184px) scale(.5)}
-.s-leg-l     > .art{transform:translate(76px,452px) scale(.45)}
-.s-leg-r     > .art{transform:translate(153px,448px) scale(.45)}
-.s-prop      > .art{transform:translate(42px,125px) scale(.22)}
-
-/* motion — the export left hairBackSway and propBob with empty longhands,
-   so both are written out here as full shorthands with their delays kept */
+/* motion — the rig export left hairBackSway and propBob with empty
+   animation-name longhands, so both are written out here in full */
 [data-anim="breathe"]     {animation:breathe      calc(2.6s/var(--sp)) ease-in-out infinite}
 [data-anim="headBob"]     {animation:headBob      calc(3.4s/var(--sp)) ease-in-out infinite}
 [data-anim="hairBackSway"]{animation:hairBackSway calc(3.4s/var(--sp)) ease-in-out infinite;
                            animation-delay:calc(.16s/var(--sp))}
 [data-anim="armSwayL"]    {animation:armSwayL     calc(3.4s/var(--sp)) ease-in-out infinite}
 [data-anim="armSwayR"]    {animation:armSwayR     calc(3.4s/var(--sp)) ease-in-out infinite}
-[data-anim="propBob"]     {animation:propBob      calc(3.4s/var(--sp)) ease-in-out infinite;
+[data-anim="propBob"]     {animation:propBob      calc(3s/var(--sp))   ease-in-out infinite;
                            animation-delay:calc(.26s/var(--sp))}
 [data-anim="legIdleL"]    {animation:legIdleL     calc(3.4s/var(--sp)) ease-in-out infinite}
 [data-anim="legIdleR"]    {animation:legIdleR     calc(3.4s/var(--sp)) ease-in-out infinite}

@@ -56,7 +56,8 @@ function levelBadge(lv){
   if(lv===5)return"宗";
   if(lv===7)return"文";
   if(lv===6)return"＋";
-  return lv+"级";
+  // 1.1 / 1.2 share the band's seal — "1.1级" is too wide for the stamp
+  return Math.floor(lv)+"级";
 }
 
 /* ---------- helpers ---------- */
@@ -83,7 +84,22 @@ function updateRefresherBadge(){
   }
 }
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
-const LEVELS=[[1,"HSK 1","Basic beginner words","一"],[2,"HSK 2","New HSK 2 words only","二"],[3,"HSK 3","New HSK 3 words only","三"],[4,"HSK 4","New HSK 4 words only","四"]];
+/* x.1 completes the official HSK 2.0 band, x.2 adds what the 2021 HSK 3.0 standard
+   introduced on top of it — see the header of data.js */
+const LEVELS=[
+  [1,"HSK 1","Basic beginner words","一"],
+  [1.1,"HSK 1.1","Rest of the official HSK 1 list","一"],
+  [1.2,"HSK 1.2","Added by the 2021 HSK 3.0 standard","一"],
+  [2,"HSK 2","New HSK 2 words only","二"],
+  [2.1,"HSK 2.1","Rest of the official HSK 2 list","二"],
+  [2.2,"HSK 2.2","Added by the 2021 HSK 3.0 standard","二"],
+  [3,"HSK 3","New HSK 3 words only","三"],
+  [3.1,"HSK 3.1","Rest of the official HSK 3 list","三"],
+  [3.2,"HSK 3.2","Added by the 2021 HSK 3.0 standard","三"],
+  [4,"HSK 4","New HSK 4 words only","四"],
+  [4.1,"HSK 4.1","Rest of the official HSK 4 list","四"],
+  [4.2,"HSK 4.2","Added by the 2021 HSK 3.0 standard","四"]
+];
 const TABS=[...LEVELS,[5,"Master"],[7,"Master II"]];
 const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
@@ -118,7 +134,10 @@ function goLevels(category){
 }
 function renderLevelRows(){
   const category=pendingCategory;
-  const rows=LEVELS.map(([lv,name,desc,em])=>{
+  // only the original bands have fill-in-the-blank sentences written for them,
+  // so don't offer an empty quiz for the x.1 / x.2 lists
+  const avail=category==="sentences"?LEVELS.filter(([lv])=>SENTQ.some(s=>s[0]===lv)):LEVELS;
+  const rows=avail.map(([lv,name,desc,em])=>{
     const n=category==="sentences"?SENTQ.filter(s=>s[0]===lv).length:WORDS.filter(w=>w[3]===lv).length;
     const unit=category==="sentences"?"sentences":"words";
     const sel=multiLevelSel.has(lv);
@@ -1438,7 +1457,9 @@ function clearBest(){
 
 /* ---------- competition leaderboard (named, per-level) ---------- */
 let compBoardScope=null;
-const COMP_SCOPE_ORDER=["HSK 1","HSK 2","HSK 3","HSK 4","Master","Master II"];
+const COMP_SCOPE_ORDER=["HSK 1","HSK 1.1","HSK 1.2","HSK 2","HSK 2.1","HSK 2.2",
+                        "HSK 3","HSK 3.1","HSK 3.2","HSK 4","HSK 4.1","HSK 4.2",
+                        "Master","Master II"];
 function renderCompBoard(){
   const board=store.get("hsk_competition",{});
   const scopes=Object.keys(board).sort((a,b)=>{

@@ -1441,7 +1441,7 @@ html[data-theme="dark"] .swipe-front .zh{
 .icsprite{position:absolute;width:0;height:0;overflow:hidden}
 
 /* ============================================================
-   MODE SELECT — "Pick how you want to be tested"
+   PICK TILE — shared by Choose mode and Choose level
    Each mode is a tile carrying an engraved glyph well. The accent and the
    corner wash are per-mode custom properties so one rule serves all four.
    ============================================================ */
@@ -1452,39 +1452,67 @@ html[data-theme="dark"] .swipe-front .zh{
 .modegrid{display:grid;grid-template-columns:1fr;gap:12px}
 @media (min-width:700px){.modegrid{grid-template-columns:1fr 1fr;gap:20px}}
 
-.modecard{--mode-accent:var(--ink);--mode-wash:rgba(26,28,26,.05);
+.picktile{--mode-accent:var(--ink);--mode-wash:rgba(26,28,26,.05);
   position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;width:100%;
   padding:20px;text-align:left;cursor:pointer;color:var(--ink);
   background:var(--tile-face);border:1px solid var(--tile-lo);border-radius:12px;
   box-shadow:0 2px 0 0 var(--tile-lo),0 4px 12px rgba(26,28,26,.05);
   transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,.2,1)}
-.modecard:hover{transform:translateY(-2px);
+.picktile:hover{transform:translateY(-2px);
   box-shadow:0 4px 0 0 var(--tile-lo),0 8px 16px rgba(26,28,26,.08)}
-.modecard:active{transform:translateY(2px);
+.picktile:active{transform:translateY(2px);
   box-shadow:0 0 0 0 var(--tile-lo),0 2px 4px rgba(26,28,26,.02)}
 /* the mode's colour bleeding out of the top corner */
-.modecard::after{content:"";position:absolute;top:0;right:0;width:96px;height:96px;pointer-events:none;
+.picktile::after{content:"";position:absolute;top:0;right:0;width:96px;height:96px;pointer-events:none;
   border-bottom-left-radius:100%;background:linear-gradient(to bottom right,var(--mode-wash),transparent)}
 
-.modeglyph{flex:0 0 auto;width:64px;height:64px;border-radius:8px;
+.pickglyph{flex:0 0 auto;width:64px;height:64px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
   background:var(--well);color:var(--mode-accent);
   font-family:var(--hanzi);font-size:30px;font-weight:700;line-height:1;
   box-shadow:inset 2px 2px 4px rgba(26,28,26,.1),inset -1px -1px 2px rgba(255,255,255,.8)}
-html[data-theme="dark"] .modeglyph{
+html[data-theme="dark"] .pickglyph{
   box-shadow:inset 2px 2px 4px rgba(0,0,0,.5),inset -1px -1px 2px rgba(255,255,255,.05)}
 
-.modetext{flex:1;min-width:0}
-.modett{display:block;font-size:18px;line-height:24px;font-weight:700;margin-bottom:3px;
+.picktext{flex:1;min-width:0}
+.picktt{display:block;font-size:18px;line-height:24px;font-weight:700;margin-bottom:3px;
   transition:color .2s}
-.modecard:hover .modett{color:var(--mode-accent)}
-.modedd{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
-.modechev{flex:0 0 auto;color:var(--quiet);font-size:20px;line-height:1;
+.picktile:hover .picktt{color:var(--mode-accent)}
+.pickdd{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
+.pickchev{flex:0 0 auto;color:var(--quiet);font-size:20px;line-height:1;
   opacity:0;transition:opacity .2s}
-.modecard:hover .modechev{opacity:1}
+.picktile:hover .pickchev{opacity:1}
 
 .m-arcade{--mode-accent:var(--seal);--mode-wash:rgba(190,52,37,.07)}
 .m-comp{--mode-accent:var(--jade);--mode-wash:rgba(0,107,62,.07)}
 .m-unlim{--mode-accent:var(--ink);--mode-wash:rgba(26,28,26,.06)}
 .m-timer{--mode-accent:#004224;--mode-wash:rgba(0,66,36,.07)}
 html[data-theme="dark"] .m-timer{--mode-accent:#7FD8A6}
+
+/* compact variant — the level list runs to fourteen rows, so it needs a
+   tighter rhythm than the four mode tiles */
+.picktile.sm{padding:13px 15px;gap:14px;border-radius:12px}
+.picktile.sm .pickglyph{width:50px;height:50px;font-size:27px;border-radius:8px}
+.picktile.sm .picktt{font-size:16px;line-height:22px;margin-bottom:1px}
+.picktile.sm .pickdd{font-size:12.5px}
+.picktile.sm::after{width:72px;height:72px}
+
+/* multi-select: the chevron gives way to a tick box */
+.picktile .multitick{display:none;flex-shrink:0;width:22px;height:22px;border-radius:7px;
+  border:1.5px solid var(--line);align-items:center;justify-content:center;
+  font-size:12px;color:transparent}
+.picktile.multimode .multitick{display:flex}
+.picktile.multimode .pickchev{display:none}
+.picktile.multisel{border-color:var(--jade)}
+.picktile.multisel .multitick{background:var(--jade);border-color:var(--jade);color:#fff}
+/* on a touch screen there is no hover, so the chevron has to be visible */
+@media (hover:none){.picktile .pickchev{opacity:.55}}
+
+.pk-hsk{--mode-accent:var(--seal);--mode-wash:rgba(190,52,37,.07)}
+.pk-master{--mode-accent:var(--ink);--mode-wash:rgba(26,28,26,.06)}
+.pk-master2{--mode-accent:var(--jade);--mode-wash:rgba(0,107,62,.07)}
+.pk-list{--mode-accent:var(--jade);--mode-wash:rgba(0,107,62,.06)}
+/* wordlist rows are a persistent choice, so their tick box is always shown */
+.pk-list .multitick{display:flex}
+.picktile.sel{border-color:var(--jade);box-shadow:0 2px 0 0 var(--jade),0 4px 12px rgba(0,0,0,.06)}
+.picktile.sel .multitick{background:var(--jade);border-color:var(--jade);color:#fff}

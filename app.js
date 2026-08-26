@@ -338,31 +338,24 @@ function goLevels(category){
 }
 function renderLevelRows(){
   const category=pendingCategory;
-  // only the original bands have fill-in-the-blank sentences written for them,
-  // so don't offer an empty quiz for the x.1 / x.2 lists
-  const avail=category==="sentences"?LEVELS.filter(([lv])=>SENTQ.some(s=>s[0]===lv)):LEVELS;
-  const rows=avail.map(([lv,name,desc,em])=>{
+  const tile=(lv,name,desc,em,accent)=>{
     const n=category==="sentences"?SENTQ.filter(s=>s[0]===lv).length:WORDS.filter(w=>w[3]===lv).length;
     const unit=category==="sentences"?"sentences":"words";
     const sel=multiLevelSel.has(lv);
-    const cls=`card${multiLevelMode?" multimode":""}${sel?" multisel":""}`;
+    const cls=`picktile sm ${accent}${multiLevelMode?" multimode":""}${sel?" multisel":""}`;
     const action=multiLevelMode?`toggleMultiLevel(${lv})`:`startLevel(${lv})`;
     return `<button class="${cls}" onclick="${action}">
-      <div class="sealic quiet">${em}</div><div><div class="tt">${name}</div>
-      <div class="dd">${desc} · ${n} ${unit}</div></div>
-      <div class="multitick">✓</div><div class="chev">›</div></button>`;
-  });
+      <span class="pickglyph">${em}</span>
+      <span class="picktext">
+        <span class="picktt">${name}</span>
+        <span class="pickdd">${desc} · ${n} ${unit}</span>
+      </span>
+      <span class="multitick">✓</span><span class="pickchev">›</span></button>`;
+  };
+  const rows=LEVELS.map(([lv,name,desc,em])=>tile(lv,name,desc,em,"pk-hsk"));
   if(!multiLevelMode&&(category==="guessing"||category==="typing"||category==="writing")){
-    const mn=WORDS.filter(w=>w[3]===5).length;
-    const mn2=WORDS.filter(w=>w[3]===7).length;
-    rows.push(`<button class="card" onclick="startMaster(5)">
-      <div class="sealic">宗</div><div><div class="tt">Master 宗师</div>
-      <div class="dd">Rare characters, trap readings and literary chengyu — hard even for native speakers · ${mn} words</div></div>
-      <div class="chev">›</div></button>`);
-    rows.push(`<button class="card" onclick="startMaster(7)">
-      <div class="sealic">文</div><div><div class="tt">Master II 文哲</div>
-      <div class="dd">Literary allusions, classical idioms and abstract vocabulary from essays and prose — hard even for native speakers · ${mn2} words</div></div>
-      <div class="chev">›</div></button>`);
+    rows.push(tile(5,"Master 宗师","Rare characters, trap readings and literary chengyu","宗","pk-master"));
+    rows.push(tile(7,"Master II 文哲","Literary allusions, classical idioms and abstract vocabulary","文","pk-master2"));
   }
   $("levelrows").innerHTML=rows.join("");
 }
@@ -401,10 +394,14 @@ function renderLevelWordlists(){
   $("levelwlsection").style.display=entries.length?"block":"none";
   $("levelwlrows").innerHTML=entries.map(([id,l])=>{
     const on=pendingWordlistIds.has(id);
-    return `<button class="wrow ${on?"sel":""}" onclick="toggleLevelWordlist('${id}')">
-      <span style="font-family:var(--ui);font-size:14.5px;font-weight:600;min-width:0">${esc(l.name||"Untitled list")}</span>
-      <span><div class="en">${l.words.length} word${l.words.length===1?"":"s"}</div></span>
-      <span class="tick">✓</span></button>`;
+    const n=l.words.length;
+    return `<button class="picktile sm pk-list${on?" sel":""}" onclick="toggleLevelWordlist('${id}')">
+      <span class="pickglyph">册</span>
+      <span class="picktext">
+        <span class="picktt">${esc(l.name||"Untitled list")}</span>
+        <span class="pickdd">${n} word${n===1?"":"s"}</span>
+      </span>
+      <span class="multitick">✓</span></button>`;
   }).join("");
   updateLevelWordlistBar();
 }

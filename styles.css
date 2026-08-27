@@ -1349,7 +1349,8 @@ html.no-tabs .rigtap{pointer-events:none}
 /* speech bubble — a poke gets a line out of her. It lives outside .rigscale
    for the same reason the menu does: inside it the text would render at a
    third size. It sits above her head and flips its tail with the menu. */
-.rigsay{position:absolute;right:var(--rigedge);bottom:84%;z-index:4;
+/* 98% clears the top of her hair — the bubble sits over her, not beside her */
+.rigsay{position:absolute;right:var(--rigedge);bottom:98%;z-index:4;
   width:max-content;max-width:min(200px,44vw);
   border:1.5px solid var(--tile-lo);background:var(--tile-face);color:var(--ink);
   border-radius:12px;padding:7px 10px;box-shadow:var(--tile-lift);

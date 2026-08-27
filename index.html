@@ -1072,6 +1072,10 @@
      menu take pointer events; the rest of the dock stays click-through. -->
 <div class="rigdock" id="rigdock">
   <button class="rigtap" id="rigtap" onclick="pokeRig()" aria-label="Poke the mascot"></button>
+  <div class="rigsay" id="rigsay" aria-live="polite">
+    <div class="rigsay-cn" id="rigsaycn"></div>
+    <div class="rigsay-en" id="rigsayen"></div>
+  </div>
   <div class="rigmenu" id="rigmenu">
     <button class="rigbtn" id="rigmovebtn" onclick="toggleRigMove()">✥ Move</button>
     <button class="rigbtn" onclick="hideRigForSession()">✕ Hide</button>
@@ -1079,6 +1083,28 @@
   <div class="rigscale">
    <div class="rigbounce" id="rigbounce">
     <div class="rig" id="rigfigure">
+    <!-- reaction effects, drawn behind every body part -->
+    <div class="slot s-fx" aria-hidden="true">
+      <div class="fx fx-sun">
+        <div class="fx-rays"></div>
+        <div class="fx-glow"></div>
+        <i class="fx-spark a"></i><i class="fx-spark b"></i>
+        <i class="fx-spark c"></i><i class="fx-spark d"></i>
+      </div>
+      <div class="fx fx-bloom">
+        <div class="bloom-glow"></div>
+        <i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><i class="e"></i>
+      </div>
+      <div class="fx fx-notes">
+        <div class="notes-glow"></div>
+        <i class="a">♪</i><i class="b">♫</i><i class="c">♬</i><i class="d">♪</i>
+      </div>
+      <div class="fx fx-storm">
+        <i class="fx-puff a"></i><i class="fx-puff b"></i>
+        <i class="fx-puff c"></i><i class="fx-puff d"></i>
+      </div>
+      <div class="fx fx-heat"></div>
+    </div>
     <div class="slot s-hair-back" data-anim="hairBackSway">
       <img class="art" src="parts/hair-back.png" alt="">
     </div>
@@ -1102,6 +1128,22 @@
     </div>
     <div class="slot s-head" data-anim="headBob">
       <img class="art" id="righead" src="parts/head.png" alt="">
+    </div>
+    <!-- the rain falls in FRONT of her; its cloud is in the layer behind -->
+    <div class="slot s-fx-front" aria-hidden="true">
+      <div class="fx fx-rain">
+        <i class="fx-drop a"></i><i class="fx-drop b"></i>
+        <i class="fx-drop c"></i><i class="fx-drop d"></i><i class="fx-drop e"></i>
+      </div>
+      <div class="fx fx-vein">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M30 9 L50 33 L70 9"/><path d="M91 30 L67 50 L91 70"/>
+            <path d="M70 91 L50 67 L30 91"/><path d="M9 70 L33 50 L9 30"/>
+          </g>
+        </svg>
+      </div>
+      <div class="fx fx-gloom"></div>
     </div>
     </div>
    </div>

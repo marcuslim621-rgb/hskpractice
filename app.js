@@ -86,6 +86,60 @@ const NO_TABS=new Set(["swipe","quiz","typequiz","writequiz","sentquiz","summary
 let rigMoveMode=false;
 let rigSpeedTimers=[];
 function rigDock(){return $("rigdock")}
+/* what she says when poked. The cheerful set runs while she's still in good
+   humour; past RIG_PATIENCE the same tap gets the other set instead. Lines are
+   drawn at random but never twice in a row. */
+const RIG_LINES={
+  happy:[
+    ["加油！！","You can do it! / Go for it!"],
+    ["你可以的！","You got this!"],
+    ["祝你好运！","Good luck!"],
+    ["冲啊！！","Let's go!! / Go go go!!"],
+    ["稳住！","Stay strong / Keep it together!"],
+    ["别慌，你行的！","Don't panic, you've got this!"],
+    ["相信自己！","Believe in yourself!"],
+    ["一定可以的！","You can definitely do it!"],
+    ["坚持一下！","Hang in there!"],
+    ["再坚持一下就好了！","Just hang in there a little longer!"],
+    ["撑住啊！","Hang in there!"],
+    ["别放弃！","Don't give up!"],
+    ["慢慢来，你可以的。","Take it easy, you've got this."],
+    ["一切都会好的！","Everything will be okay!"],
+    ["好运好运！","Good luck, good luck!"],
+    ["给你加个油！","Sending you some encouragement!"],
+    ["今天也要加油哦～","You got this today too~"],
+    ["祝你一切顺利！","Hope everything goes smoothly!"],
+    ["顺顺利利！","Hope it all goes smoothly!"],
+    ["拿下它！","Go crush it! / Nail it!"]
+  ],
+  cross:[
+    ["真他妈傻逼",""],
+    ["纯傻逼",""],
+    ["傻屌也可以",""],
+    ["臭傻逼！",""]
+  ]
+};
+let rigSayTimer=0,rigLastLine="";
+function sayRig(happy,hold){
+  const dock=rigDock();
+  if(!dock)return;
+  const pool=happy?RIG_LINES.happy:RIG_LINES.cross;
+  let i=Math.floor(Math.random()*pool.length);
+  if(pool.length>1&&pool[i][0]===rigLastLine)i=(i+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;
+  rigLastLine=pool[i][0];
+  $("rigsaycn").textContent=pool[i][0];
+  $("rigsayen").textContent=pool[i][1];
+  dock.classList.add("saying");
+  dock.classList.toggle("saying-cross",!happy);
+  clearTimeout(rigSayTimer);
+  rigSayTimer=setTimeout(hushRig,hold);
+}
+function hushRig(){
+  const dock=rigDock();
+  if(!dock)return;
+  clearTimeout(rigSayTimer);
+  dock.classList.remove("saying","saying-cross");
+}
 function pokeRig(){
   const dock=rigDock();
   if(!dock)return;
@@ -105,7 +159,11 @@ function pokeRig(){
   rigPokes++;
   clearTimeout(rigCalmTimer);
   rigCalmTimer=setTimeout(()=>{rigPokes=0},6000);
-  setRigFace(rigPokes<=RIG_PATIENCE,1200);
+  const happy=rigPokes<=RIG_PATIENCE;
+  // a poke holds longer than an answer reaction — the drifting effects need
+  // a beat or two to read
+  setRigFace(happy,2400);
+  sayRig(happy,2600);
   updateRigMenuSide();
   dock.classList.toggle("open");
   if(!dock.classList.contains("open")&&rigMoveMode)toggleRigMove();
@@ -136,8 +194,35 @@ function setRigFace(ok,hold){
     pick=pool[(pool.indexOf(pick)+1+Math.floor(Math.random()*(pool.length-1)))%pool.length];
   rigLastFace=pick;
   head.src="parts/"+pick+".png";
+  setRigFx(ok);
   clearTimeout(rigFaceTimer);
-  rigFaceTimer=setTimeout(()=>{head.src="parts/head.png"},hold);
+  rigFaceTimer=setTimeout(()=>{head.src="parts/head.png";clearRigFx()},hold);
+}
+/* The weather behind her head. Each mood has three of them and they cycle at
+   random, never the same one twice in a row, so a run of pokes doesn't play
+   the same beat over and over. Held and cleared with the face. */
+const RIG_FX={
+  happy:["fx-sunburst","fx-bloom-on","fx-notes-on"],
+  cross:["fx-storm-on","fx-anger","fx-gloom-on"]
+};
+const RIG_FX_ALL=[].concat(RIG_FX.happy,RIG_FX.cross);
+let rigLastFx="";
+function setRigFx(ok){
+  const fig=$("rigfigure");
+  if(!fig)return;
+  const pool=ok?RIG_FX.happy:RIG_FX.cross;
+  let i=Math.floor(Math.random()*pool.length);
+  if(pool[i]===rigLastFx)i=(i+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;
+  rigLastFx=pool[i];
+  fig.classList.remove(...RIG_FX_ALL);
+  // a reflow between the remove and the add, or re-picking the same effect
+  // would leave its animations mid-cycle instead of starting them over
+  void fig.offsetWidth;
+  fig.classList.add(pool[i]);
+}
+function clearRigFx(){
+  const fig=$("rigfigure");
+  if(fig)fig.classList.remove(...RIG_FX_ALL);
 }
 function reactRig(ok){
   const fig=$("rigfigure");
@@ -157,6 +242,7 @@ function closeRigMenu(){
   const dock=rigDock();
   if(!dock)return;
   dock.classList.remove("open");
+  hushRig();
   if(rigMoveMode)toggleRigMove();
 }
 function toggleRigMove(){

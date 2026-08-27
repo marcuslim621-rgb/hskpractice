@@ -44,6 +44,9 @@
   --tile-jade-border-hover:rgba(0,107,62,.3);
   --hanzi:"Noto Serif SC","Songti SC","SimSun",serif;
   --ui:"Manrope",ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+  /* letterpress: a dark edge above the stroke and a lit one below, so the
+     hanzi reads as cut into the tile rather than printed on it */
+  --engrave:0 -1px 1px rgba(96,44,32,.34),0 1px 0 rgba(255,255,255,.9);
 }
 html[data-theme="dark"]{
   /* the same tiles carved from dark stone rather than bone */
@@ -67,6 +70,7 @@ html[data-theme="dark"]{
   --on-jade:#0E120F;
   --well:#191A18;
   --tile-face:#212220;
+  --engrave:0 -1px 1px rgba(0,0,0,.62),0 1px 0 rgba(255,255,255,.14);
   --tile-hi:rgba(255,255,255,.07);
   --tile-lo:#0D0E0C;
   --tile-inset:inset 0 1px 2px rgba(255,255,255,.05);
@@ -1162,7 +1166,7 @@ html[data-theme="dark"] #wllist .wrow{border-top-color:rgba(65,179,131,.18)}
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
   box-shadow:var(--tile-stack);
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--hanzi);font-size:22px;font-weight:700}
+  font-family:var(--hanzi);font-size:22px;font-weight:700;text-shadow:var(--engrave)}
 .appbar-titles{min-width:0}
 .appbar-title{font-size:21px;font-weight:700;line-height:1.2;color:var(--seal);letter-spacing:-.01em}
 .appbar-sub{font-size:11.5px;color:var(--muted);margin-top:1px;
@@ -1222,7 +1226,7 @@ html[data-theme="dark"] .listrow .sealic.quiet{
   background:var(--tile-face);color:var(--seal);
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
   box-shadow:var(--tile-stack);
-  font-family:var(--hanzi);font-size:20px;font-weight:600;
+  font-family:var(--hanzi);font-size:20px;font-weight:600;text-shadow:var(--engrave);
   transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
 .listrow .sealic.jade{color:var(--jade)}
 .listrow:not(.listrow-static):hover .sealic{transform:rotate(-4deg) scale(1.04)}
@@ -1241,7 +1245,7 @@ html[data-theme="dark"] .listrow .sealic.quiet{
   box-shadow:0 4px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.06)}
 .swipe-ic{width:50px;height:58px;border-radius:12px;background:var(--tile-face);color:var(--seal);
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
-  box-shadow:var(--tile-stack);font-size:22px;font-weight:700}
+  box-shadow:var(--tile-stack);font-size:22px;font-weight:700;text-shadow:var(--engrave)}
 .swipe-heading{font-size:16px;font-weight:600}
 .swipe-sub{font-size:12px}
 .qwrite-pick{border:1.5px solid var(--tile-lo);background:var(--tile-face);color:var(--ink);
@@ -1335,9 +1339,11 @@ html.no-tabs .rigtap{pointer-events:none}
 /* if she's parked near the left edge there's no room beside her, so the
    menu swaps to her other side */
 .rigdock.flip .rigmenu{right:auto;left:100%;margin-right:0;margin-left:6px}
-.rigbtn{white-space:nowrap;border:1.5px solid var(--tile-lo);background:var(--tile-face);
-  color:var(--ink);border-radius:99px;padding:7px 12px;font-family:var(--ui);
-  font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:var(--tile-lift)}
+/* symbol only — a round token rather than a labelled pill */
+.rigbtn{display:grid;place-items:center;width:30px;height:30px;padding:0;
+  border:1.5px solid var(--tile-lo);background:var(--tile-face);
+  color:var(--ink);border-radius:50%;font-family:var(--ui);line-height:1;
+  font-size:14px;font-weight:700;cursor:pointer;box-shadow:var(--tile-lift)}
 .rigbtn:active{transform:translateY(1px);box-shadow:none}
 
 /* speech bubble — a poke gets a line out of her. It lives outside .rigscale

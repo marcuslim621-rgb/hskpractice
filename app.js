@@ -119,20 +119,45 @@ const RIG_LINES={
     ["臭傻逼！",""]
   ]
 };
+// what she says when you arrive, before you've done anything to deserve a
+// reaction — the same bubble, drawn from its own set
+const RIG_GREETINGS=[
+  ["学中文时间到！","Chinese study time!"],
+  ["你回来啦！","You're back!"],
+  ["今天也一起加油吧！","Let's give it our best today too!"],
+  ["准备好了吗？","Ready?"],
+  ["欢迎回来～","Welcome back~"]
+];
 let rigSayTimer=0,rigLastLine="";
-function sayRig(happy,hold){
+function showRigLine(line,happy,hold){
   const dock=rigDock();
   if(!dock)return;
-  const pool=happy?RIG_LINES.happy:RIG_LINES.cross;
-  let i=Math.floor(Math.random()*pool.length);
-  if(pool.length>1&&pool[i][0]===rigLastLine)i=(i+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;
-  rigLastLine=pool[i][0];
-  $("rigsaycn").textContent=pool[i][0];
-  $("rigsayen").textContent=pool[i][1];
+  rigLastLine=line[0];
+  $("rigsaycn").textContent=line[0];
+  $("rigsayen").textContent=line[1];
   dock.classList.add("saying");
   dock.classList.toggle("saying-cross",!happy);
   clearTimeout(rigSayTimer);
   rigSayTimer=setTimeout(hushRig,hold);
+}
+function sayRig(happy,hold){
+  const pool=happy?RIG_LINES.happy:RIG_LINES.cross;
+  let i=Math.floor(Math.random()*pool.length);
+  if(pool.length>1&&pool[i][0]===rigLastLine)i=(i+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;
+  showRigLine(pool[i],happy,hold);
+}
+/* One greeting a load: she looks up pleased, with a face and an effect picked
+   the same way a poke picks them. Held back a beat so it lands after the
+   screen has settled rather than during the first paint. */
+function greetRig(){
+  if(!rigDock())return;
+  setTimeout(()=>{
+    if(document.documentElement.classList.contains("rig-hidden"))return;
+    const bounce=$("rigbounce");
+    if(bounce){bounce.classList.remove("jump");void bounce.offsetWidth;bounce.classList.add("jump")}
+    setRigFace(true,3200);
+    showRigLine(RIG_GREETINGS[Math.floor(Math.random()*RIG_GREETINGS.length)],true,3400);
+  },900);
 }
 function hushRig(){
   const dock=rigDock();
@@ -248,7 +273,10 @@ function closeRigMenu(){
 function toggleRigMove(){
   rigMoveMode=!rigMoveMode;
   rigDock().classList.toggle("moving",rigMoveMode);
-  $("rigmovebtn").textContent=rigMoveMode?"✓ Done":"✥ Move";
+  const btn=$("rigmovebtn");
+  btn.textContent=rigMoveMode?"✓":"✥";
+  btn.setAttribute("aria-label",rigMoveMode?"Done moving the mascot":"Move the mascot");
+  btn.title=rigMoveMode?"Done":"Move";
 }
 function hideRigForSession(){
   closeRigMenu();
@@ -263,11 +291,11 @@ function placeRig(x,y){
   dock.style.right="auto";dock.style.bottom="auto";
   updateRigMenuSide();
 }
-// the menu needs ~96px beside her; near the left edge it flips to her right
+// the menu needs ~40px beside her; near the left edge it flips to her right
 function updateRigMenuSide(){
   const dock=rigDock();
   if(!dock)return;
-  dock.classList.toggle("flip",dock.getBoundingClientRect().left<96);
+  dock.classList.toggle("flip",dock.getBoundingClientRect().left<40);
 }
 function restoreRigPos(){
   const p=store.get("hsk_rig_pos",null);
@@ -3001,4 +3029,5 @@ syncAllCustomWords();
 // the first screen is marked active in the markup, so show() never ran for it
 updateShell((document.querySelector(".screen.active")||{id:"scr-home"}).id.slice(4));
 restoreRigPos();
+greetRig();
 

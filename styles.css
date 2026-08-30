@@ -1867,3 +1867,22 @@ html.splashing,html.splashing body{overflow:hidden}
 .wrow.catmore2{padding-left:30px}
 .wrow.catsub2{padding-left:42px}
 .wrow.catsub2 .py{font-size:12.5px}
+
+/* ---------- Quick Lesson ---------- */
+.lessonsub{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:2px}
+.lessonchips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 12px}
+.lessonchip{display:inline-flex;align-items:baseline;gap:5px;padding:6px 10px;border-radius:9px;
+  background:var(--tile-face);border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);
+  box-shadow:var(--tile-lift)}
+.lessonchip b{font-family:var(--hanzi);font-size:16px;font-weight:600;color:var(--seal)}
+.lessonchip i{font-style:normal;font-size:10.5px;color:var(--quiet)}
+.lessonrow{display:flex;gap:9px;margin-bottom:6px}
+.lessonbtn{flex:1;font-size:12.5px;padding:9px 10px}
+.lessonopts{display:flex;gap:8px;margin:2px 0 10px}
+.lessonopt{flex:1;padding:11px 0;border-radius:10px;cursor:pointer;
+  background:var(--tile-face);color:var(--ink);font-family:var(--ui);font-size:14px;font-weight:700;
+  border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+  box-shadow:var(--tile-lift)}
+.lessonopt.on{background:var(--seal);color:#fff;border-color:var(--seal-deep);box-shadow:var(--tile-lift-hi)}
+.lessonstart{width:100%;margin-top:6px}
+.lessonpickbar{padding:0 2px 8px;font-size:12px;color:var(--muted);font-weight:600}

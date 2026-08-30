@@ -1180,10 +1180,105 @@ function refrBuildQueue(){
   }
   return shuffle(items);
 }
+/* ---------- Quick Lesson: a few words, every mode, one short session ----------
+   The queue is built up front to the chosen length, cycling the modes so each
+   word is met as recognition, then typing, then writing, and as a sentence
+   where one exists. Getting a word wrong puts it back a few questions later,
+   displacing a later slot so the lesson still runs to the length you asked
+   for. It rides on the refresher's machinery: same one-question-per-engine
+   queue, so every engine already knows how to hand control back. */
+const LESSON_MODES=["guessing","typing","writing"];
+let LESSON={words:null,n:10,q:30};
+function getLessonScope(){
+  const s=store.get("hsk_lesson_scope",{mode:"all"});
+  if(s&&s.mode==="level")s.level=normBand(s.level);
+  return s;
+}
+function lessonPool(){return scopedPool(getLessonScope())}
+function hasSentenceFor(w){return SENTQ.some(q=>q[2]===w[0])}
+function goLesson(){
+  LESSON.n=store.get("hsk_lesson_n",10);
+  LESSON.q=store.get("hsk_lesson_q",30);
+  if(!LESSON.words)pickLessonWords();
+  renderLesson();
+  show("lesson");
+}
+/* least-practised first, so a lesson teaches rather than re-tests */
+function pickLessonWords(){
+  const pool=lessonPool();
+  const stats=store.get("hsk_word_stats",{});
+  const seen=w=>{
+    const s=stats[wordKey(w)];
+    if(!s||!s.byMode)return 0;
+    return Object.values(s.byMode).reduce((n,m)=>n+(m.ok||0)+(m.bad||0),0);
+  };
+  const ranked=shuffle([...pool]).sort((a,b)=>seen(a)-seen(b));
+  LESSON.words=ranked.slice(0,Math.min(LESSON.n,pool.length)).map(wordKey);
+}
+function reshuffleLessonWords(){
+  const pool=lessonPool();
+  LESSON.words=shuffle([...pool]).slice(0,Math.min(LESSON.n,pool.length)).map(wordKey);
+  renderLesson();
+}
+function setLessonN(n){
+  LESSON.n=n;store.set("hsk_lesson_n",n);
+  const have=(LESSON.words||[]).length;
+  if(have<n)pickLessonWords();else LESSON.words=LESSON.words.slice(0,n);
+  renderLesson();
+}
+function setLessonQ(q){LESSON.q=q;store.set("hsk_lesson_q",q);renderLesson()}
+function renderLesson(){
+  const pool=lessonPool();
+  $("lessonscopelabel").textContent=scopeLabel(getLessonScope())+" · "+pool.length+" word"+(pool.length===1?"":"s");
+  if(!LESSON.words||!LESSON.words.length)pickLessonWords();
+  const words=(LESSON.words||[]).map(findWord).filter(Boolean);
+  $("lessonwordchips").innerHTML=words.length
+    ? words.map(w=>`<span class="lessonchip"><b>${w[0]}</b><i>${esc(pin(w[1]))}</i></span>`).join("")
+    : `<div class="empty">No words in this scope yet</div>`;
+  const opt=(val,cur,fn)=>`<button class="lessonopt${val===cur?" on":""}" onclick="${fn}(${val})">${val}</button>`;
+  $("lessonnopts").innerHTML=[5,10,15,20].map(n=>opt(n,LESSON.n,"setLessonN")).join("");
+  $("lessonqopts").innerHTML=[10,20,30,40].map(q=>opt(q,LESSON.q,"setLessonQ")).join("");
+  const withSent=words.filter(hasSentenceFor).length;
+  $("lessonmodehint").textContent=withSent
+    ? `Recognition, typing and writing, plus fill-in-the-blank for ${withSent} of these words.`
+    : "Recognition, typing and writing. None of these words has a fill-in-the-blank sentence yet.";
+  $("lessonpickmax").textContent="tap to add or remove";
+}
+function buildLessonQueue(words,qCount){
+  const q=[];
+  let round=0;
+  while(q.length<qCount&&words.length){
+    const order=shuffle([...words]);
+    for(let idx=0;idx<order.length&&q.length<qCount;idx++){
+      const w=order[idx];
+      let mode=LESSON_MODES[(round+idx)%LESSON_MODES.length];
+      // a sentence question every fourth turn, but only where one exists
+      if(round>0&&(round+idx)%4===3&&hasSentenceFor(w))mode="sentences";
+      q.push({c:wordKey(w),mode});
+    }
+    round++;
+  }
+  return q;
+}
+function startLesson(){
+  const words=(LESSON.words||[]).map(findWord).filter(Boolean);
+  if(!words.length){alert("Pick at least one word for this lesson first.");return}
+  const queue=buildLessonQueue(words,LESSON.q);
+  REFR={active:true,kind:"lesson",queue,target:queue.length,i:0,ok:0,bad:0,results:[],startedAt:Date.now()};
+  refrRunCurrent();
+}
+/* a word you got wrong comes back, taking a later slot rather than lengthening
+   the lesson */
+function lessonRequeue(c,mode){
+  const at=REFR.i+3;
+  if(at>=REFR.queue.length)return;
+  REFR.queue.splice(at,0,{c,mode});
+  if(REFR.queue.length>REFR.target)REFR.queue.length=REFR.target;
+}
 function startRefresherMixed(){
   const queue=refrBuildQueue();
   if(!queue.length){alert("Nothing due right now within this scope — check back later, or widen the scope! 🎉");return}
-  REFR={active:true,queue,i:0,ok:0,bad:0,results:[],startedAt:Date.now()};
+  REFR={active:true,kind:"refresher",queue,target:queue.length,i:0,ok:0,bad:0,results:[],startedAt:Date.now()};
   refrRunCurrent();
 }
 function refrRunCurrent(){
@@ -1192,7 +1287,9 @@ function refrRunCurrent(){
   const dict=allWords();
   const w=dict.find(x=>wordKey(x)===c);
   if(!w){REFR.i++;refrRunCurrent();return} // word no longer exists (e.g. deleted custom word)
-  const label="Refresher · "+CATEGORY_TITLE[mode];
+  const label=REFR.kind==="lesson"
+    ? `Lesson ${REFR.i+1}/${REFR.queue.length} · ${CATEGORY_TITLE[mode]}`
+    : "Refresher · "+CATEGORY_TITLE[mode];
   if(mode==="guessing")startQuiz([w],label,"unlimited");
   else if(mode==="typing")startTypeQuiz([w],label,"unlimited");
   else if(mode==="writing")startWriteQuiz([w],label,"unlimited");
@@ -1201,13 +1298,21 @@ function refrRunCurrent(){
     if(!sentMatches.length){REFR.i++;refrRunCurrent();return} // no sentence exists for this word
     startSentQuiz(sentMatches.slice(0,1),label,"unlimited");
   }
+  // each engine just pointed againFn at its own one-word quiz; a lesson
+  // should replay as a whole lesson instead
+  if(REFR.kind==="lesson")againFn=()=>{show("lesson");startLesson()};
 }
 // called by each engine's own single-question "finished" branch when a refresher session is active
 function refrAdvance(results){
   if(!REFR)return false;
+  const cur=REFR.queue[REFR.i];
   results.forEach(r=>{
     REFR.results.push(r);
-    if(r.ok)REFR.ok++;else REFR.bad++;
+    if(r.ok)REFR.ok++;
+    else{
+      REFR.bad++;
+      if(REFR.kind==="lesson")lessonRequeue(r.c,cur?cur.mode:"guessing");
+    }
   });
   REFR.i++;
   refrRunCurrent();
@@ -1215,14 +1320,16 @@ function refrAdvance(results){
 }
 function refrFinish(){
   const results=REFR.results,ok=REFR.ok,bad=REFR.bad;
+  const isLesson=REFR.kind==="lesson";
+  const key=isLesson?"Quick Lesson":"Refresher (mixed)";
   const hist=store.get("hsk_history",[]);
-  hist.unshift({t:Date.now(),label:"Refresher (mixed)",ok,bad,words:results});
+  hist.unshift({t:Date.now(),label:key,ok,bad,words:results});
   store.set("hsk_history",hist.slice(0,200));
   bumpStreak();
-  lastWasBest=recordBest("Refresher (mixed)",ok,bad);
+  lastWasBest=recordBest(key,ok,bad);
   REFR=null;
   $("sumbest").classList.toggle("show",lastWasBest);
-  $("sumlabel").textContent="Refresher · mixed practice";
+  $("sumlabel").textContent=isLesson?"Quick Lesson":"Refresher · mixed practice";
   $("sumok").textContent=ok;$("sumbad").textContent=bad;
   const t=ok+bad;
   $("sumacc").textContent=(t?Math.round(ok/t*100):0)+"%";
@@ -1231,14 +1338,46 @@ function refrFinish(){
 }
 function refrEndEarly(){
   if(REFR&&REFR.results.length){
+    const key=REFR.kind==="lesson"?"Quick Lesson":"Refresher (mixed)";
     const hist=store.get("hsk_history",[]);
-    hist.unshift({t:Date.now(),label:"Refresher (mixed)",ok:REFR.ok,bad:REFR.bad,words:REFR.results});
+    hist.unshift({t:Date.now(),label:key,ok:REFR.ok,bad:REFR.bad,words:REFR.results});
     store.set("hsk_history",hist.slice(0,200));
     bumpStreak();
-    recordBest("Refresher (mixed)",REFR.ok,REFR.bad);
+    recordBest(key,REFR.ok,REFR.bad);
   }
+  const back=REFR&&REFR.kind==="lesson"?"lesson":"home";
   REFR=null;
-  show("home");
+  show(back);
+}
+
+/* ---------- choosing the words by hand ---------- */
+function openLessonWordPicker(){renderLessonWordPicker();$("lessonwordsheet").classList.add("show")}
+function closeLessonWordPicker(){$("lessonwordsheet").classList.remove("show");renderLesson()}
+function toggleLessonWord(k){
+  const cur=LESSON.words||[];
+  const i=cur.indexOf(k);
+  if(i>=0)cur.splice(i,1);
+  else{
+    if(cur.length>=LESSON.n){alert(`This lesson is set to ${LESSON.n} words — remove one first, or raise the count.`);return}
+    cur.push(k);
+  }
+  LESSON.words=cur;
+  renderLessonWordPicker();
+}
+function renderLessonWordPicker(){
+  const pool=lessonPool();
+  const chosen=new Set(LESSON.words||[]);
+  $("lessonpickcount").textContent=chosen.size;
+  $("lessonpickmax").textContent=`of ${LESSON.n} · ${pool.length} to choose from`;
+  // the chosen words come first, so one that sits past the cap is still
+  // there to be removed
+  const ordered=[...pool].sort((a,b)=>(chosen.has(wordKey(b))?1:0)-(chosen.has(wordKey(a))?1:0));
+  $("lessonwordlist").innerHTML=ordered.slice(0,400).map(w=>{
+    const k=wordKey(w);
+    return `<button class="wrow ${chosen.has(k)?"sel":""}" onclick="toggleLessonWord('${k.replace(/'/g,"&#39;")}')">
+      <span><div class="py">${w[0]} · ${esc(pin(w[1]))}</div><div class="en">${esc(w[2])}</div></span>
+      <span class="tick">✓</span></button>`;
+  }).join("")+(pool.length>400?`<div class="empty">Showing the first 400 — narrow the scope to see more</div>`:"");
 }
 function saveSession(){
   const hist=store.get("hsk_history",[]);
@@ -2562,8 +2701,8 @@ function getSwipeScope(){
   return s;
 }
 function saveSwipeScopeObj(s){store.set("hsk_swipe_scope",s)}
-function swipeScopedPool(){
-  const scope=getSwipeScope();
+function swipeScopedPool(){return scopedPool(getSwipeScope())}
+function scopedPool(scope){
   const dict=allWords();
   if(scope.mode==="level")return dict.filter(w=>inBand(w,scope.level));
   if(scope.mode==="cat")return dict.filter(w=>inCat(w,scope.id)&&(scope.level==null||inBand(w,scope.level)));
@@ -2576,8 +2715,8 @@ function swipeScopedPool(){
   }
   return dict;
 }
-function swipeScopeLabel(){
-  const scope=getSwipeScope();
+function swipeScopeLabel(){return scopeLabel(getSwipeScope())}
+function scopeLabel(scope){
   if(scope.mode==="level"){
     const found=LEVELS.find(l=>l[0]===scope.level);
     return found?found[1]:("HSK "+scope.level);
@@ -2646,7 +2785,16 @@ function renderMastery(){
         ?"Nothing mastered in this list yet — swipe “Know it” on a word to master it."
         :"Every word in this list is mastered. 恭喜!"}</div>`;
 }
+/* one sheet, two customers: the swipe deck and the lesson builder */
+let scopePickerTarget="swipe";
+function pickerScope(){return scopePickerTarget==="lesson"?getLessonScope():getSwipeScope()}
 function openSwipeListPicker(){
+  scopePickerTarget="swipe";
+  renderSwipeListPicker();
+  $("swipescopesheet").classList.add("show");
+}
+function openLessonScopePicker(){
+  scopePickerTarget="lesson";
   renderSwipeListPicker();
   $("swipescopesheet").classList.add("show");
 }
@@ -2654,6 +2802,13 @@ function closeSwipeListPicker(){
   $("swipescopesheet").classList.remove("show");
 }
 function pickSwipeScope(scope){
+  if(scopePickerTarget==="lesson"){
+    store.set("hsk_lesson_scope",scope);
+    LESSON.words=null;                    // the old picks are out of scope now
+    renderLesson();
+    closeSwipeListPicker();
+    return;
+  }
   saveSwipeScopeObj(scope);
   updateSwipeCardSummary();
   closeSwipeListPicker();
@@ -2691,7 +2846,7 @@ function catTally(dict,mastered,lv){
   return out;
 }
 function renderSwipeListPicker(){
-  const scope=getSwipeScope();
+  const scope=pickerScope();
   const lists=getWordlists();
   const entries=Object.entries(lists).sort((a,b)=>b[1].created-a[1].created);
   const dict=allWords();

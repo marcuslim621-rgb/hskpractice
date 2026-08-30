@@ -166,6 +166,11 @@
         <div class="tt">Fill-in-the-Blank</div>
         <div class="chev">›</div>
       </button>
+      <button class="listrow" onclick="goLesson()">
+        <div class="sealic quiet">课</div>
+        <div class="tt">Quick Lesson</div>
+        <div class="chev">›</div>
+      </button>
       <div class="listrow listrow-static">
         <div class="sealic quiet">温</div>
         <button class="tt listrow-maintap" onclick="startRefresher()">Refresher<span class="refresherbadge" id="refresherbadge" style="display:none"></span></button>
@@ -381,6 +386,45 @@
   </section>
 
   <!-- LEVEL SELECT -->
+  <section class="screen" id="scr-lesson">
+    <div class="topbar">
+      <button class="linkbtn" onclick="show('home')">← Home</button>
+      <h2>Quick Lesson</h2>
+      <button class="helpicon" onclick="openHelp()" aria-label="How to use">?</button>
+    </div>
+    <p class="hint">A few words at a time, drilled from every angle until they stick.</p>
+    <div class="rowcard">
+      <button class="listrow" onclick="openLessonScopePicker()">
+        <div class="sealic quiet">范</div>
+        <div class="tt">Draw words from<div class="lessonsub" id="lessonscopelabel">All words</div></div>
+        <div class="chev">›</div>
+      </button>
+    </div>
+    <div class="sechead">Words in this lesson</div>
+    <div class="lessonchips" id="lessonwordchips"></div>
+    <div class="lessonrow">
+      <button class="btn outline lessonbtn" onclick="reshuffleLessonWords()">↻ Shuffle</button>
+      <button class="btn outline lessonbtn" onclick="openLessonWordPicker()">Choose words</button>
+    </div>
+    <div class="sechead">How many words</div>
+    <div class="lessonopts" id="lessonnopts"></div>
+    <div class="sechead">How many questions</div>
+    <div class="lessonopts" id="lessonqopts"></div>
+    <p class="hint" id="lessonmodehint"></p>
+    <button class="btn primary lessonstart" onclick="startLesson()">Start lesson →</button>
+  </section>
+
+  <div class="qpicksheet" id="lessonwordsheet" onclick="if(event.target===this)closeLessonWordPicker()">
+    <div class="qpickpanel">
+      <div class="qpickhead">
+        <h3>Choose words</h3>
+        <button class="helpxbtn" onclick="closeLessonWordPicker()">✕</button>
+      </div>
+      <div class="lessonpickbar"><b id="lessonpickcount">0</b> chosen · <span id="lessonpickmax"></span></div>
+      <div class="qpicklist" id="lessonwordlist"></div>
+    </div>
+  </div>
+
   <section class="screen" id="scr-levels">
     <div class="topbar">
       <button class="linkbtn" onclick="show('modeselect')">← Back</button>

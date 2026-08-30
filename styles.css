@@ -1766,11 +1766,14 @@ html.splashing,html.splashing body{overflow:hidden}
   content:"";position:absolute;inset:0;border-radius:16px;
   border:1px solid rgba(229,226,217,.6);pointer-events:none;
 }
+/* Ink for the phrase, cinnabar reserved for the 汉 tile that drops in —
+   the same way a mahjong set keeps red for the character that matters. */
 .sp-front span{
   font-family:var(--hanzi);font-size:38px;font-weight:700;line-height:1;
-  color:var(--seal);
+  color:var(--ink);
   text-shadow:0 1px 2px rgba(255,255,255,.8),0 -1px 1px rgba(0,0,0,.2);
 }
+#sp-drop .sp-front span{color:var(--seal)}
 @media(min-width:400px){.sp-front span{font-size:46px}}
 .sp-back{
   background:var(--jade);

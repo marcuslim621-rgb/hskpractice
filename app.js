@@ -331,7 +331,7 @@ function restoreRigPos(){
   });
 })();
 const APPBAR_TEXT={
-  home:["Hanzi Daily","HSK 1-4 preparation | Hi Momo!"],
+  home:["Hanzi Daily","HSK 1-4 preparation"],
   review:["Review","Your words, and how well you know them"],
   progress:["Progress","Scores, streaks and statistics"],
   settings:["Settings","Appearance and help"]

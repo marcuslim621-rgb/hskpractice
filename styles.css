@@ -1241,7 +1241,14 @@ html[data-theme="dark"] .listrow .sealic.quiet{
   box-shadow:0 4px 0 0 var(--tile-lo),0 6px 16px rgba(0,0,0,.06)}
 .swipe-ic{width:50px;height:58px;border-radius:12px;background:var(--tile-face);color:var(--seal);
   border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
-  box-shadow:var(--tile-stack);font-size:22px;font-weight:700}
+  box-shadow:var(--tile-stack);font-size:22px;font-weight:700;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+/* the 卡 tile cocks over on hover, the same as the row tiles below it */
+.swipecard:hover .swipe-ic{transform:rotate(-4deg) scale(1.04)}
+.swipecard:active .swipe-ic{transform:rotate(-4deg) scale(1.02);
+  box-shadow:var(--tile-stack-press)}
+@media (prefers-reduced-motion:reduce){
+  .swipecard:hover .swipe-ic,.swipecard:active .swipe-ic{transform:none}}
 .swipe-heading{font-size:16px;font-weight:600}
 .swipe-sub{font-size:12px}
 .qwrite-pick{border:1.5px solid var(--tile-lo);background:var(--tile-face);color:var(--ink);

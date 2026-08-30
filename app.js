@@ -437,6 +437,17 @@ const LEVELS=[
    normBand() also repairs scopes saved before the bands were merged, which
    would otherwise name a level like 1.1 that nothing matches any more. */
 const inBand=(w,lv)=>Math.floor(w[3])===Math.floor(lv);
+/* Thematic grouping, from categories.js. A word's id is either a
+   subcategory ("food.drinks") or a bare parent ("food") where only the
+   parent is known, so a parent matches its own words and its children's. */
+const catOf=w=>(typeof WORD_CATEGORY!=="undefined"&&WORD_CATEGORY[w[0]])||"";
+const inCat=(w,id)=>{const c=catOf(w);return c===id||c.startsWith(id+".")};
+const SUBS_OF=id=>(typeof SUBCATEGORIES==="undefined"?[]:SUBCATEGORIES.filter(s=>s[0].startsWith(id+".")));
+const CAT_NAME=id=>{
+  if(typeof SUBCATEGORIES!=="undefined"){const s=SUBCATEGORIES.find(x=>x[0]===id);if(s)return s[1]}
+  if(typeof CATEGORIES!=="undefined"){const c=CATEGORIES.find(x=>x[0]===id);if(c)return c[1]}
+  return id;
+};
 const normBand=lv=>typeof lv==="number"?Math.floor(lv):lv;
 const TABS=[...LEVELS,[5,"Master"],[7,"Master II"]];
 const EDITOR_TABS=[...TABS,[6,"My Words"]];
@@ -2555,6 +2566,7 @@ function swipeScopedPool(){
   const scope=getSwipeScope();
   const dict=allWords();
   if(scope.mode==="level")return dict.filter(w=>inBand(w,scope.level));
+  if(scope.mode==="cat")return dict.filter(w=>inCat(w,scope.id));
   if(scope.mode==="wordlist"){
     const lists=getWordlists();
     const l=lists[scope.id];
@@ -2570,6 +2582,7 @@ function swipeScopeLabel(){
     const found=LEVELS.find(l=>l[0]===scope.level);
     return found?found[1]:("HSK "+scope.level);
   }
+  if(scope.mode==="cat")return CAT_NAME(scope.id);
   if(scope.mode==="wordlist"){
     const lists=getWordlists();
     const l=lists[scope.id];
@@ -2643,6 +2656,10 @@ function pickSwipeScope(scope){
 function pickSwipeScopeAll(){pickSwipeScope({mode:"all"})}
 function pickSwipeScopeLevel(lv){pickSwipeScope({mode:"level",level:lv})}
 function pickSwipeScopeWordlist(id){pickSwipeScope({mode:"wordlist",id:id})}
+function pickSwipeScopeCat(id){pickSwipeScope({mode:"cat",id:id})}
+/* which parent is expanded in the picker; null = all collapsed */
+let swipeCatOpen=null;
+function toggleSwipeCat(id){swipeCatOpen=swipeCatOpen===id?null:id;renderSwipeListPicker()}
 function renderSwipeListPicker(){
   const scope=getSwipeScope();
   const lists=getWordlists();
@@ -2675,6 +2692,42 @@ function renderSwipeListPicker(){
       <span><div class="py">${esc(name)}</div></span>
       ${tally(b.done,b.total)}</button>`;
   });
+  if(typeof CATEGORIES!=="undefined"){
+    // tally every category in one pass, parents accumulating their children
+    const byCat={};
+    dict.forEach(w=>{
+      const c=catOf(w);
+      if(!c)return;
+      const done=mastered.has(wordKey(w));
+      [c,c.split(".")[0]].filter((v,i,a)=>a.indexOf(v)===i).forEach(id=>{
+        const b=byCat[id]||(byCat[id]={done:0,total:0});
+        b.total++;
+        if(done)b.done++;
+      });
+    });
+    html+=`<div class="sechead" style="margin-top:14px">By category</div>`;
+    CATEGORIES.forEach(([id,name,em])=>{
+      const b=byCat[id];
+      if(!b||!b.total)return;
+      const on=scope.mode==="cat"&&scope.id===id;
+      const open=swipeCatOpen===id;
+      const kids=SUBS_OF(id).filter(sc=>byCat[sc[0]]&&byCat[sc[0]].total);
+      html+=`<button class="wrow ${on?"sel":""}" onclick="pickSwipeScopeCat('${id}')">
+        <span><div class="py">${em} ${esc(name)}</div></span>
+        ${tally(b.done,b.total)}</button>`;
+      if(kids.length){
+        html+=`<button class="wrow catmore" onclick="toggleSwipeCat('${id}')">
+          <span><div class="en">${open?"Hide":"Show"} ${kids.length} subcategor${kids.length===1?"y":"ies"}</div></span></button>`;
+        if(open)kids.forEach(([sid,sname])=>{
+          const sb=byCat[sid];
+          const son=scope.mode==="cat"&&scope.id===sid;
+          html+=`<button class="wrow catsub ${son?"sel":""}" onclick="pickSwipeScopeCat('${sid}')">
+            <span><div class="py">${esc(sname)}</div></span>
+            ${tally(sb.done,sb.total)}</button>`;
+        });
+      }
+    });
+  }
   if(entries.length){
     html+=`<div class="sechead" style="margin-top:14px">My wordlists</div>`;
     entries.forEach(([id,l])=>{

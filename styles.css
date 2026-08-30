@@ -1855,3 +1855,11 @@ html.splashing,html.splashing body{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
   .splash-word{animation:none}
 }
+
+/* picker rows for the thematic categories: the expander is quieter than a
+   real choice, and subcategory rows sit indented under their parent */
+.wrow.catmore{padding:2px 0 8px 14px;min-height:0;background:none;border:none;box-shadow:none}
+.wrow.catmore .en{color:var(--quiet);font-size:11px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase}
+.wrow.catsub{padding-left:26px}
+.wrow.catsub .py{font-size:13px;color:var(--muted)}

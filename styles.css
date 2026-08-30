@@ -1744,7 +1744,7 @@ html.splashing,html.splashing body{overflow:hidden}
 }
 /* ambient ground shadow under the tile */
 .sp-tile::after{
-  content:"";position:absolute;inset:0;border-radius:12px;
+  content:"";position:absolute;inset:0;border-radius:6px;
   background:rgba(0,0,0,.4);filter:blur(12px);
   transform:translateZ(-25px) translateY(15px) scale(.95);
   pointer-events:none;
@@ -1752,7 +1752,7 @@ html.splashing,html.splashing body{overflow:hidden}
 
 .sp-face{
   position:absolute;width:100%;height:100%;
-  backface-visibility:hidden;border-radius:12px;
+  backface-visibility:hidden;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
 }
 .sp-front{
@@ -1763,7 +1763,7 @@ html.splashing,html.splashing body{overflow:hidden}
              0 0 5px rgba(255,255,255,.5);
 }
 .sp-front::before{
-  content:"";position:absolute;inset:0;border-radius:12px;
+  content:"";position:absolute;inset:0;border-radius:6px;
   border:1px solid rgba(229,226,217,.6);pointer-events:none;
 }
 .sp-front span{
@@ -1779,16 +1779,18 @@ html.splashing,html.splashing body{overflow:hidden}
              inset -2px -2px 5px rgba(0,0,0,.5);
 }
 
-/* the four extruded edges, jade above the ivory lip */
+/* The four extruded edges. They run the full length of each side: inset
+   them and the corners open up into holes you can see straight through,
+   which reads as chunks missing from the tile. */
 .sp-side{position:absolute;backface-visibility:visible;display:block}
-.sp-top{width:calc(100% - 16px);height:32px;top:-16px;left:8px;
+.sp-top{width:100%;height:32px;top:-16px;left:0;
   transform:rotateX(90deg);background:linear-gradient(to bottom,#005C34 50%,var(--line) 50%)}
-.sp-bottom{width:calc(100% - 16px);height:32px;bottom:-16px;left:8px;
+.sp-bottom{width:100%;height:32px;bottom:-16px;left:0;
   transform:rotateX(-90deg);background:linear-gradient(to top,#005C34 50%,var(--line) 50%);
   box-shadow:0 8px 15px rgba(0,0,0,.4)}
-.sp-left{width:32px;height:calc(100% - 16px);top:8px;left:-16px;
+.sp-left{width:32px;height:100%;top:0;left:-16px;
   transform:rotateY(-90deg);background:linear-gradient(to right,#005C34 50%,var(--line) 50%)}
-.sp-right{width:32px;height:calc(100% - 16px);top:8px;right:-16px;
+.sp-right{width:32px;height:100%;top:0;right:-16px;
   transform:rotateY(90deg);background:linear-gradient(to left,#005C34 50%,var(--line) 50%)}
 
 .splash-word{

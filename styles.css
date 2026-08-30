@@ -1798,10 +1798,23 @@ html.splashing,html.splashing body{overflow:hidden}
   animation:spPulse 2s ease-in-out infinite;
 }
 
+/* The tile falls already facedown, so it is the jade back that tumbles in
+   and slams onto the table — the 汉 face stays hidden until the reveal.
+   Both keyframes list the same transform functions in the same order, so
+   the browser interpolates them one by one instead of matrix-blending the
+   two poses (which is what used to swing the ivory face into view). */
 @keyframes spDrop{
-  0%{transform:translate3d(0,-150px,40px) rotate3d(1,1,1,45deg) scale(1.1);opacity:0}
-  15%{opacity:1}
-  100%{transform:rotateX(180deg) translate3d(0,0,0) scale(1);opacity:1}
+  0%{transform:translate3d(0,-150px,40px) rotateX(180deg) rotate3d(1,1,1,45deg) scale(1.1)}
+  100%{transform:translate3d(0,0,0) rotateX(180deg) rotate3d(1,1,1,0deg) scale(1)}
+}
+/* The fade rides on the wrapper, never on the tile itself: an opacity
+   animation promotes its element to its own compositing layer, and that
+   layer flattens the tile's preserve-3d context — which switches off
+   backface-visibility and lets the ivory 汉 face show through the jade
+   back on the way down. */
+@keyframes spFadeIn{
+  0%{opacity:0}
+  15%,100%{opacity:1}
 }
 @keyframes spReveal{
   0%{transform:rotateX(180deg) translate3d(0,0,0) rotateZ(0deg)}

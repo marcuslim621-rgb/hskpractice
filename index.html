@@ -52,6 +52,7 @@
   var sp=document.getElementById("splash");if(!sp)return;
   var tiles=[].slice.call(sp.querySelectorAll(".sp-tile"));
   var drop=document.getElementById("sp-drop");
+  var dropWrap=drop.parentNode;
   var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   var t0=Date.now(),timers=[],gone=false;
   document.documentElement.classList.add("splashing");
@@ -61,12 +62,14 @@
     tiles.forEach(function(t){
       t.style.animation="none";
       t.style.transform="rotateX(180deg) translate3d(0,0,0)";
-      t.style.opacity=(t===drop?"0":"1");
     });
+    dropWrap.style.animation="none";
+    dropWrap.style.opacity="0";
     void drop.offsetWidth;                       // reflow, so the drop replays
     drop.style.animation="spDrop .3s cubic-bezier(.8,0,1,1) forwards";
+    dropWrap.style.animation="spFadeIn .3s linear forwards";
     timers.push(setTimeout(function(){
-      drop.style.opacity="1";
+      dropWrap.style.opacity="1";
       tiles.forEach(function(t){
         t.style.setProperty("--tip-x",((Math.random()-.5)*6).toFixed(2)+"px");
         t.style.setProperty("--tip-y",((Math.random()-.5)*6).toFixed(2)+"px");
@@ -78,7 +81,8 @@
   }
 
   if(reduce){
-    tiles.forEach(function(t){t.style.transform="rotateX(15deg)";t.style.opacity="1"});
+    tiles.forEach(function(t){t.style.transform="rotateX(15deg)"});
+    dropWrap.style.opacity="1";
   }else{
     timers.push(setTimeout(seq,100));
   }

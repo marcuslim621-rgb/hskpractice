@@ -1700,3 +1700,115 @@ html[data-theme="dark"] .m-timer{--mode-accent:#7FD8A6}
 .pk-list .multitick{display:flex}
 .picktile.sel{border-color:var(--jade);box-shadow:0 2px 0 0 var(--jade),0 4px 12px rgba(0,0,0,.06)}
 .picktile.sel .multitick{background:var(--jade);border-color:var(--jade);color:#fff}
+
+/* ============================================================
+   Splash — the loading screen. Four mahjong tiles slam facedown
+   onto the table, then tip forward to reveal 学汉语吧. Built from
+   the same tile vocabulary as the rest of the app: ivory face,
+   jade back, cinnabar engraving, bone-shadow edges.
+   ============================================================ */
+html.splashing,html.splashing body{overflow:hidden}
+
+.splash{
+  position:fixed;inset:0;z-index:9000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:32px;
+  background:var(--card);
+  transition:opacity .4s ease;
+}
+/* atmospheric vignette, so the tiles sit in a pool of light */
+.splash::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  opacity:.4;mix-blend-mode:multiply;
+  background:radial-gradient(circle at center,transparent 0%,var(--line) 100%);
+}
+.splash.sp-out{opacity:0;pointer-events:none}
+
+.splash-tiles{
+  position:relative;z-index:1;
+  display:flex;align-items:flex-end;justify-content:center;
+  gap:16px;
+}
+@media(min-width:400px){.splash-tiles{gap:24px}}
+
+/* perspective sits on each tile, not the row, so the outer tiles don't skew */
+.sp-wrap{width:64px;height:96px;flex:0 0 auto;perspective:1200px}
+.sp-wrap.sp-lead{z-index:2}
+@media(min-width:400px){.sp-wrap{width:76px;height:108px}}
+
+.sp-tile{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  transform-origin:center center -10px;
+  transform:rotateX(180deg);          /* starts facedown */
+}
+/* ambient ground shadow under the tile */
+.sp-tile::after{
+  content:"";position:absolute;inset:0;border-radius:12px;
+  background:rgba(0,0,0,.4);filter:blur(12px);
+  transform:translateZ(-25px) translateY(15px) scale(.95);
+  pointer-events:none;
+}
+
+.sp-face{
+  position:absolute;width:100%;height:100%;
+  backface-visibility:hidden;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.sp-front{
+  background:var(--tile-face);
+  transform:translateZ(16px);
+  box-shadow:inset 1px 1px 3px rgba(255,255,255,.9),
+             inset -2px -2px 6px rgba(229,226,217,.8),
+             0 0 5px rgba(255,255,255,.5);
+}
+.sp-front::before{
+  content:"";position:absolute;inset:0;border-radius:12px;
+  border:1px solid rgba(229,226,217,.6);pointer-events:none;
+}
+.sp-front span{
+  font-family:var(--hanzi);font-size:38px;font-weight:700;line-height:1;
+  color:var(--seal);
+  text-shadow:0 1px 2px rgba(255,255,255,.8),0 -1px 1px rgba(0,0,0,.2);
+}
+@media(min-width:400px){.sp-front span{font-size:46px}}
+.sp-back{
+  background:var(--jade);
+  transform:rotateY(180deg) translateZ(16px);
+  box-shadow:inset 2px 2px 5px rgba(255,255,255,.15),
+             inset -2px -2px 5px rgba(0,0,0,.5);
+}
+
+/* the four extruded edges, jade above the ivory lip */
+.sp-side{position:absolute;backface-visibility:visible;display:block}
+.sp-top{width:calc(100% - 16px);height:32px;top:-16px;left:8px;
+  transform:rotateX(90deg);background:linear-gradient(to bottom,#005C34 50%,var(--line) 50%)}
+.sp-bottom{width:calc(100% - 16px);height:32px;bottom:-16px;left:8px;
+  transform:rotateX(-90deg);background:linear-gradient(to top,#005C34 50%,var(--line) 50%);
+  box-shadow:0 8px 15px rgba(0,0,0,.4)}
+.sp-left{width:32px;height:calc(100% - 16px);top:8px;left:-16px;
+  transform:rotateY(-90deg);background:linear-gradient(to right,#005C34 50%,var(--line) 50%)}
+.sp-right{width:32px;height:calc(100% - 16px);top:8px;right:-16px;
+  transform:rotateY(90deg);background:linear-gradient(to left,#005C34 50%,var(--line) 50%)}
+
+.splash-word{
+  position:relative;z-index:1;
+  font-size:20px;font-weight:700;letter-spacing:.01em;
+  color:var(--muted);
+  animation:spPulse 2s ease-in-out infinite;
+}
+
+@keyframes spDrop{
+  0%{transform:translate3d(0,-150px,40px) rotate3d(1,1,1,45deg) scale(1.1);opacity:0}
+  15%{opacity:1}
+  100%{transform:rotateX(180deg) translate3d(0,0,0) scale(1);opacity:1}
+}
+@keyframes spReveal{
+  0%{transform:rotateX(180deg) translate3d(0,0,0) rotateZ(0deg)}
+  100%{transform:rotateX(15deg) translate3d(var(--tip-x,0px),var(--tip-y,10px),0) rotateZ(var(--tip-r,0deg))}
+}
+@keyframes spPulse{0%,100%{opacity:.7}50%{opacity:1}}
+
+@media(prefers-reduced-motion:reduce){
+  .splash-word{animation:none}
+}

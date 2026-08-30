@@ -3031,3 +3031,6 @@ updateShell((document.querySelector(".screen.active")||{id:"scr-home"}).id.slice
 restoreRigPos();
 greetRig();
 
+
+// the tiles have done their job — let the homescreen through
+if(window.hideSplash)window.hideSplash();

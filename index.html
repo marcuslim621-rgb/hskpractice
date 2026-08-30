@@ -32,6 +32,73 @@
   <symbol id="ic-settings-f" viewBox="0 -960 960 960"><path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm112-260q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Z"/></symbol>
   <symbol id="ic-flame" viewBox="0 -960 960 960"><path d="M160-400q0-105 50-187t110-138q60-56 110-85.5l50-29.5v132q0 37 25 58.5t56 21.5q17 0 32.5-7t28.5-23l18-22q72 42 116 116.5T800-400q0 88-43 160.5T644-125q17-24 26.5-52.5T680-238q0-40-15-75.5T622-377L480-516 339-377q-29 29-44 64t-15 75q0 32 9.5 60.5T316-125q-70-42-113-114.5T160-400Zm320-4 85 83q17 17 26 38t9 45q0 49-35 83.5T480-120q-50 0-85-34.5T360-238q0-23 9-44.5t26-38.5l85-83Z"/></symbol>
 </svg>
+<!-- Splash: four mahjong tiles slam facedown, then tip up to reveal 学汉语吧.
+     Shown until the app has booted (min ~1.5s), then fades out and is removed. -->
+<div class="splash" id="splash" role="status" aria-label="Loading Hanzi Daily">
+  <div class="splash-tiles">
+    <div class="sp-wrap"><div class="sp-tile"><div class="sp-face sp-front"><span>学</span></div><div class="sp-face sp-back"></div><i class="sp-side sp-top"></i><i class="sp-side sp-bottom"></i><i class="sp-side sp-left"></i><i class="sp-side sp-right"></i></div></div>
+    <div class="sp-wrap sp-lead"><div class="sp-tile" id="sp-drop"><div class="sp-face sp-front"><span>汉</span></div><div class="sp-face sp-back"></div><i class="sp-side sp-top"></i><i class="sp-side sp-bottom"></i><i class="sp-side sp-left"></i><i class="sp-side sp-right"></i></div></div>
+    <div class="sp-wrap"><div class="sp-tile"><div class="sp-face sp-front"><span>语</span></div><div class="sp-face sp-back"></div><i class="sp-side sp-top"></i><i class="sp-side sp-bottom"></i><i class="sp-side sp-left"></i><i class="sp-side sp-right"></i></div></div>
+    <div class="sp-wrap"><div class="sp-tile"><div class="sp-face sp-front"><span>吧</span></div><div class="sp-face sp-back"></div><i class="sp-side sp-top"></i><i class="sp-side sp-bottom"></i><i class="sp-side sp-left"></i><i class="sp-side sp-right"></i></div></div>
+  </div>
+  <div class="splash-word">Hanzi Daily</div>
+</div>
+
+<script>
+/* Splash sequence: slam the 汉 tile down facedown, pause, then tip all four
+   forward with a little randomised settle so they read as real tiles on a
+   table. Loops while the app boots; hideSplash() below fades it out. */
+(function(){
+  var sp=document.getElementById("splash");if(!sp)return;
+  var tiles=[].slice.call(sp.querySelectorAll(".sp-tile"));
+  var drop=document.getElementById("sp-drop");
+  var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var t0=Date.now(),timers=[],gone=false;
+  document.documentElement.classList.add("splashing");
+
+  function seq(){
+    if(gone)return;
+    tiles.forEach(function(t){
+      t.style.animation="none";
+      t.style.transform="rotateX(180deg) translate3d(0,0,0)";
+      t.style.opacity=(t===drop?"0":"1");
+    });
+    void drop.offsetWidth;                       // reflow, so the drop replays
+    drop.style.animation="spDrop .3s cubic-bezier(.8,0,1,1) forwards";
+    timers.push(setTimeout(function(){
+      drop.style.opacity="1";
+      tiles.forEach(function(t){
+        t.style.setProperty("--tip-x",((Math.random()-.5)*6).toFixed(2)+"px");
+        t.style.setProperty("--tip-y",((Math.random()-.5)*6).toFixed(2)+"px");
+        t.style.setProperty("--tip-r",((Math.random()-.5)*8).toFixed(2)+"deg");
+        t.style.animation="spReveal .6s cubic-bezier(.34,1.56,.64,1) forwards";
+      });
+      timers.push(setTimeout(seq,3000));        // .6s reveal + 2.4s to read
+    },800));                                     // .3s drop + .5s beat
+  }
+
+  if(reduce){
+    tiles.forEach(function(t){t.style.transform="rotateX(15deg)";t.style.opacity="1"});
+  }else{
+    timers.push(setTimeout(seq,100));
+  }
+
+  function hide(){
+    if(gone)return;gone=true;
+    timers.forEach(clearTimeout);
+    document.documentElement.classList.remove("splashing");
+    sp.classList.add("sp-out");
+    setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp)},450);
+  }
+  // let one full cycle land before dismissing, however fast the app booted
+  window.hideSplash=function(){
+    setTimeout(hide,Math.max(0,(reduce?500:1500)-(Date.now()-t0)));
+  };
+  window.addEventListener("load",function(){window.hideSplash()});
+  setTimeout(hide,6000);                         // never trap the user behind it
+})();
+</script>
+
 <div class="app">
 
   <!-- HOME -->

@@ -1863,3 +1863,7 @@ html.splashing,html.splashing body{overflow:hidden}
   text-transform:uppercase}
 .wrow.catsub{padding-left:26px}
 .wrow.catsub .py{font-size:13px;color:var(--muted)}
+/* second nesting level: a category inside one HSK band, and its subcategories */
+.wrow.catmore2{padding-left:30px}
+.wrow.catsub2{padding-left:42px}
+.wrow.catsub2 .py{font-size:12.5px}

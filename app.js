@@ -2566,7 +2566,7 @@ function swipeScopedPool(){
   const scope=getSwipeScope();
   const dict=allWords();
   if(scope.mode==="level")return dict.filter(w=>inBand(w,scope.level));
-  if(scope.mode==="cat")return dict.filter(w=>inCat(w,scope.id));
+  if(scope.mode==="cat")return dict.filter(w=>inCat(w,scope.id)&&(scope.level==null||inBand(w,scope.level)));
   if(scope.mode==="wordlist"){
     const lists=getWordlists();
     const l=lists[scope.id];
@@ -2582,7 +2582,12 @@ function swipeScopeLabel(){
     const found=LEVELS.find(l=>l[0]===scope.level);
     return found?found[1]:("HSK "+scope.level);
   }
-  if(scope.mode==="cat")return CAT_NAME(scope.id);
+  if(scope.mode==="cat"){
+    const n=CAT_NAME(scope.id);
+    if(scope.level==null)return n;
+    const l=LEVELS.find(x=>x[0]===scope.level);
+    return (l?l[1]:"HSK "+scope.level)+" · "+n;
+  }
   if(scope.mode==="wordlist"){
     const lists=getWordlists();
     const l=lists[scope.id];
@@ -2656,10 +2661,35 @@ function pickSwipeScope(scope){
 function pickSwipeScopeAll(){pickSwipeScope({mode:"all"})}
 function pickSwipeScopeLevel(lv){pickSwipeScope({mode:"level",level:lv})}
 function pickSwipeScopeWordlist(id){pickSwipeScope({mode:"wordlist",id:id})}
-function pickSwipeScopeCat(id){pickSwipeScope({mode:"cat",id:id})}
-/* which parent is expanded in the picker; null = all collapsed */
-let swipeCatOpen=null;
-function toggleSwipeCat(id){swipeCatOpen=swipeCatOpen===id?null:id;renderSwipeListPicker()}
+function pickSwipeScopeCat(id,lv){pickSwipeScope({mode:"cat",id:id,level:lv==null?null:lv})}
+/* what is expanded in the picker; null = collapsed. swipeCatOpen is keyed
+   by "<level>|<parent>" under a level, or by the bare parent id in the
+   all-levels section, so the same theme can be open in only one place. */
+let swipeCatOpen=null,swipeLevelOpen=null;
+function toggleSwipeCat(k){swipeCatOpen=swipeCatOpen===k?null:k;renderSwipeListPicker()}
+function toggleSwipeLevel(lv){
+  swipeLevelOpen=swipeLevelOpen===lv?null:lv;
+  swipeCatOpen=null;
+  renderSwipeListPicker();
+}
+/* mastered/total per category, optionally within one band. Parents count
+   their children's words as well as any of their own. */
+function catTally(dict,mastered,lv){
+  const out={};
+  dict.forEach(w=>{
+    if(lv!=null&&!inBand(w,lv))return;
+    const c=catOf(w);
+    if(!c)return;
+    const done=mastered.has(wordKey(w));
+    const ids=c.indexOf(".")>0?[c,c.split(".")[0]]:[c];
+    ids.forEach(id=>{
+      const b=out[id]||(out[id]={done:0,total:0});
+      b.total++;
+      if(done)b.done++;
+    });
+  });
+  return out;
+}
 function renderSwipeListPicker(){
   const scope=getSwipeScope();
   const lists=getWordlists();
@@ -2691,25 +2721,42 @@ function renderSwipeListPicker(){
     html+=`<button class="wrow ${on?"sel":""}" onclick="pickSwipeScopeLevel(${lv})">
       <span><div class="py">${esc(name)}</div></span>
       ${tally(b.done,b.total)}</button>`;
-  });
-  if(typeof CATEGORIES!=="undefined"){
-    // tally every category in one pass, parents accumulating their children
-    const byCat={};
-    dict.forEach(w=>{
-      const c=catOf(w);
-      if(!c)return;
-      const done=mastered.has(wordKey(w));
-      [c,c.split(".")[0]].filter((v,i,a)=>a.indexOf(v)===i).forEach(id=>{
-        const b=byCat[id]||(byCat[id]={done:0,total:0});
-        b.total++;
-        if(done)b.done++;
+    if(typeof CATEGORIES==="undefined")return;
+    const lvCats=catTally(dict,mastered,lv);
+    const parents=CATEGORIES.filter(([id])=>lvCats[id]&&lvCats[id].total);
+    if(!parents.length)return;
+    const lvOpen=swipeLevelOpen===lv;
+    html+=`<button class="wrow catmore" onclick="toggleSwipeLevel(${lv})">
+      <span><div class="en">${lvOpen?"Hide":"Show"} ${parents.length} categories</div></span></button>`;
+    if(!lvOpen)return;
+    parents.forEach(([id,cname,em])=>{
+      const pb=lvCats[id];
+      const psel=scope.mode==="cat"&&scope.id===id&&scope.level===lv;
+      html+=`<button class="wrow catsub ${psel?"sel":""}" onclick="pickSwipeScopeCat('${id}',${lv})">
+        <span><div class="py">${em} ${esc(cname)}</div></span>
+        ${tally(pb.done,pb.total)}</button>`;
+      const kids=SUBS_OF(id).filter(sc=>lvCats[sc[0]]&&lvCats[sc[0]].total);
+      if(kids.length<2)return;                 // one child tells you nothing the parent didn't
+      const key=lv+"|"+id;
+      const open=swipeCatOpen===key;
+      html+=`<button class="wrow catmore catmore2" onclick="toggleSwipeCat('${key}')">
+        <span><div class="en">${open?"Hide":"Show"} ${kids.length} subcategories</div></span></button>`;
+      if(open)kids.forEach(([sid,sname])=>{
+        const sb=lvCats[sid];
+        const ssel=scope.mode==="cat"&&scope.id===sid&&scope.level===lv;
+        html+=`<button class="wrow catsub catsub2 ${ssel?"sel":""}" onclick="pickSwipeScopeCat('${sid}',${lv})">
+          <span><div class="py">${esc(sname)}</div></span>
+          ${tally(sb.done,sb.total)}</button>`;
       });
     });
-    html+=`<div class="sechead" style="margin-top:14px">By category</div>`;
+  });
+  if(typeof CATEGORIES!=="undefined"){
+    const byCat=catTally(dict,mastered,null);
+    html+=`<div class="sechead" style="margin-top:14px">By category · all levels</div>`;
     CATEGORIES.forEach(([id,name,em])=>{
       const b=byCat[id];
       if(!b||!b.total)return;
-      const on=scope.mode==="cat"&&scope.id===id;
+      const on=scope.mode==="cat"&&scope.id===id&&scope.level==null;
       const open=swipeCatOpen===id;
       const kids=SUBS_OF(id).filter(sc=>byCat[sc[0]]&&byCat[sc[0]].total);
       html+=`<button class="wrow ${on?"sel":""}" onclick="pickSwipeScopeCat('${id}')">
@@ -2720,7 +2767,7 @@ function renderSwipeListPicker(){
           <span><div class="en">${open?"Hide":"Show"} ${kids.length} subcategor${kids.length===1?"y":"ies"}</div></span></button>`;
         if(open)kids.forEach(([sid,sname])=>{
           const sb=byCat[sid];
-          const son=scope.mode==="cat"&&scope.id===sid;
+          const son=scope.mode==="cat"&&scope.id===sid&&scope.level==null;
           html+=`<button class="wrow catsub ${son?"sel":""}" onclick="pickSwipeScopeCat('${sid}')">
             <span><div class="py">${esc(sname)}</div></span>
             ${tally(sb.done,sb.total)}</button>`;

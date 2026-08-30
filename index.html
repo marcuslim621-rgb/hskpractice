@@ -62,11 +62,13 @@
     tiles.forEach(function(t){
       t.style.animation="none";
       t.style.transform="rotateX(180deg) translate3d(0,0,0)";
+      t.classList.remove("sp-lit");     // facedown: edge-on sides stay hidden
     });
     dropWrap.style.animation="none";
     dropWrap.style.opacity="0";
     void drop.offsetWidth;                       // reflow, so the drop replays
     drop.style.animation="spDrop .3s cubic-bezier(.8,0,1,1) forwards";
+    drop.classList.add("sp-lit");       // it tumbles, so its sides have area
     dropWrap.style.animation="spFadeIn .3s linear forwards";
     timers.push(setTimeout(function(){
       dropWrap.style.opacity="1";
@@ -74,6 +76,7 @@
         t.style.setProperty("--tip-x",((Math.random()-.5)*6).toFixed(2)+"px");
         t.style.setProperty("--tip-y",((Math.random()-.5)*6).toFixed(2)+"px");
         t.style.setProperty("--tip-r",((Math.random()-.5)*8).toFixed(2)+"deg");
+        t.classList.add("sp-lit");      // tipping up: the edges come into view
         t.style.animation="spReveal .6s cubic-bezier(.34,1.56,.64,1) forwards";
       });
       timers.push(setTimeout(seq,3000));        // .6s reveal + 2.4s to read
@@ -81,7 +84,7 @@
   }
 
   if(reduce){
-    tiles.forEach(function(t){t.style.transform="rotateX(15deg)"});
+    tiles.forEach(function(t){t.style.transform="rotateX(15deg)";t.classList.add("sp-lit")});
     dropWrap.style.opacity="1";
   }else{
     timers.push(setTimeout(seq,100));

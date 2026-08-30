@@ -1785,7 +1785,16 @@ html.splashing,html.splashing body{overflow:hidden}
    out past the rounded face as little ears. So they run full length — no
    holes — and their ends fade out across the 16px corner radius, which
    dissolves the ears instead of cutting them off. */
-.sp-side{position:absolute;backface-visibility:visible;display:block}
+/* Seen exactly edge-on — which is the whole time a tile lies facedown — a
+   flat panel collapses to a hairline, and the four of them trace a hard
+   square outline around the tile's bounding box, straight across the
+   rounded corners. They contribute nothing at that angle, so they stay
+   hidden until the tile actually tips or tumbles and they gain real area.
+   display, not visibility or opacity: visibility:hidden does not actually
+   cull them here — the hairline still paints — and an opacity layer would
+   flatten them out of the tile's 3D context. */
+.sp-side{position:absolute;backface-visibility:visible;display:none}
+.sp-tile.sp-lit .sp-side{display:block}
 .sp-top,.sp-bottom{
   -webkit-mask-image:linear-gradient(to right,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);
           mask-image:linear-gradient(to right,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%)}

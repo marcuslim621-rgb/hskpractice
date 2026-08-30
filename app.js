@@ -56,7 +56,6 @@ function levelBadge(lv){
   if(lv===5)return"宗";
   if(lv===7)return"文";
   if(lv===6)return"＋";
-  // 1.1 / 1.2 share the band's seal — "1.1级" is too wide for the stamp
   return Math.floor(lv)+"级";
 }
 
@@ -424,22 +423,21 @@ function updateRefresherBadge(){
   }
 }
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
-/* x.1 completes the official HSK 2.0 band, x.2 adds what the 2021 HSK 3.0 standard
-   introduced on top of it — see the header of data.js */
+/* One list per HSK band. data.js still records which sub-band a word came
+   from in w[3] — x.1 completes the official HSK 2.0 band, x.2 adds what the
+   2021 HSK 3.0 standard introduced — but the app bands them together, so
+   every level filter goes through inBand() rather than comparing w[3]. */
 const LEVELS=[
-  [1,"HSK 1","Basic beginner words","一"],
-  [1.1,"HSK 1.1","Rest of the official HSK 1 list","一"],
-  [1.2,"HSK 1.2","Added by the 2021 HSK 3.0 standard","一"],
-  [2,"HSK 2","New HSK 2 words only","二"],
-  [2.1,"HSK 2.1","Rest of the official HSK 2 list","二"],
-  [2.2,"HSK 2.2","Added by the 2021 HSK 3.0 standard","二"],
-  [3,"HSK 3","New HSK 3 words only","三"],
-  [3.1,"HSK 3.1","Rest of the official HSK 3 list","三"],
-  [3.2,"HSK 3.2","Added by the 2021 HSK 3.0 standard","三"],
-  [4,"HSK 4","New HSK 4 words only","四"],
-  [4.1,"HSK 4.1","Rest of the official HSK 4 list","四"],
-  [4.2,"HSK 4.2","Added by the 2021 HSK 3.0 standard","四"]
+  [1,"HSK 1","The whole HSK 1 band","一"],
+  [2,"HSK 2","The whole HSK 2 band","二"],
+  [3,"HSK 3","The whole HSK 3 band","三"],
+  [4,"HSK 4","The whole HSK 4 band","四"]
 ];
+/* w[3] is 1, 1.1 or 1.2 for band 1, and so on; 5/6/7 floor to themselves.
+   normBand() also repairs scopes saved before the bands were merged, which
+   would otherwise name a level like 1.1 that nothing matches any more. */
+const inBand=(w,lv)=>Math.floor(w[3])===Math.floor(lv);
+const normBand=lv=>typeof lv==="number"?Math.floor(lv):lv;
 const TABS=[...LEVELS,[5,"Master"],[7,"Master II"]];
 const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
@@ -475,7 +473,7 @@ function goLevels(category){
 function renderLevelRows(){
   const category=pendingCategory;
   const tile=(lv,name,desc,em,accent)=>{
-    const n=category==="sentences"?SENTQ.filter(s=>s[0]===lv).length:WORDS.filter(w=>w[3]===lv).length;
+    const n=category==="sentences"?SENTQ.filter(s=>s[0]===lv).length:WORDS.filter(w=>inBand(w,lv)).length;
     const unit=category==="sentences"?"sentences":"words";
     const sel=multiLevelSel.has(lv);
     const cls=`picktile sm ${accent}${multiLevelMode?" multimode":""}${sel?" multisel":""}`;
@@ -500,7 +498,7 @@ function toggleMultiLevelMode(){
   multiLevelSel=new Set();
   $("multitogglebtn").classList.toggle("on",multiLevelMode);
   $("multitogglebtn").textContent=multiLevelMode?"Cancel":"Select multiple";
-  $("levelhint").textContent=multiLevelMode?"Tap all the levels you want to include":"Each level tests only the words introduced at that level";
+  $("levelhint").textContent=multiLevelMode?"Tap all the levels you want to include":"Each level covers its whole HSK band";
   $("multilevelbar").style.display="none";
   renderLevelRows();
 }
@@ -552,7 +550,7 @@ function updateLevelWordlistBar(){
 function startMaster(level){
   const lv=level||5;
   const cat=pendingCategory,variant=pendingVariant;
-  const pool=WORDS.filter(w=>w[3]===lv);
+  const pool=WORDS.filter(w=>inBand(w,lv));
   const tierName=lv===7?"Master II":"Master";
   const label=`${tierName} · ${CATEGORY_TITLE[cat]} · ${VARIANT_LABEL[variant]}`;
   if(cat==="typing")startTypeQuiz(pool,label,variant);
@@ -566,7 +564,7 @@ function startLevel(lv){
     startSentQuiz(SENTQ.filter(s=>s[0]===lv),label,variant);
     return;
   }
-  const pool=WORDS.filter(w=>w[3]===lv);
+  const pool=WORDS.filter(w=>inBand(w,lv));
   if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
   if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
   startQuiz(pool,label,variant);
@@ -761,7 +759,7 @@ function renderEditorTabs(){
 }
 function editorVisible(){
   const q=$("editorsearch").value.trim().toLowerCase();
-  return allWords().filter(w=>w[3]===editorTab&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
+  return allWords().filter(w=>inBand(w,editorTab)&&(!q||w[0].includes(q)||pin(w[1]).toLowerCase().includes(q)||w[1].toLowerCase().includes(q)||w[2].toLowerCase().includes(q)));
 }
 function renderEditorList(){
   $("editorlist").innerHTML=editorVisible().map(w=>{
@@ -881,7 +879,7 @@ function renderWordlistLevels(){
     return;
   }
   const byLevel={};
-  matched.forEach(w=>{(byLevel[w[3]]=byLevel[w[3]]||[]).push(w)});
+  matched.forEach(w=>{const b=Math.floor(w[3]);(byLevel[b]=byLevel[b]||[]).push(w)});
   const rows=[];
   rows.push(`<button class="card" onclick="startWordlistFiltered(null)">
     <div class="sealic">词</div><div><div class="tt">All words</div>
@@ -919,7 +917,7 @@ function startWordlistFiltered(level){
     startSentQuiz(pool,label,variant);
     return;
   }
-  const pool=selected.filter(w=>level===null||w[3]===level);
+  const pool=selected.filter(w=>level===null||inBand(w,level));
   if(!pool.length)return;
   if(cat==="typing"){startTypeQuiz(pool,label,variant);return}
   if(cat==="writing"){startWriteQuiz(pool,label,variant);return}
@@ -1798,9 +1796,7 @@ function clearBest(){
 
 /* ---------- competition leaderboard (named, per-level) ---------- */
 let compBoardScope=null;
-const COMP_SCOPE_ORDER=["HSK 1","HSK 1.1","HSK 1.2","HSK 2","HSK 2.1","HSK 2.2",
-                        "HSK 3","HSK 3.1","HSK 3.2","HSK 4","HSK 4.1","HSK 4.2",
-                        "Master","Master II"];
+const COMP_SCOPE_ORDER=["HSK 1","HSK 2","HSK 3","HSK 4","Master","Master II"];
 function renderCompBoard(){
   const board=store.get("hsk_competition",{});
   const scopes=Object.keys(board).sort((a,b)=>{
@@ -2008,7 +2004,7 @@ function wlCurrentWords(){
     return allWords().filter(w=>keys.has(wordKey(w)));
   }
   if(wlTab===6)return getUserWords();
-  return WORDS.filter(w=>w[3]===wlTab);
+  return WORDS.filter(w=>inBand(w,wlTab));
 }
 function renderPosFilters(){
   const present=new Set(wlCurrentWords().map(w=>w[4]));
@@ -2549,12 +2545,16 @@ function markSwipeMastered(c){
   const m=store.get("hsk_mastered",[]);
   if(!m.includes(c)){m.push(c);store.set("hsk_mastered",m)}
 }
-function getSwipeScope(){return store.get("hsk_swipe_scope",{mode:"all"})}
+function getSwipeScope(){
+  const s=store.get("hsk_swipe_scope",{mode:"all"});
+  if(s&&s.mode==="level")s.level=normBand(s.level);   // saved before the merge
+  return s;
+}
 function saveSwipeScopeObj(s){store.set("hsk_swipe_scope",s)}
 function swipeScopedPool(){
   const scope=getSwipeScope();
   const dict=allWords();
-  if(scope.mode==="level")return dict.filter(w=>w[3]===scope.level);
+  if(scope.mode==="level")return dict.filter(w=>inBand(w,scope.level));
   if(scope.mode==="wordlist"){
     const lists=getWordlists();
     const l=lists[scope.id];
@@ -2655,7 +2655,8 @@ function renderSwipeListPicker(){
   dict.forEach(w=>{
     const done=mastered.has(wordKey(w));
     if(done)allDone++;
-    const b=byLevel[w[3]]||(byLevel[w[3]]={done:0,total:0});
+    const k=Math.floor(w[3]);
+    const b=byLevel[k]||(byLevel[k]={done:0,total:0});
     b.total++;
     if(done)b.done++;
   });

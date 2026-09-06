@@ -1,0 +1,21 @@
+#scr-recognition{position:relative;contain:none}
+#scr-recognition .rt-game{background:#164c3f;color:#fff5dd;border-radius:18px;overflow:hidden;font-family:Manrope,system-ui,sans-serif}
+#scr-recognition .rt-head{padding:15px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#102f28;font-size:12px}
+#scr-recognition button{font:inherit;cursor:pointer}#scr-recognition .rt-exit{color:#fff5dd;border:1px solid #688976;border-radius:7px;background:transparent;padding:10px;min-height:44px}
+#scr-recognition .rt-table{padding:20px 18px;background:radial-gradient(ellipse at 50% 35%,#ffffff09,transparent 70%),repeating-linear-gradient(45deg,#ffffff02 0 1px,transparent 1px 4px)}
+#scr-recognition .rt-wall{display:flex;justify-content:center;gap:4px;margin-bottom:22px}#scr-recognition .rt-wall i{width:18px;height:25px;border:2px solid #e4d9b8;border-radius:3px;background:#286b54;box-shadow:0 4px #aaa182,0 7px #174333}
+#scr-recognition .rt-eyebrow{text-align:center;color:#d3dfcf;text-transform:uppercase;letter-spacing:.12em;font-size:11px}#scr-recognition h1{font:24px Georgia,serif;color:#fff5dd;text-align:center;margin:8px 0 20px}
+#scr-recognition .rt-status{display:flex;justify-content:space-between;gap:10px;font-size:12px}#scr-recognition progress{display:block;width:100%;height:5px;accent-color:#e9c881;margin:12px 0;border:0}
+#scr-recognition .rt-clue{text-align:center;font:clamp(22px,5vw,36px) Georgia,serif;overflow-wrap:anywhere;margin:20px 0;min-height:45px}#scr-recognition .rt-feedback{font-size:13px;text-align:center;min-height:38px;color:#ffe3a3;overflow-wrap:anywhere}
+#scr-recognition .rt-next-wrap{display:flex;justify-content:center;min-height:44px;margin:8px 0}#scr-recognition .rt-next{background:#f4ead3;color:#233e31;border:1px solid #ddd0ae;border-radius:8px;padding:10px 20px;box-shadow:0 3px #b4a17e;min-height:44px}
+#scr-recognition .rt-hand{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;padding:10px 0 22px;border-bottom:9px solid #8f6340;box-shadow:0 6px #3c2b21;border-radius:4px}
+#scr-recognition .rt-tile{display:flex;align-items:center;justify-content:center;min-width:0;background:linear-gradient(125deg,#fffdf2,#fff8e7);color:#183d33;border:1px solid #eee4cc;border-radius:6px;box-shadow:inset 1px 1px #fffef6,inset -1px -1px #e7ddc3,0 4px #cfc4a5,0 7px #b7bea1,0 10px #0b6b4a;font-family:'Noto Serif SC',SimSun,serif}
+#scr-recognition .rt-hand .rt-tile{width:100%;aspect-ratio:110/144;min-height:50px;padding:3px 0;font-size:clamp(16px,4vw,32px);writing-mode:vertical-rl;overflow-wrap:anywhere;line-height:1.1}
+#scr-recognition .rt-hand .rt-tile span{max-height:100%;font-size:inherit}#scr-recognition .rt-hand .rt-tile:disabled{cursor:default}#scr-recognition .rt-matched{visibility:hidden}
+#scr-recognition .rt-hand .rt-tile{min-height:max(50px,calc(var(--rt-letters,1) * 36px));font-size:clamp(16px,4vw,28px)}
+#scr-recognition .rt-pile{position:relative;width:170px;height:98px;margin:8px auto}#scr-recognition .rt-pile:empty:after{content:'Matched tiles';position:absolute;inset:15px 0;display:grid;place-items:center;border:1px dashed #91ad8870;border-radius:14px;color:#c9d8bb;font-size:12px}
+#scr-recognition .rt-pile .rt-tile{position:absolute;width:38px;height:50px;font-size:18px;writing-mode:vertical-rl;line-height:1.05;overflow-wrap:anywhere;padding:2px;box-shadow:0 4px #cfc4a5,0 7px #0b6b4a}
+#scr-recognition .rt-flying{position:absolute;width:38px;height:50px;font-size:18px;writing-mode:vertical-rl;z-index:20;pointer-events:none;transform-origin:top left}
+#scr-recognition .rt-foot{font-size:12px;text-align:center;color:#d3dfcf;margin:20px 0 0}
+body:has(#scr-recognition.active) .rigdock{display:none}
+@media(max-width:420px){#scr-recognition .rt-table{padding:16px 10px}#scr-recognition .rt-hand{gap:3px}#scr-recognition .rt-head{padding:10px}}

@@ -76,7 +76,7 @@ const TAB_FOR_SCREEN={
   progress:"progress",history:"progress",leaderboard:"progress",stats:"progress",
   settings:"settings"
 };
-const NO_TABS=new Set(["swipe","quiz","typequiz","writequiz","sentquiz","summary","gameover"]);
+const NO_TABS=new Set(["recognition","swipe","quiz","typequiz","writequiz","sentquiz","summary","gameover"]);
 
 /* ---------- mascot: poke, move, dismiss ----------
    Poking makes her hop and briefly winds the idle loop up; --sp divides every
@@ -454,10 +454,11 @@ const EDITOR_TABS=[...TABS,[6,"My Words"]];
 
 /* ---------- level select ---------- */
 const CATEGORY_TITLE={guessing:"Recognition",typing:"Typing",writing:"Writing",sentences:"Fill-in-the-Blank"};
-const VARIANT_LABEL={arcade:"Arcade",unlimited:"Unlimited",timer:"Timer",competition:"Competition"};
+const VARIANT_LABEL={tilehand:"Tile hand",arcade:"Arcade",unlimited:"Unlimited",timer:"Timer",competition:"Competition"};
 let pendingCategory="guessing";
 let pendingVariant="arcade";
 function goCategory(cat){
+  if(cat==="guessing"){pendingVariant="tilehand";goLevels(cat);return;}
   pendingCategory=cat;
   $("mstitle").textContent=CATEGORY_TITLE[cat];
   $("ms-competition").style.display=cat==="guessing"?"":"none";
@@ -970,6 +971,7 @@ function buildQueue(pool){
 let againFn=null;
 let quizTimer=null;
 function startQuiz(pool,label,variant){
+  if(variant==="tilehand"){startTileRecognition(pool,label);return;}
   againFn=()=>startQuiz(pool,label,variant);
   clearInterval(quizTimer);
   const lives=variant==="arcade"?5:variant==="competition"?3:Infinity;

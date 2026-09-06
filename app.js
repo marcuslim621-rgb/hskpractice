@@ -6,6 +6,27 @@ const store={
   del(k){try{localStorage.removeItem(k)}catch(e){delete mem[k]}}
 };
 
+/* ---------- XP and daily quests ---------- */
+var lastReward;
+function awardPractice(results){
+  lastReward=Rewards.earn(store.get('hsk_rewards',null),todayStr(),results||[]);
+  store.set('hsk_rewards',lastReward.state);
+}
+function renderRewards(screen){
+  if(!['home','progress','summary','gameover'].includes(screen))return;
+  const state=Rewards.earn(store.get('hsk_rewards',null),todayStr(),[]).state;
+  const level=Rewards.level(state.xp), floor=100*(level-1)**2, next=100*level**2;
+  let card=$('rewards-'+screen);
+  if(!card){card=document.createElement('div');card.id='rewards-'+screen;card.className='rewardcard';$('scr-'+screen).prepend(card);}
+  const result=['summary','gameover'].includes(screen);
+  card.innerHTML=`<div class="rewardhead"><span class="rewardseal" aria-hidden="true">学</span><div><div class="rewardeyebrow">YOUR LEARNING JOURNEY</div><h2>Level ${level}</h2></div><strong>${state.xp} XP</strong></div>
+    ${result&&lastReward?`<p class="rewardearned" role="status">${lastReward.leveled?'Level up! · ':''}+${lastReward.earned} XP this session${lastReward.unlocked.length?' · Quest complete!':''}</p>`:''}
+    <progress aria-label="Progress to level ${level+1}" max="${next-floor}" value="${state.xp-floor}"></progress>
+    <p class="rewardhint">${next-state.xp} XP to level ${level+1}</p>
+    <div class="rewardquests"><h3>Today's quests</h3>${Rewards.quests(state).map(q=>`<div class="rewardquest ${state.claimed.includes(q.id)?'complete':''}"><span>${state.claimed.includes(q.id)?'✓':'○'} ${q.title}</span><strong>${Math.min(q.value,q.target)}/${q.target}</strong><small>+${q.bonus} XP</small></div>`).join('')}</div>
+    <p class="rewardhint">2 XP for trying a word, 10 for knowing it. Each word earns up to 10 XP per day across all modes. Quests reset daily. Saved on this device.</p>`;
+}
+
 /* ---------- daily streak ---------- */
 function todayStr(){
   const d=new Date();
@@ -350,6 +371,7 @@ function show(name){
   $("scr-"+name).classList.add("active");
   window.scrollTo(0,0);
   updateShell(name);
+  renderRewards(name);
   if(name==="home"){updateRefresherBadge();updateRefresherScopeLabel();updateSwipeCardSummary();updateStreakFlame()}
   if(name==="summary")fireConfetti();
 }
@@ -1325,6 +1347,7 @@ function refrFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:key,ok,bad,words:results});
   store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
   bumpStreak();
   lastWasBest=recordBest(key,ok,bad);
   REFR=null;
@@ -1342,6 +1365,7 @@ function refrEndEarly(){
     const hist=store.get("hsk_history",[]);
     hist.unshift({t:Date.now(),label:key,ok:REFR.ok,bad:REFR.bad,words:REFR.results});
     store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
     bumpStreak();
     recordBest(key,REFR.ok,REFR.bad);
   }
@@ -1383,6 +1407,7 @@ function saveSession(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:S.label,ok:S.ok,bad:S.bad,words:S.results});
   store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
   bumpStreak();
   recordWordStats(S.results,"guessing");
   lastWasBest=recordBest(S.label,S.ok,S.bad);
@@ -1544,6 +1569,7 @@ function typeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:TS.label,ok:TS.ok,bad:TS.bad,words:TS.results});
   store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
   bumpStreak();
   recordWordStats(TS.results,"typing");
   lastWasBest=recordBest(TS.label,TS.ok,TS.bad);
@@ -1696,6 +1722,7 @@ function writeSave(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:WQ.label,ok:WQ.ok,bad:WQ.bad,words:WQ.results});
   store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
   bumpStreak();
   recordWordStats(WQ.results,"writing");
   lastWasBest=recordBest(WQ.label,WQ.ok,WQ.bad);
@@ -1894,6 +1921,7 @@ function sentSaveGameOver(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
   bumpStreak();
   recordWordStats(SS.results,"sentences");
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
@@ -1908,6 +1936,7 @@ function sentFinish(){
   const hist=store.get("hsk_history",[]);
   hist.unshift({t:Date.now(),label:SS.label,ok:SS.ok,bad:SS.bad,words:SS.results});
   store.set("hsk_history",hist.slice(0,200));
+  awardPractice(hist[0].words);
   bumpStreak();
   recordWordStats(SS.results,"sentences");
   lastWasBest=recordBest(SS.label,SS.ok,SS.bad);
@@ -3063,6 +3092,7 @@ function recordSwipe(c,known){
   }else{
     fam[c]={fam:0,last:now};
   }
+  awardPractice([{c,ok:known}]);
   saveSwipeFam(fam);
   bumpStreak();
 }
@@ -3290,3 +3320,4 @@ greetRig();
 
 // the tiles have done their job — let the homescreen through
 if(window.hideSplash)window.hideSplash();
+renderRewards((document.querySelector('.screen.active')||{id:'scr-home'}).id.slice(4));

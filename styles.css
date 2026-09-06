@@ -1886,3 +1886,9 @@ html.splashing,html.splashing body{overflow:hidden}
 .lessonopt.on{background:var(--seal);color:#fff;border-color:var(--seal-deep);box-shadow:var(--tile-lift-hi)}
 .lessonstart{width:100%;margin-top:6px}
 .lessonpickbar{padding:0 2px 8px;font-size:12px;color:var(--muted);font-weight:600}
+
+/* Daily quest tiles share the app's ink, ivory and jade palette. */
+.rewardcard{padding:20px;margin:0 0 20px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--tile-lift)}
+.rewardhead{display:flex;align-items:center;gap:12px}.rewardhead>strong{margin-left:auto;color:var(--jade);white-space:nowrap}.rewardseal{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:var(--jade-tint);color:var(--jade);font:26px var(--hanzi)}
+.rewardeyebrow{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--muted)}.rewardhead h2{font-size:24px;margin:2px 0}.rewardcard progress{display:block;width:100%;height:10px;margin-top:16px;accent-color:var(--jade);border:0;border-radius:8px;overflow:hidden}.rewardcard progress::-webkit-progress-bar{background:var(--line)}.rewardcard progress::-webkit-progress-value{background:var(--jade)}
+.rewardhint{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 0 0}.rewardquests h3{font-size:14px;margin:18px 0 8px}.rewardquest{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px}.rewardquest>span{flex:1}.rewardquest small{color:var(--muted);white-space:nowrap}.rewardquest.complete{color:var(--jade)}.rewardearned{padding:10px 12px;background:var(--jade-tint);color:var(--jade);border-radius:10px;font-weight:800}

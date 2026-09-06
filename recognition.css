@@ -19,3 +19,12 @@
 #scr-recognition .rt-foot{font-size:12px;text-align:center;color:#d3dfcf;margin:20px 0 0}
 body:has(#scr-recognition.active) .rigdock{display:none}
 @media(max-width:420px){#scr-recognition .rt-table{padding:16px 10px}#scr-recognition .rt-hand{gap:3px}#scr-recognition .rt-head{padding:10px}}
+/* Short, tactile motion; the hand only deals at the start of a round. */
+#scr-recognition .rt-hand .rt-tile{transition:transform 160ms cubic-bezier(.2,.75,.25,1),filter 160ms;transform-origin:50% 80%}
+@media(hover:hover){#scr-recognition .rt-hand .rt-tile:not(:disabled):hover{transform:translateY(-5px);filter:brightness(1.035)}}
+#scr-recognition .rt-hand .rt-tile:not(:disabled):active{transform:translateY(2px);filter:brightness(.98)}
+#scr-recognition .rt-next,#scr-recognition .rt-exit{transition:transform 140ms,background-color 140ms}
+#scr-recognition .rt-next:active,#scr-recognition .rt-exit:active{transform:translateY(2px)}
+#scr-recognition .rt-next:disabled{cursor:default;opacity:.65}
+#scr-recognition .rt-flying{will-change:transform;backface-visibility:hidden}
+@media(prefers-reduced-motion:reduce){#scr-recognition *,#scr-recognition *:before,#scr-recognition *:after{animation:none!important;transition:none!important}#scr-recognition .rt-hand .rt-tile:not(:disabled):hover{transform:none}}

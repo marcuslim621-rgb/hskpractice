@@ -28,3 +28,10 @@ body:has(#scr-recognition.active) .rigdock{display:none}
 #scr-recognition .rt-next:disabled{cursor:default;opacity:.65}
 #scr-recognition .rt-flying{will-change:transform;backface-visibility:hidden}
 @media(prefers-reduced-motion:reduce){#scr-recognition *,#scr-recognition *:before,#scr-recognition *:after{animation:none!important;transition:none!important}#scr-recognition .rt-hand .rt-tile:not(:disabled):hover{transform:none}}
+#scr-recognition .rt-hand{grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+#scr-recognition .rt-hand .rt-tile{touch-action:none;user-select:none;cursor:grab}
+#scr-recognition .rt-hand .rt-tile:active{cursor:grabbing}
+#scr-recognition .rt-pile{width:190px;height:108px;border:1px dashed #91ad8870;border-radius:14px;transition:background-color 140ms,box-shadow 140ms}
+#scr-recognition .rt-pile:empty:after{content:'Drop your tile here';border:0}
+#scr-recognition .rt-pile.rt-drop-ready{background:#ffffff18;box-shadow:0 0 0 3px #e9c88180}
+#scr-recognition .rt-dragging{position:absolute;z-index:30;pointer-events:none;writing-mode:vertical-rl;font-size:clamp(16px,4vw,28px);box-shadow:0 6px #cfc4a5,0 10px #0b6b4a,0 18px 22px #001d2670}

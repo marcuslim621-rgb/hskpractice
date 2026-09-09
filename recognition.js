@@ -124,13 +124,18 @@ function resolveStagedWord(r,screen){
   r.answered=true;r.results.push({c:wordKey(question.w),ok:!r.missed});
   r.rack=r.rack.filter(e=>!r.staged.includes(e));
   renderTileRecognition('answer');
-  /* translate before rotate, so the lift stays vertical on screen rather than
-     being carried around by the rotation */
+  /* Turns left to right (rotateY) with a hop under it. Translate before rotate,
+     so the hop stays vertical on screen rather than being carried around by the
+     turn. The easing lives on the keyframes, not the options, so the rise, the
+     fall and the small second bounce can each have their own curve — a single
+     curve across the whole thing reads as a float, not a bounce. */
   screen.querySelectorAll('.rt-staged').forEach((tile,i)=>moveTileElement(tile,[
-    {transform:'translateY(0) rotateX(0deg) scale(1)'},
-    {transform:'translateY(-9px) rotateX(180deg) scale(1.07)',offset:.5},
-    {transform:'translateY(0) rotateX(360deg) scale(1)'}
-  ],{duration:560,delay:i*90,easing:'cubic-bezier(.32,.72,.28,1)',fill:'backwards'}));
+    {transform:'translateY(0) rotateY(0deg) scale(1)',easing:'cubic-bezier(.3,.1,.5,1)'},
+    {transform:'translateY(-14px) rotateY(180deg) scale(1.07)',offset:.45,easing:'cubic-bezier(.5,0,.75,.5)'},
+    {transform:'translateY(0) rotateY(300deg) scale(1)',offset:.78,easing:'cubic-bezier(.3,0,.5,1)'},
+    {transform:'translateY(-5px) rotateY(336deg) scale(1.02)',offset:.9,easing:'cubic-bezier(.5,0,.8,.6)'},
+    {transform:'translateY(0) rotateY(360deg) scale(1)'}
+  ],{duration:640,delay:i*90,easing:'linear',fill:'backwards'}));
 }
 /* Lays the standing word into the meld, then moves on. Called from the Next
    button, which is the only way out of an answered question. */

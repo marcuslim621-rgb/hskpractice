@@ -138,7 +138,7 @@ body:has(#scr-recognition.active){overflow-x:hidden}
   border:1.5px dashed color-mix(in srgb,var(--on-felt-dim) 45%,transparent)}
 
 /* A locked-in word stays standing until Next lays it into the meld. It turns
-   end over end on the way in, so it needs a real reverse: without one the
+   left to right on the way in, so it needs a real reverse: without one the
    hanzi would render mirrored through the back half of the turn. The back is
    a pseudo-element rather than markup, so flyTile still reads the tile's
    textContent as just the character. */
@@ -146,7 +146,7 @@ body:has(#scr-recognition.active){overflow-x:hidden}
 #scr-recognition .rt-staged::after{
   content:'';position:absolute;inset:-1.5px;border-radius:6px;
   background:var(--tile-back);border:1.5px solid var(--felt-tile-lo);
-  transform:rotateX(180deg);backface-visibility:hidden}
+  transform:rotateY(180deg);backface-visibility:hidden}
 #scr-recognition .rt-won{cursor:default}
 
 /* ---------- the meld: matched words, grouped and laid out in flow ---------- */

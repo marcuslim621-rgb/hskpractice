@@ -28,7 +28,7 @@ function startTileRecognition(pool,label){
   const kinds=shuffle(chosen.map((_,i)=>i%2?'english':'pinyin'));
   const rack=[];
   chosen.forEach((w,wi)=>[...w[0]].forEach((ch,ci)=>rack.push({id:wi+'-'+ci,ch})));
-  tileRound={pool,label,hand:[...chosen],rack:shuffle(rack),staged:[],reject:null,
+  tileRound={pool,label,hand:[...chosen],rack:shuffle(rack),staged:[],reject:null,skipped:false,
     questions:shuffle([...chosen]).map((w,i)=>({w,kind:kinds[i]})),
     i:0,results:[],matched:[],missed:false,answered:false,saved:false};
   if(!$('scr-recognition')){const screen=document.createElement('section');screen.id='scr-recognition';screen.className='screen';document.querySelector('.app').append(screen);}
@@ -68,16 +68,25 @@ function renderTileRecognition(phase='question'){
   /* the rack empties one question before the hand formally ends, so it collapses
      on "every tile laid" rather than on `done` — otherwise it leaves a gap */
   const spent=!r.rack.length;
-  screen.innerHTML=`<div class="rt-game${done?' rt-done':''}${spent?' rt-spent':''}"><header class="rt-head"><button class="rt-exit" type="button">← Leave hand</button><span>Hanzi Daily · Recognition</span></header><div class="rt-table"><div class="rt-wall" aria-hidden="true">${'<i></i>'.repeat(r.questions.length-r.matched.length)}</div><div class="rt-eyebrow">${done?'Hand complete':'Lay it out in order'}</div><h1>${done?'Nicely played.':question.kind==='pinyin'?'Match the pinyin':'Match the English meaning'}</h1><div class="rt-status"><span>${done?r.questions.length+' words practised':'Question '+(r.i+1)+' of '+r.questions.length}</span><span>${r.matched.length} of ${r.questions.length} laid</span></div><progress max="${r.questions.length}" value="${r.matched.length}" aria-label="Words matched"></progress><div class="rt-center">${done
+  /* The count leads, and words already laid stack directly under it. On the
+     done screen the meld moves below the score instead, so the finished hand
+     still reads as the payoff rather than as a running tally. */
+  const statusBar=`<div class="rt-status"><span>${done?r.questions.length+' words practised':'Question '+(r.i+1)+' of '+r.questions.length}</span><span>${r.matched.length} of ${r.questions.length} laid</span></div><progress max="${r.questions.length}" value="${r.matched.length}" aria-label="Words matched"></progress>`;
+  const centre=done
     ?`<div class="rt-clue">${r.results.filter(v=>v.ok).length} / ${r.questions.length}</div><p class="rt-feedback">matched on the first try · practice saved</p>`
-    :`<div class="rt-clue">${esc(question.kind==='pinyin'?pin(question.w[1]):question.w[2])}</div>${tileStage()}<p class="rt-feedback${r.answered&&!r.missed?' is-hit':r.reject?' is-miss':''}" aria-live="polite">${r.answered?esc(question.w[0]+' · '+pin(question.w[1])+' · '+question.w[2]):r.reject?esc(r.reject)+' is not it. Try again.':'Tap or drag characters into the slots, in order.'}</p>`
-  }</div>${tileMeld()}<div class="rt-next-wrap">${done?'<button class="rt-next">Shuffle a new hand →</button>':r.answered?'<button class="rt-next">'+(r.i+1===r.questions.length?'Finish hand':'Next question →')+'</button>':''}</div><div class="rt-hand" aria-label="Character tiles">${r.rack.map((e,i)=>{const inUse=r.staged.includes(e);return `<button class="rt-tile${inUse?' rt-inuse':''}" type="button" data-rack-index="${i}" aria-label="Choose ${esc(e.ch)}"${done||r.answered||inUse?' disabled':''}>${esc(e.ch)}</button>`}).join('')}</div><p class="rt-foot">${r.questions.length} words · mixed pinyin & English</p></div></div>`;
+    :`<div class="rt-clue">${esc(question.kind==='pinyin'?pin(question.w[1]):question.w[2])}</div>${tileStage()}<p class="rt-feedback${r.answered&&!r.missed?' is-hit':r.reject?' is-miss':''}" aria-live="polite">${r.answered?(r.skipped?'Skipped · ':'')+esc(question.w[0]+' · '+pin(question.w[1])+' · '+question.w[2]):r.reject?esc(r.reject)+' is not it. Try again.':'Tap or drag characters into the slots, in order.'}</p>`;
+  const action=done?'<button class="rt-next">Shuffle a new hand →</button>'
+    :r.answered?'<button class="rt-next">'+(r.i+1===r.questions.length?'Finish hand':'Next question →')+'</button>'
+    :'<button class="rt-skip" type="button">Skip · show me</button>';
+  screen.innerHTML=`<div class="rt-game${done?' rt-done':''}${spent?' rt-spent':''}"><header class="rt-head"><button class="rt-exit" type="button">← Leave hand</button><span>Hanzi Daily · Recognition</span></header><div class="rt-table">${statusBar}${done?'':tileMeld()}<h1>${done?'Nicely played.':question.kind==='pinyin'?'Match the pinyin':'Match the English meaning'}</h1><div class="rt-center">${centre}</div>${done?tileMeld():''}<div class="rt-next-wrap">${action}</div><div class="rt-hand" aria-label="Character tiles">${r.rack.map((e,i)=>{const inUse=r.staged.includes(e);return `<button class="rt-tile${inUse?' rt-inuse':''}" type="button" data-rack-index="${i}" aria-label="Choose ${esc(e.ch)}"${done||r.answered||inUse?' disabled':''}>${esc(e.ch)}</button>`}).join('')}</div><p class="rt-foot">${r.questions.length} words · mixed pinyin & English</p></div></div>`;
   screen.querySelector('.rt-exit').onclick=exitTileRecognition;
+  const skip=screen.querySelector('.rt-skip');
+  if(skip)skip.onclick=()=>revealStagedWord(r,screen);
   const next=screen.querySelector('.rt-next');
   if(next)next.onclick=()=>{
     if(done){startTileRecognition(r.pool,r.label);return;}
     meldStandingWord(r,screen,()=>{
-      r.i++;r.answered=false;r.missed=false;r.reject=null;
+      r.i++;r.answered=false;r.missed=false;r.reject=null;r.skipped=false;
       if(r.i===r.questions.length)saveTileRecognition();
       renderTileRecognition();
     });
@@ -142,6 +151,26 @@ function resolveStagedWord(r,screen){
     {transform:'translateY(0) rotateY(360deg) scale(1.03,.97)',offset:.95,easing:'cubic-bezier(.3,.5,.5,1)'},
     {transform:'translateY(0) rotateY(360deg) scale(1,1)'}
   ],{duration:820,delay:i*140,easing:'linear',fill:'backwards'}));
+}
+/* Skip: lay the answer out for them. It scores as a miss and settles in rather
+   than jumping — the jump is for words that were earned. From here it behaves
+   like any answered question, so Next still lays it into the meld. */
+function revealStagedWord(r,screen){
+  if(r!==tileRound||r.answered)return;
+  const question=r.questions[r.i],picked=[];
+  for(const ch of [...question.w[0]]){
+    const e=r.rack.find(x=>x.ch===ch&&!picked.includes(x));
+    if(e)picked.push(e);
+  }
+  if(picked.length!==[...question.w[0]].length)return;
+  r.staged=picked;r.missed=true;r.skipped=true;r.answered=true;r.reject=null;
+  r.results.push({c:wordKey(question.w),ok:false});
+  r.rack=r.rack.filter(e=>!picked.includes(e));
+  renderTileRecognition('answer');
+  screen.querySelectorAll('.rt-staged').forEach((tile,i)=>moveTileElement(tile,[
+    {opacity:0,transform:'translateY(-6px) scale(.94)'},
+    {opacity:1,transform:'translateY(0) scale(1)'}
+  ],{duration:240,delay:i*70,easing:'cubic-bezier(.2,.7,.3,1)',fill:'backwards'}));
 }
 /* Lays the standing word into the meld, then moves on. Called from the Next
    button, which is the only way out of an answered question. */

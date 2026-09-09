@@ -55,25 +55,14 @@ body:has(#scr-recognition.active){overflow-x:hidden}
   background:radial-gradient(ellipse at 50% 35%,#ffffff09,transparent 70%),
              repeating-linear-gradient(45deg,#ffffff02 0 1px,transparent 1px 4px)}
 
-/* the wall: face-down tiles, one per question still to come */
-#scr-recognition .rt-wall{display:flex;justify-content:center;gap:4px;margin-bottom:22px;min-height:25px}
-#scr-recognition .rt-wall:empty{display:none}
-#scr-recognition .rt-wall i{
-  width:18px;height:25px;border-radius:3px;
-  background:var(--tile-back);border:2px solid var(--felt-tile-lo);
-  box-shadow:0 3px 0 0 var(--tile-back-deep),0 5px 6px -3px rgba(0,0,0,.3)}
-
-#scr-recognition .rt-eyebrow{
-  text-align:center;color:var(--on-felt-dim);text-transform:uppercase;
-  letter-spacing:.12em;font-size:11px;font-weight:700}
-#scr-recognition h1{
-  font-family:var(--hanzi);font-size:24px;font-weight:600;
-  color:var(--on-felt);text-align:center;margin:8px 0 20px}
-
+/* the count leads the screen */
 #scr-recognition .rt-status{
   display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--on-felt-dim)}
 #scr-recognition progress{
   display:block;width:100%;height:5px;accent-color:var(--felt-gold);margin:12px 0;border:0}
+#scr-recognition h1{
+  font-family:var(--hanzi);font-size:24px;font-weight:600;
+  color:var(--on-felt);text-align:center;margin:4px 0 18px}
 
 /* the clue is the question — it carries the screen */
 #scr-recognition .rt-clue{
@@ -86,6 +75,13 @@ body:has(#scr-recognition.active){overflow-x:hidden}
 #scr-recognition .rt-feedback.is-hit{color:var(--felt-ok)}
 
 #scr-recognition .rt-next-wrap{display:flex;justify-content:center;min-height:44px;margin:8px 0}
+/* giving up is quiet: an outline, not a tile, so it never competes with Next */
+#scr-recognition .rt-skip{
+  background:transparent;color:var(--on-felt-dim);
+  border:1px solid var(--felt-edge);border-radius:8px;
+  padding:11px 18px;font-size:13px;font-weight:600;min-height:44px}
+@media(hover:hover){#scr-recognition .rt-skip:hover{background:#ffffff12;color:var(--on-felt)}}
+#scr-recognition .rt-skip:active{transform:translateY(2px)}
 #scr-recognition .rt-next{
   background:var(--felt-tile);color:var(--felt-tile-ink);
   border:1.5px solid var(--felt-tile-lo);border-top-color:var(--felt-tile-hi);border-left-color:var(--felt-tile-hi);

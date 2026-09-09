@@ -55,14 +55,14 @@ body:has(#scr-recognition.active){overflow-x:hidden}
   background:radial-gradient(ellipse at 50% 35%,#ffffff09,transparent 70%),
              repeating-linear-gradient(45deg,#ffffff02 0 1px,transparent 1px 4px)}
 
-/* the count leads the screen */
+/* the task leads, the count sits under it */
+#scr-recognition h1{
+  font-family:var(--hanzi);font-size:24px;font-weight:600;
+  color:var(--on-felt);text-align:center;margin:0 0 16px}
 #scr-recognition .rt-status{
   display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--on-felt-dim)}
 #scr-recognition progress{
   display:block;width:100%;height:5px;accent-color:var(--felt-gold);margin:12px 0;border:0}
-#scr-recognition h1{
-  font-family:var(--hanzi);font-size:24px;font-weight:600;
-  color:var(--on-felt);text-align:center;margin:4px 0 18px}
 
 /* the clue is the question — it carries the screen */
 #scr-recognition .rt-clue{

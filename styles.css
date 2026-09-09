@@ -42,6 +42,22 @@
   --tile-jade-bg:rgba(0,107,62,.05);
   --tile-jade-border:rgba(0,107,62,.18);
   --tile-jade-border-hover:rgba(0,107,62,.3);
+  /* felt table — the recognition screen's own surface. The playing tiles on it
+     stay bone in both themes: a mahjong tile is ivory whatever the room's lit like. */
+  --felt:#17503F;
+  --felt-deep:#0E332A;
+  --felt-edge:#2C6B57;
+  --on-felt:#FFF7E6;
+  --on-felt-dim:#CFE0D4;
+  --felt-ok:#6FD69B;
+  --felt-bad:#FFA894;
+  --felt-gold:#E9C881;
+  --rail:#8F6340;
+  --rail-deep:#3C2B21;
+  --felt-tile:#FDFBF7;
+  --felt-tile-hi:#FFFFFF;
+  --felt-tile-lo:#E5E2D9;
+  --felt-tile-ink:#1A1C1A;
   --hanzi:"Noto Serif SC","Songti SC","SimSun",serif;
   --ui:"Manrope",ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
 }
@@ -78,6 +94,14 @@ html[data-theme="dark"]{
   --tile-jade-bg:rgba(79,191,136,.11);
   --tile-jade-border:rgba(79,191,136,.23);
   --tile-jade-border-hover:rgba(79,191,136,.33);
+  /* the table is lit lower at night; the tiles on it are not repainted */
+  --felt:#144134;
+  --felt-deep:#0B2620;
+  --felt-edge:#245646;
+  --on-felt:#F2EAD6;
+  --on-felt-dim:#B9CDBE;
+  --rail:#6B4A30;
+  --rail-deep:#2A1E17;
 }
 html[data-theme="dark"] body{-webkit-font-smoothing:auto}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}

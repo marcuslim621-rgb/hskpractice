@@ -11,7 +11,14 @@
    fill the screen stops reading as a tile. The rack wraps
    instead of scaling.
    ============================================================ */
+/* Full bleed. The table is a place you sit down at, not a card on a page, so it
+   escapes .app's 440px cap and 18px gutters and runs to all four edges. The
+   negative margins cancel .app's padding exactly; `50% - 50vw` resolves to the
+   viewport edge whether or not .app is at its max width. */
 #scr-recognition{
+  margin:calc(-22px - env(safe-area-inset-top)) calc(50% - 50vw)
+         calc(-44px - env(safe-area-inset-bottom));
+  width:100vw;
   position:relative;contain:none;
   /* a real mahjong face is about 20x26mm — 1:1.30 */
   --rt-w:46px;      --rt-h:60px;
@@ -21,14 +28,21 @@
   --felt-tile-stack-press:var(--felt-tile-inset),0 1px 0 0 var(--tile-back),0 2px 0 0 var(--tile-back-deep);
 }
 #scr-recognition .rt-game{
-  background:var(--felt);color:var(--on-felt);border-radius:18px;overflow:hidden;
+  background:var(--felt);color:var(--on-felt);
   font-family:var(--ui);
-  box-shadow:0 4px 0 0 var(--felt-deep),0 8px 20px rgba(0,0,0,.18)}
+  min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column}
 #scr-recognition button{font:inherit;cursor:pointer}
+/* 100vw counts the desktop scrollbar, which would otherwise show a sliver of
+   horizontal scroll while the table is up */
+body:has(#scr-recognition.active){overflow-x:hidden}
 
 /* ---------- chrome ---------- */
+/* the bar and the felt run the full width; their contents stay centred on a
+   440px column so nothing strands itself in the corners of a wide window */
 #scr-recognition .rt-head{
-  padding:15px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:calc(15px + env(safe-area-inset-top)) max(15px,calc(50vw - 205px)) 15px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
   background:var(--felt-deep);font-size:12px;letter-spacing:.02em}
 #scr-recognition .rt-exit{
   color:var(--on-felt);border:1px solid var(--felt-edge);border-radius:7px;
@@ -36,7 +50,8 @@
 @media(hover:hover){#scr-recognition .rt-exit:hover{background:#ffffff12}}
 
 #scr-recognition .rt-table{
-  padding:20px 18px;
+  flex:1;
+  padding:20px max(18px,calc(50vw - 202px)) calc(20px + env(safe-area-inset-bottom));
   background:radial-gradient(ellipse at 50% 35%,#ffffff09,transparent 70%),
              repeating-linear-gradient(45deg,#ffffff02 0 1px,transparent 1px 4px)}
 
@@ -151,8 +166,8 @@
 
 body:has(#scr-recognition.active) .rigdock{display:none}
 @media(max-width:420px){
-  #scr-recognition .rt-table{padding:16px 10px}
-  #scr-recognition .rt-head{padding:10px}}
+  #scr-recognition .rt-table{padding:16px 10px calc(16px + env(safe-area-inset-bottom))}
+  #scr-recognition .rt-head{padding:calc(10px + env(safe-area-inset-top)) 10px 10px}}
 
 /* ---------- motion: short and tactile; the hand deals once a round ---------- */
 #scr-recognition .rt-hand .rt-tile{

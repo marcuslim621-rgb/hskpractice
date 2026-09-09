@@ -124,18 +124,24 @@ function resolveStagedWord(r,screen){
   r.answered=true;r.results.push({c:wordKey(question.w),ok:!r.missed});
   r.rack=r.rack.filter(e=>!r.staged.includes(e));
   renderTileRecognition('answer');
+  /* translate before rotate, so the lift stays vertical on screen rather than
+     being carried around by the rotation */
   screen.querySelectorAll('.rt-staged').forEach((tile,i)=>moveTileElement(tile,[
-    {transform:'rotate(0deg) translateY(0) scale(1)'},
-    {transform:'rotate(180deg) translateY(-9px) scale(1.07)',offset:.5},
-    {transform:'rotate(360deg) translateY(0) scale(1)'}
+    {transform:'translateY(0) rotateX(0deg) scale(1)'},
+    {transform:'translateY(-9px) rotateX(180deg) scale(1.07)',offset:.5},
+    {transform:'translateY(0) rotateX(360deg) scale(1)'}
   ],{duration:560,delay:i*90,easing:'cubic-bezier(.32,.72,.28,1)',fill:'backwards'}));
 }
 /* Lays the standing word into the meld, then moves on. Called from the Next
    button, which is the only way out of an answered question. */
 function meldStandingWord(r,screen,after){
+  /* a tile caught mid-spin measures as a squashed box, so settle the spin
+     before reading where the tiles are */
   const sources=r.staged.map((_,k)=>{
     const t=screen.querySelector(`[data-staged="${k}"]`);
-    return t&&t.getBoundingClientRect();
+    if(!t)return null;
+    t.getAnimations().forEach(a=>a.cancel());
+    return t.getBoundingClientRect();
   });
   const meldStart=r.matched.reduce((n,w)=>n+[...w[0]].length,0);
   r.matched.push(r.questions[r.i].w);r.staged=[];

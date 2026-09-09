@@ -127,15 +127,26 @@ body:has(#scr-recognition.active){overflow-x:hidden}
   border-color:color-mix(in srgb,var(--felt-gold) 70%,transparent);
   box-shadow:0 0 0 3px color-mix(in srgb,var(--felt-gold) 50%,transparent)}
 
-/* one slot per character, so the word's length is visible before you start */
-/* positioned so it is the offsetParent flyTile measures a slot against */
+/* one slot per character, so the word's length is visible before you start.
+   Positioned so it is the offsetParent flyTile measures a slot against; the
+   perspective is what makes a correct word tumble on X rather than squash flat. */
 #scr-recognition .rt-stage{
-  position:relative;
+  position:relative;perspective:700px;
   display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 14px}
 #scr-recognition .rt-slot{
   flex:0 0 auto;width:var(--rt-w);height:var(--rt-h);border-radius:6px;
   border:1.5px dashed color-mix(in srgb,var(--on-felt-dim) 45%,transparent)}
-/* a locked-in word: it stays standing until Next lays it into the meld */
+
+/* A locked-in word stays standing until Next lays it into the meld. It turns
+   end over end on the way in, so it needs a real reverse: without one the
+   hanzi would render mirrored through the back half of the turn. The back is
+   a pseudo-element rather than markup, so flyTile still reads the tile's
+   textContent as just the character. */
+#scr-recognition .rt-staged{position:relative;transform-style:preserve-3d;backface-visibility:hidden}
+#scr-recognition .rt-staged::after{
+  content:'';position:absolute;inset:-1.5px;border-radius:6px;
+  background:var(--tile-back);border:1.5px solid var(--felt-tile-lo);
+  transform:rotateX(180deg);backface-visibility:hidden}
 #scr-recognition .rt-won{cursor:default}
 
 /* ---------- the meld: matched words, grouped and laid out in flow ---------- */

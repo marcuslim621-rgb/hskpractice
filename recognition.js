@@ -48,7 +48,7 @@ function tileStage(){
   for(let k=0;k<len;k++){
     const e=r.staged[k];
     out.push(e
-      ?`<button class="rt-tile rt-staged" type="button" data-staged="${k}" aria-label="Take back ${esc(e.ch)}">${esc(e.ch)}</button>`
+      ?`<button class="rt-tile rt-staged${r.answered?' rt-won':''}" type="button" data-staged="${k}"${r.answered?' disabled':''} aria-label="${r.answered?esc(e.ch):'Take back '+esc(e.ch)}">${esc(e.ch)}</button>`
       :`<span class="rt-slot" aria-hidden="true"></span>`);
   }
   return `<div class="rt-stage" aria-label="Your answer, ${len} character${len===1?'':'s'}">${out.join('')}</div>`;
@@ -74,7 +74,14 @@ function renderTileRecognition(phase='question'){
   }</div>${tileMeld()}<div class="rt-next-wrap">${done?'<button class="rt-next">Shuffle a new hand →</button>':r.answered?'<button class="rt-next">'+(r.i+1===r.questions.length?'Finish hand':'Next question →')+'</button>':''}</div><div class="rt-hand" aria-label="Character tiles">${r.rack.map((e,i)=>{const inUse=r.staged.includes(e);return `<button class="rt-tile${inUse?' rt-inuse':''}" type="button" data-rack-index="${i}" aria-label="Choose ${esc(e.ch)}"${done||r.answered||inUse?' disabled':''}>${esc(e.ch)}</button>`}).join('')}</div><p class="rt-foot">${r.questions.length} words · mixed pinyin & English</p></div></div>`;
   screen.querySelector('.rt-exit').onclick=exitTileRecognition;
   const next=screen.querySelector('.rt-next');
-  if(next)next.onclick=()=>{if(done){startTileRecognition(r.pool,r.label);return;}r.i++;r.answered=false;r.missed=false;r.staged=[];r.reject=null;if(r.i===r.questions.length)saveTileRecognition();renderTileRecognition();};
+  if(next)next.onclick=()=>{
+    if(done){startTileRecognition(r.pool,r.label);return;}
+    meldStandingWord(r,screen,()=>{
+      r.i++;r.answered=false;r.missed=false;r.reject=null;
+      if(r.i===r.questions.length)saveTileRecognition();
+      renderTileRecognition();
+    });
+  };
   screen.querySelectorAll('[data-staged]').forEach(button=>{
     button.onclick=()=>{if(r!==tileRound||r.answered)return;r.staged.splice(Number(button.dataset.staged),1);r.reject=null;renderTileRecognition('stage');};
   });
@@ -110,14 +117,29 @@ function resolveStagedWord(r,screen){
     setTimeout(()=>{if(r!==tileRound||r.answered||!r.staged.length)return;r.staged=[];renderTileRecognition('stage');},700);
     return;
   }
-  /* every slot is already filled and settled by the time this runs, so the tiles
-     can be measured where they sit before the rack closes up over them */
-  const sources=r.staged.map((_,k)=>screen.querySelector(`[data-staged="${k}"]`).getBoundingClientRect());
-  const meldStart=r.matched.reduce((n,w)=>n+[...w[0]].length,0);
-  const laid=r.staged;
-  r.answered=true;r.matched.push(question.w);r.results.push({c:wordKey(question.w),ok:!r.missed});
-  r.rack=r.rack.filter(e=>!laid.includes(e));r.staged=[];
+  /* Correct: the word stays standing in its slots and spins to show it is
+     locked in. It is not melded here — that happens on the way to the next
+     question, so `matched` (and with it the wall and the progress bar) only
+     advances when the tiles actually come down. */
+  r.answered=true;r.results.push({c:wordKey(question.w),ok:!r.missed});
+  r.rack=r.rack.filter(e=>!r.staged.includes(e));
   renderTileRecognition('answer');
+  screen.querySelectorAll('.rt-staged').forEach((tile,i)=>moveTileElement(tile,[
+    {transform:'rotate(0deg) translateY(0) scale(1)'},
+    {transform:'rotate(180deg) translateY(-9px) scale(1.07)',offset:.5},
+    {transform:'rotate(360deg) translateY(0) scale(1)'}
+  ],{duration:560,delay:i*90,easing:'cubic-bezier(.32,.72,.28,1)',fill:'backwards'}));
+}
+/* Lays the standing word into the meld, then moves on. Called from the Next
+   button, which is the only way out of an answered question. */
+function meldStandingWord(r,screen,after){
+  const sources=r.staged.map((_,k)=>{
+    const t=screen.querySelector(`[data-staged="${k}"]`);
+    return t&&t.getBoundingClientRect();
+  });
+  const meldStart=r.matched.reduce((n,w)=>n+[...w[0]].length,0);
+  r.matched.push(r.questions[r.i].w);r.staged=[];
+  after();
   animateTilesToMeld(sources,meldStart);
 }
 function wireTileDrag(button,submit,screen){

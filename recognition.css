@@ -135,6 +135,8 @@ body:has(#scr-recognition.active){overflow-x:hidden}
 #scr-recognition .rt-slot{
   flex:0 0 auto;width:var(--rt-w);height:var(--rt-h);border-radius:6px;
   border:1.5px dashed color-mix(in srgb,var(--on-felt-dim) 45%,transparent)}
+/* a locked-in word: it stays standing until Next lays it into the meld */
+#scr-recognition .rt-won{cursor:default}
 
 /* ---------- the meld: matched words, grouped and laid out in flow ---------- */
 #scr-recognition .rt-meld{

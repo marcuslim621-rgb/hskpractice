@@ -124,18 +124,24 @@ function resolveStagedWord(r,screen){
   r.answered=true;r.results.push({c:wordKey(question.w),ok:!r.missed});
   r.rack=r.rack.filter(e=>!r.staged.includes(e));
   renderTileRecognition('answer');
-  /* Turns left to right (rotateY) with a hop under it. Translate before rotate,
-     so the hop stays vertical on screen rather than being carried around by the
-     turn. The easing lives on the keyframes, not the options, so the rise, the
-     fall and the small second bounce can each have their own curve — a single
-     curve across the whole thing reads as a float, not a bounce. */
+  /* The tile jumps, turning left to right (rotateY) on the way up, then bounces
+     twice more in decreasing arcs. Translate before rotate, so the jump stays
+     vertical on screen rather than being carried around by the turn. The spin
+     finishes as it first lands, so the squash-and-stretch after that happens
+     face-on where it reads. Easing lives on the keyframes rather than the
+     options: rises decelerate and falls accelerate, which is what makes it
+     read as gravity instead of a float. */
+  const RISE='cubic-bezier(.22,.6,.4,1)',FALL='cubic-bezier(.55,0,.85,.45)';
   screen.querySelectorAll('.rt-staged').forEach((tile,i)=>moveTileElement(tile,[
-    {transform:'translateY(0) rotateY(0deg) scale(1)',easing:'cubic-bezier(.3,.1,.5,1)'},
-    {transform:'translateY(-14px) rotateY(180deg) scale(1.07)',offset:.45,easing:'cubic-bezier(.5,0,.75,.5)'},
-    {transform:'translateY(0) rotateY(300deg) scale(1)',offset:.78,easing:'cubic-bezier(.3,0,.5,1)'},
-    {transform:'translateY(-5px) rotateY(336deg) scale(1.02)',offset:.9,easing:'cubic-bezier(.5,0,.8,.6)'},
-    {transform:'translateY(0) rotateY(360deg) scale(1)'}
-  ],{duration:640,delay:i*90,easing:'linear',fill:'backwards'}));
+    {transform:'translateY(0) rotateY(0deg) scale(1,1)',easing:RISE},
+    {transform:'translateY(-30px) rotateY(200deg) scale(1.06,1.06)',offset:.28,easing:FALL},
+    {transform:'translateY(0) rotateY(360deg) scale(1.09,.91)',offset:.5,easing:RISE},
+    {transform:'translateY(-14px) rotateY(360deg) scale(.97,1.05)',offset:.63,easing:FALL},
+    {transform:'translateY(0) rotateY(360deg) scale(1.05,.95)',offset:.77,easing:RISE},
+    {transform:'translateY(-5px) rotateY(360deg) scale(.99,1.02)',offset:.88,easing:FALL},
+    {transform:'translateY(0) rotateY(360deg) scale(1.03,.97)',offset:.95,easing:'cubic-bezier(.3,.5,.5,1)'},
+    {transform:'translateY(0) rotateY(360deg) scale(1,1)'}
+  ],{duration:820,delay:i*140,easing:'linear',fill:'backwards'}));
 }
 /* Lays the standing word into the meld, then moves on. Called from the Next
    button, which is the only way out of an answered question. */

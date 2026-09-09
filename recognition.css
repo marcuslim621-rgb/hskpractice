@@ -142,7 +142,11 @@ body:has(#scr-recognition.active){overflow-x:hidden}
    hanzi would render mirrored through the back half of the turn. The back is
    a pseudo-element rather than markup, so flyTile still reads the tile's
    textContent as just the character. */
-#scr-recognition .rt-staged{position:relative;transform-style:preserve-3d;backface-visibility:hidden}
+/* anchored at its foot, so the squash on landing pushes down against the table
+   rather than shrinking about the middle; rotateY is unaffected by the y origin */
+#scr-recognition .rt-staged{
+  position:relative;transform-style:preserve-3d;backface-visibility:hidden;
+  transform-origin:50% 100%}
 #scr-recognition .rt-staged::after{
   content:'';position:absolute;inset:-1.5px;border-radius:6px;
   background:var(--tile-back);border:1.5px solid var(--felt-tile-lo);

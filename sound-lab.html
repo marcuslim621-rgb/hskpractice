@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Sound lab · Hanzi Daily</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* styles.css paints a fixed vignette on body::before at z-index 0; the app
+     clears it with .app{position:relative;z-index:1} and this page must too,
+     or its lower half sits under the wash */
+  .lab{max-width:760px;margin:0 auto;padding:24px 18px 80px;position:relative;z-index:1}
+  .lab h1{font-family:var(--hanzi);font-size:26px;color:var(--seal);margin:0 0 4px}
+  .lab .sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+  .lab section{background:var(--tile-face);border-radius:14px;padding:16px;margin-bottom:16px;
+    border:1.5px solid var(--tile-lo);border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);
+    box-shadow:0 2px 0 0 var(--tile-lo)}
+  .lab h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--quiet);margin:0 0 12px}
+  .row{display:grid;grid-template-columns:96px 1fr 68px;align-items:center;gap:10px;margin-bottom:9px}
+  .row label{font-size:12.5px;color:var(--muted)}
+  .row output{font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}
+  input[type=range]{width:100%;accent-color:var(--jade)}
+  .cue{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .cue:first-of-type{border-top:0;padding-top:0;margin-top:0}
+  .cuehead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .cuename{font-weight:700;font-size:14px}
+  .kind{font-size:11px;color:var(--quiet);text-transform:uppercase;letter-spacing:.06em}
+  button{font-family:var(--ui);cursor:pointer}
+  .play{background:var(--seal);color:#fff;border:0;border-radius:8px;padding:9px 16px;font-weight:700;
+    box-shadow:0 2px 0 0 var(--btn-edge)}
+  .play:active{transform:translateY(2px);box-shadow:none}
+  /* --tile-face, not --bg: the page background is --bg, so a ghost button on it
+     would read as a floating border with nothing inside */
+  .ghost{background:var(--tile-face);color:var(--ink);border:1.5px solid var(--tile-lo);
+    border-top-color:var(--tile-hi);border-left-color:var(--tile-hi);border-radius:8px;
+    padding:9px 14px;font-weight:600;font-size:13px;box-shadow:0 2px 0 0 var(--tile-lo)}
+  .ghost:active{transform:translateY(2px);box-shadow:none}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  pre{background:var(--well);border:1px solid var(--line);border-radius:10px;padding:14px;
+    font-size:11.5px;line-height:1.5;overflow-x:auto;white-space:pre;color:var(--ink);margin:0}
+  .hint{font-size:12px;color:var(--muted);margin:10px 0 0}
+  .meter{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:10px}
+  .meter b{color:var(--ink);font-weight:700}
+</style>
+</head>
+<body>
+<div class="lab">
+  <h1>Sound lab</h1>
+  <p class="sub">Drives the real <code>sound.js</code>, so what you hear is exactly what the app plays.
+     Tune, then paste the block at the bottom back over <code>SFX_MATERIAL</code> and <code>SFX_CUES</code>.</p>
+
+  <div class="bar">
+    <button class="ghost" id="theme">Dark</button>
+    <button class="ghost" id="reset">Reset to shipped values</button>
+    <button class="ghost" id="measure">Measure cues</button>
+  </div>
+
+  <section>
+    <h2>Material · shared by every tile sound</h2>
+    <div id="material"></div>
+    <p class="hint">Modes are <b>[frequency multiple, amplitude, decay length]</b>. 1 : 2.76 : 5.40 is a struck
+       free bar — that inharmonic spacing is what makes stone read as stone. Push the multiples toward whole
+       numbers (1 : 2 : 3) and it turns into a pitched, wooden block.</p>
+  </section>
+
+  <section>
+    <h2>Cues</h2>
+    <div id="cues"></div>
+  </section>
+
+  <section>
+    <h2>Paste this back into sound.js</h2>
+    <pre id="out"></pre>
+    <div class="bar" style="margin:12px 0 0"><button class="ghost" id="copy">Copy</button></div>
+    <div class="meter" id="meter"></div>
+  </section>
+</div>
+
+<script src="sound.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const SHIPPED=JSON.parse(JSON.stringify({m:SFX_MATERIAL,c:SFX_CUES}));
+const num=v=>Math.round(v*1000)/1000;
+
+/* every slider is [object, key, min, max, step, label] against the live objects */
+function slider(host,obj,key,min,max,step,label,fmt){
+  const row=document.createElement('div');row.className='row';
+  const id='s'+Math.random().toString(36).slice(2);
+  row.innerHTML=`<label for="${id}">${label}</label><input id="${id}" type="range" min="${min}" max="${max}" step="${step}"><output></output>`;
+  const input=row.querySelector('input'),out=row.querySelector('output');
+  const show=()=>out.textContent=(fmt||(v=>v))(obj[key]);
+  input.value=obj[key];show();
+  input.oninput=()=>{obj[key]=parseFloat(input.value);show();emit()};
+  host.append(row);
+  return ()=>{input.value=obj[key];show()};
+}
+const hz=v=>Math.round(v)+' Hz',ms=v=>Math.round(v*1000)+' ms',n2=v=>v.toFixed(2);
+const refreshers=[];
+
+function buildMaterial(){
+  const host=$('material');host.innerHTML='';
+  refreshers.push(slider(host,SFX_MATERIAL,'master',.1,1,.01,'Master',n2));
+  refreshers.push(slider(host,SFX_MATERIAL.tick,'cut',400,8000,50,'Contact cut',hz));
+  refreshers.push(slider(host,SFX_MATERIAL.tick,'dur',.002,.06,.001,'Contact len',ms));
+  refreshers.push(slider(host,SFX_MATERIAL.tick,'gain',0,1,.01,'Contact level',n2));
+  SFX_MATERIAL.modes.forEach((mode,i)=>{
+    const wrap=document.createElement('div');wrap.style.marginTop='8px';host.append(wrap);
+    refreshers.push(slider(wrap,mode,0,1,8,.01,`Mode ${i+1} ×`,n2));
+    refreshers.push(slider(wrap,mode,1,0,1,.01,`Mode ${i+1} level`,n2));
+    refreshers.push(slider(wrap,mode,2,.1,1,.01,`Mode ${i+1} decay`,n2));
+  });
+}
+function buildCues(){
+  const host=$('cues');host.innerHTML='';
+  Object.entries(SFX_CUES).forEach(([name,c])=>{
+    const box=document.createElement('div');box.className='cue';
+    box.innerHTML=`<div class="cuehead"><span><span class="cuename">${name}</span>
+      <span class="kind">${c.kind}</span></span><button class="play">Play</button></div>`;
+    box.querySelector('.play').onclick=()=>sfx(name);
+    const body=document.createElement('div');box.append(body);
+    if(c.kind==='stone'||c.kind==='roll'){
+      refreshers.push(slider(body,c,'freq',200,4000,10,'Pitch',hz));
+      refreshers.push(slider(body,c,'dur',.02,.8,.01,'Ring',ms));
+      refreshers.push(slider(body,c,'gain',0,1,.01,'Level',n2));
+    }
+    if(c.kind==='roll'){
+      refreshers.push(slider(body,c,'spread',0,2000,10,'Pitch spread',hz));
+      refreshers.push(slider(body,c,'count',1,10,1,'Tiles',v=>v));
+      refreshers.push(slider(body,c,'step',.01,.2,.005,'Gap',ms));
+    }
+    if(c.echo){
+      refreshers.push(slider(body,c.echo,'freq',200,4000,10,'2nd pitch',hz));
+      refreshers.push(slider(body,c.echo,'at',0,.3,.005,'2nd delay',ms));
+      refreshers.push(slider(body,c.echo,'gain',0,1,.01,'2nd level',n2));
+    }
+    if(c.kind==='pair'){
+      refreshers.push(slider(body,c,'freq',60,1200,2,'Pitch 1',hz));
+      refreshers.push(slider(body,c,'freq2',60,1200,2,'Pitch 2',hz));
+      refreshers.push(slider(body,c,'at2',0,.4,.005,'Gap',ms));
+      refreshers.push(slider(body,c,'dur',.05,.8,.01,'Ring 1',ms));
+      refreshers.push(slider(body,c,'dur2',.05,.8,.01,'Ring 2',ms));
+      refreshers.push(slider(body,c,'gain',0,1,.01,'Level 1',n2));
+      refreshers.push(slider(body,c,'gain2',0,1,.01,'Level 2',n2));
+    }
+    if(c.kind==='run'){
+      refreshers.push(slider(body,c,'step',.02,.3,.005,'Note gap',ms));
+      refreshers.push(slider(body,c,'dur',.05,1.2,.01,'Note ring',ms));
+      refreshers.push(slider(body,c,'gain',0,1,.01,'Level',n2));
+      if(c.lastDur!==undefined)refreshers.push(slider(body,c,'lastDur',.05,2,.01,'Last ring',ms));
+    }
+    host.append(box);
+  });
+}
+function emit(){
+  const m=SFX_MATERIAL;
+  const modes=m.modes.map(x=>`[${num(x[0])},${num(x[1])},${num(x[2])}]`).join(',');
+  const cues=Object.entries(SFX_CUES).map(([k,c])=>{
+    const parts=Object.entries(c).map(([key,v])=>{
+      if(Array.isArray(v))return `${key}:[${v.join(',')}]`;
+      if(typeof v==='object')return `${key}:{${Object.entries(v).map(([a,b])=>`${a}:${num(b)}`).join(',')}}`;
+      return `${key}:${typeof v==='number'?num(v):`'${v}'`}`;
+    });
+    return `  ${k.padEnd(6)}:{${parts.join(',')}}`;
+  }).join(',\n');
+  $('out').textContent=
+`const SFX_MATERIAL={
+  master:${num(m.master)},
+  tick:{cut:${num(m.tick.cut)},dur:${num(m.tick.dur)},gain:${num(m.tick.gain)}},
+  attack:${num(m.attack)},
+  modes:[${modes}]
+};
+const SFX_CUES={
+${cues}
+};`;
+}
+/* renders each cue offline and reports peak level and brightness, so tuning by
+   ear can be sanity-checked against numbers */
+async function measure(){
+  $('meter').textContent='measuring…';
+  const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  const rows=[];
+  for(const name of Object.keys(SFX_CUES)){
+    const off=new OAC(1,Math.ceil(44100*2),44100);
+    const s1=sfxCtx,s2=sfxMaster,s3=sfxNoise;
+    sfxCtx=off;sfxMaster=off.createGain();sfxMaster.gain.value=SFX_MATERIAL.master;
+    sfxMaster.connect(off.destination);
+    const n=Math.floor(off.sampleRate*.2);sfxNoise=off.createBuffer(1,n,off.sampleRate);
+    const d=sfxNoise.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    sfx(name);
+    const buf=await off.startRendering();
+    sfxCtx=s1;sfxMaster=s2;sfxNoise=s3;
+    const ch=buf.getChannelData(0);
+    let peak=0,clip=0;
+    for(let i=0;i<ch.length;i++){const a=Math.abs(ch[i]);if(a>peak)peak=a;if(a>=1)clip++}
+    const thr=peak*.0316;let ring=0;
+    for(let i=ch.length-1;i>=0;i--){if(Math.abs(ch[i])>thr){ring=i;break}}
+    // brightness: log-spaced DFT centroid just past the transient
+    const N=4096,o=Math.min(Math.round(44100*.03),ch.length-N-1);let numr=0,den=0;
+    for(let b=0;b<40;b++){
+      const f=120*Math.pow(2,b*(Math.log2(14000/120)/39)),w=2*Math.PI*f/44100;
+      let re=0,im=0;
+      for(let i=0;i<N;i++){const s=ch[o+i]*(.5-.5*Math.cos(2*Math.PI*i/N));re+=s*Math.cos(w*i);im+=s*Math.sin(w*i)}
+      const mag=Math.hypot(re,im);numr+=f*mag;den+=mag;
+    }
+    rows.push(`${name.padEnd(7)} ${(20*Math.log10(peak)).toFixed(1).padStart(6)} dBFS   ring ${String(Math.round(ring/44.1)).padStart(4)} ms   bright ${String(den?Math.round(numr/den):0).padStart(5)} Hz${clip?'   ⚠ CLIPPING':''}`);
+  }
+  $('meter').innerHTML='<b>peak · ring to −30dB · spectral centroid</b><br><pre style="margin-top:8px">'+rows.join('\n')+'</pre>';
+}
+$('measure').onclick=measure;
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('out').textContent);$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy',1200)}catch(e){$('copy').textContent='Select it manually'}};
+$('reset').onclick=()=>{
+  const s=JSON.parse(JSON.stringify(SHIPPED));
+  Object.assign(SFX_MATERIAL,s.m);
+  Object.keys(SFX_CUES).forEach(k=>delete SFX_CUES[k]);
+  Object.assign(SFX_CUES,s.c);
+  refreshers.length=0;buildMaterial();buildCues();emit();
+};
+$('theme').onclick=()=>{
+  const dark=document.documentElement.dataset.theme==='dark';
+  document.documentElement.dataset.theme=dark?'light':'dark';
+  $('theme').textContent=dark?'Dark':'Light';
+};
+buildMaterial();buildCues();emit();
+</script>
+</body>
+</html>

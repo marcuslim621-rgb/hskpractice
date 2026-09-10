@@ -41,35 +41,44 @@ function sfxTone(freq,at,dur,gain,type){
   osc.connect(g).connect(sfxMaster);
   osc.start(t);osc.stop(t+dur+.02);
 }
+/* Marble rather than wood. Three things separate them, and all three matter:
+   stone rings far higher; its modes are inharmonic (the 1 : 2.76 : 5.40 of a
+   struck free bar, which is why a tapped stone reads as a "tock" and not as a
+   note); and it barely damps, so it holds its pitch and rings on, where wood
+   thuds and bends flat as it dies. Sines, not triangles — the hardness lives in
+   the contact tick, and triangle harmonics on top of it just muddy the ring. */
+const SFX_STONE_MODES=[[1,.40,1],[2.76,.36,.70],[5.40,.22,.46]];
 function sfxClack(freq,at,dur,gain){
   const ctx=sfxCtx,t=ctx.currentTime+at;
-  const src=ctx.createBufferSource(),bp=ctx.createBiquadFilter(),ng=ctx.createGain();
+  /* the contact itself: very short and very bright, highpassed rather than
+     bandpassed so nothing warm survives it */
+  const src=ctx.createBufferSource(),hp=ctx.createBiquadFilter(),ng=ctx.createGain();
   src.buffer=sfxNoise;
-  bp.type='bandpass';bp.frequency.setValueAtTime(freq*2.1,t);bp.Q.value=1.1;
-  ng.gain.setValueAtTime(gain,t);
-  ng.gain.exponentialRampToValueAtTime(.0001,t+.032);
-  src.connect(bp).connect(ng).connect(sfxMaster);
-  src.start(t);src.stop(t+.05);
-  /* two partials a rough minor-tenth apart read as wood rather than as a pitch */
-  [[1,.55],[2.42,.24]].forEach(([mult,amp])=>{
+  hp.type='highpass';hp.frequency.setValueAtTime(2800,t);
+  ng.gain.setValueAtTime(gain*.5,t);
+  ng.gain.exponentialRampToValueAtTime(.0001,t+.010);
+  src.connect(hp).connect(ng).connect(sfxMaster);
+  src.start(t);src.stop(t+.03);
+  SFX_STONE_MODES.forEach(([mult,amp,len])=>{
     const osc=ctx.createOscillator(),g=ctx.createGain();
-    osc.type='triangle';
+    osc.type='sine';
     osc.frequency.setValueAtTime(freq*mult,t);
-    osc.frequency.exponentialRampToValueAtTime(freq*mult*.86,t+dur);
     g.gain.setValueAtTime(.0001,t);
-    g.gain.exponentialRampToValueAtTime(gain*amp,t+.005);
-    g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    g.gain.exponentialRampToValueAtTime(gain*amp,t+.002);
+    g.gain.exponentialRampToValueAtTime(.0001,t+dur*len);
     osc.connect(g).connect(sfxMaster);
-    osc.start(t);osc.stop(t+dur+.02);
+    osc.start(t);osc.stop(t+dur*len+.02);
   });
 }
 function sfx(name){
   if(!sfxReady())return;
   switch(name){
-    case 'place': sfxClack(760,0,.10,.5);break;                       /* tile into a slot */
-    case 'undo':  sfxClack(500,0,.08,.28);break;                      /* taken back */
-    case 'lay':   sfxClack(620,0,.13,.42);sfxClack(560,.06,.12,.3);break; /* down into the meld */
-    case 'deal':  for(let i=0;i<5;i++)sfxClack(600+Math.random()*260,i*.045,.07,.2);break;
+    /* stone rings high, so these gains sit lower than the wooden ones did —
+       equal-loudness makes 1.5kHz read far hotter than 700Hz at the same level */
+    case 'place': sfxClack(1660,0,.28,.30);break;                     /* tile into a slot */
+    case 'undo':  sfxClack(1420,0,.22,.18);break;                     /* taken back: same stone, lifted not struck */
+    case 'lay':   sfxClack(1460,0,.32,.27);sfxClack(1290,.055,.26,.18);break; /* down into the meld */
+    case 'deal':  for(let i=0;i<5;i++)sfxClack(1380+Math.random()*560,i*.045,.15,.13);break;
     case 'win':   [0,1,2,3].forEach((n,i)=>sfxTone(SFX_PENT[n],i*.065,.34-i*.03,.34-i*.05));break;
     case 'wrong': sfxTone(184,0,.20,.30,'sine');sfxTone(146,.055,.24,.26,'sine');break;
     case 'skip':  sfxTone(494,0,.16,.20,'sine');sfxTone(392,.075,.22,.17,'sine');break;

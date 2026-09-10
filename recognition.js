@@ -28,7 +28,7 @@ function startTileRecognition(pool,label){
   const kinds=shuffle(chosen.map((_,i)=>i%2?'english':'pinyin'));
   const rack=[];
   chosen.forEach((w,wi)=>[...w[0]].forEach((ch,ci)=>rack.push({id:wi+'-'+ci,ch})));
-  tileRound={pool,label,hand:[...chosen],rack:shuffle(rack),staged:[],reject:null,skipped:false,
+  tileRound={pool,label,hand:[...chosen],rack:shuffle(rack),staged:[],reject:null,skipped:false,chimed:false,
     questions:shuffle([...chosen]).map((w,i)=>({w,kind:kinds[i]})),
     i:0,results:[],matched:[],missed:false,answered:false,saved:false};
   if(!$('scr-recognition')){const screen=document.createElement('section');screen.id='scr-recognition';screen.className='screen';document.querySelector('.app').append(screen);}
@@ -92,7 +92,7 @@ function renderTileRecognition(phase='question'){
     });
   };
   screen.querySelectorAll('[data-staged]').forEach(button=>{
-    button.onclick=()=>{if(r!==tileRound||r.answered)return;r.staged.splice(Number(button.dataset.staged),1);r.reject=null;renderTileRecognition('stage');};
+    button.onclick=()=>{if(r!==tileRound||r.answered)return;r.staged.splice(Number(button.dataset.staged),1);r.reject=null;sfx('undo');renderTileRecognition('stage');};
   });
   screen.querySelectorAll('[data-rack-index]').forEach(button=>{
     /* a tap flies from the tile's place in the rack; a drop flies from where it
@@ -100,15 +100,17 @@ function renderTileRecognition(phase='question'){
     const stage=from=>stageTile(r,Number(button.dataset.rackIndex),screen,from||button.getBoundingClientRect());
     wireTileDrag(button,stage,screen);
   });
+  if(phase==='deal')sfx('deal');
   if(phase==='deal')screen.querySelectorAll('[data-rack-index]').forEach((tile,i)=>moveTileElement(tile,[{transform:'translateY(-28px) rotate(-8deg) scale(.92)',opacity:0},{transform:'translateY(2px) rotate(1deg)',opacity:1,offset:.8},{transform:'translateY(0) rotate(0)',opacity:1}],{duration:430,delay:i*30,easing:'cubic-bezier(.2,.75,.25,1)',fill:'backwards'}));
   if(phase==='question')moveTileElement(screen.querySelector('.rt-clue'),[{transform:'translateY(10px)',opacity:0},{transform:'translateY(0)',opacity:1}],{duration:280,easing:'cubic-bezier(.2,.75,.25,1)'});
+  if(done&&!r.chimed){r.chimed=true;sfx('finish')}
   if(done)screen.querySelectorAll('.rt-meld .rt-tile').forEach((tile,i)=>moveTileElement(tile,[{translate:'0 0'},{translate:'0 -7px',offset:.45},{translate:'0 0'}],{duration:380,delay:i*35,easing:'ease-in-out'}));
 }
 function stageTile(r,rackIndex,screen,from){
   if(r!==tileRound||r.answered)return;
   const entry=r.rack[rackIndex],question=r.questions[r.i],target=[...question.w[0]];
   if(!entry||r.staged.includes(entry)||r.staged.length>=target.length)return;
-  r.staged.push(entry);r.reject=null;
+  r.staged.push(entry);r.reject=null;sfx('place');
   const slot=r.staged.length-1,complete=r.staged.length===target.length;
   renderTileRecognition('stage');
   /* the word is only judged once the last tile has actually landed in its slot */
@@ -119,7 +121,7 @@ function stageTile(r,rackIndex,screen,from){
 function resolveStagedWord(r,screen){
   const question=r.questions[r.i];
   if(r.staged.map(e=>e.ch).join('')!==question.w[0]){
-    r.missed=true;r.reject=r.staged.map(e=>e.ch).join('');
+    r.missed=true;r.reject=r.staged.map(e=>e.ch).join('');sfx('wrong');
     /* leave the wrong word standing for a beat so it can be read, then take it back */
     renderTileRecognition('stage');
     screen.querySelectorAll('.rt-staged').forEach(t=>moveTileElement(t,[{transform:'translateX(0)'},{transform:'translateX(-3px) rotate(-2deg)'},{transform:'translateX(3px) rotate(2deg)'},{transform:'translateX(0)'}],{duration:260,easing:'ease-out'}));
@@ -132,7 +134,7 @@ function resolveStagedWord(r,screen){
      advances when the tiles actually come down. */
   r.answered=true;r.results.push({c:wordKey(question.w),ok:!r.missed});
   r.rack=r.rack.filter(e=>!r.staged.includes(e));
-  renderTileRecognition('answer');
+  renderTileRecognition('answer');sfx('win');
   /* The tile jumps, turning left to right (rotateY) on the way up, then bounces
      twice more in decreasing arcs. Translate before rotate, so the jump stays
      vertical on screen rather than being carried around by the turn. The spin
@@ -166,7 +168,7 @@ function revealStagedWord(r,screen){
   r.staged=picked;r.missed=true;r.skipped=true;r.answered=true;r.reject=null;
   r.results.push({c:wordKey(question.w),ok:false});
   r.rack=r.rack.filter(e=>!picked.includes(e));
-  renderTileRecognition('answer');
+  renderTileRecognition('answer');sfx('skip');
   screen.querySelectorAll('.rt-staged').forEach((tile,i)=>moveTileElement(tile,[
     {opacity:0,transform:'translateY(-6px) scale(.94)'},
     {opacity:1,transform:'translateY(0) scale(1)'}
@@ -185,7 +187,7 @@ function meldStandingWord(r,screen,after){
   });
   const meldStart=r.matched.reduce((n,w)=>n+[...w[0]].length,0);
   r.matched.push(r.questions[r.i].w);r.staged=[];
-  after();
+  sfx('lay');after();
   animateTilesToMeld(sources,meldStart);
 }
 function wireTileDrag(button,submit,screen){
